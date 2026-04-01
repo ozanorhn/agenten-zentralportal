@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ToastService } from '../../services/toast.service';
 
 interface AgentRow {
   id: string;
@@ -20,6 +21,8 @@ interface AgentRow {
   styleUrl: './management.scss',
 })
 export class Management {
+  private readonly toast = inject(ToastService);
+
   agents: AgentRow[] = [
     {
       id: 'nexus-01',
@@ -66,6 +69,18 @@ export class Management {
       lastActivity: 'Gerade eben',
     },
   ];
+
+  editAgent(agent: AgentRow): void {
+    this.toast.show(`Agent "${agent.name}" wird bearbeitet…`, 'info');
+  }
+
+  duplicateAgent(agent: AgentRow): void {
+    this.toast.show(`Agent "${agent.name}" wurde dupliziert.`, 'success');
+  }
+
+  deleteAgent(agent: AgentRow): void {
+    this.toast.show(`Agent "${agent.name}" wurde gelöscht.`, 'error');
+  }
 
   getStatusClasses(status: string): string {
     switch (status) {

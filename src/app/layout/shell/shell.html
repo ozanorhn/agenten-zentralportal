@@ -35,9 +35,27 @@
           <span class="material-symbols-outlined text-on-surface-variant">dark_mode</span>
         }
       </button>
-      <button class="hover:bg-surface-container-high transition-all duration-300 p-2 rounded-full active:scale-95">
-        <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
-      </button>
+
+      <!-- Notification Bell -->
+      <div class="relative">
+        <button
+          (click)="toggleNotifications()"
+          class="relative hover:bg-surface-container-high transition-all duration-300 p-2 rounded-full active:scale-95"
+        >
+          <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+          @if (notifService.unreadCount() > 0) {
+            <span class="absolute top-1 right-1 w-4 h-4 bg-[#0070FF] rounded-full text-[9px] font-black text-white
+                         flex items-center justify-center shadow-[0_0_6px_rgba(0,112,255,0.8)]">
+              {{ notifService.unreadCount() > 9 ? '9+' : notifService.unreadCount() }}
+            </span>
+          }
+        </button>
+        <app-notification-dropdown
+          [visible]="showNotifications()"
+          (close)="showNotifications.set(false)"
+        />
+      </div>
+
       <button class="hover:bg-surface-container-high transition-all duration-300 p-2 rounded-full active:scale-95">
         <span class="material-symbols-outlined text-on-surface-variant">settings</span>
       </button>
@@ -71,7 +89,7 @@
             {{ section.label }}
           </p>
           <nav class="space-y-1">
-            @for (item of section.items; track item.route) {
+            @for (item of section.items; track item.route + item.label) {
               <a
                 [routerLink]="item.route"
                 routerLinkActive="text-[#0070FF] border-l-4 border-[#0070FF] bg-gradient-to-r from-[#0070FF]/20 to-transparent"
@@ -117,5 +135,9 @@
       </a>
     }
   </nav>
+
+  <!-- Global Modals -->
+  <app-paywall-modal />
+  <app-booking-modal [visible]="showBooking()" (close)="showBooking.set(false)" />
 
 </div>

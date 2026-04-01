@@ -17,7 +17,7 @@ import { AGENTS_MAP } from '../../data/agents.data';
 @Component({
   selector: 'app-agent-result',
   standalone: true,
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './agent-result.html',
   styleUrl: './agent-result.scss',
 })

@@ -1,16 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
-
-interface ConversationEntry {
-  id: string;
-  agent: string;
-  icon: string;
-  category: string;
-  preview: string;
-  time: string;
-  tokens: number;
-}
+import { RunHistoryService } from '../../services/run-history.service';
 
 @Component({
   selector: 'app-conversations',
@@ -27,14 +18,14 @@ interface ConversationEntry {
           Content <span class="text-[#0070FF]">History</span>
         </h1>
         <p class="text-on-surface-variant text-xl max-w-2xl font-light leading-relaxed">
-          Alle generierten Inhalte und Workflow-Historien deiner Content-Agenten.
+          Alle generierten Inhalte und Workflow-Historien deiner Agenten.
         </p>
       </div>
 
       <!-- Conversation List -->
       <div class="space-y-4">
-        @for (entry of entries; track entry.id) {
-          <a [routerLink]="['/agents', entry.id]"
+        @for (entry of entries(); track entry.id) {
+          <a [routerLink]="['/agents', entry.agentId, 'result']"
              class="glass-panel kinetic-border rounded-xl p-6 flex items-center gap-6
                     hover:bg-surface-variant/50 transition-all duration-300 group block">
             <div class="w-12 h-12 bg-surface-container-highest rounded-2xl flex items-center justify-center
@@ -43,7 +34,7 @@ interface ConversationEntry {
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-3 mb-1">
-                <h3 class="font-headline font-bold text-on-surface">{{ entry.agent }}</h3>
+                <h3 class="font-headline font-bold text-on-surface">{{ entry.agentName }}</h3>
                 <span class="px-2 py-0.5 glass-panel kinetic-border text-[10px] font-bold tracking-widest uppercase rounded-full text-primary">
                   {{ entry.category }}
                 </span>
@@ -61,8 +52,8 @@ interface ConversationEntry {
         }
       </div>
 
-      <!-- Empty state if no entries -->
-      @if (entries.length === 0) {
+      <!-- Empty state -->
+      @if (entries().length === 0) {
         <div class="mt-16 flex flex-col items-center justify-center text-center opacity-40">
           <span class="material-symbols-outlined text-6xl text-on-surface-variant mb-4">history_edu</span>
           <p class="text-on-surface-variant text-lg font-medium">Noch keine Workflows ausgeführt</p>
@@ -74,33 +65,28 @@ interface ConversationEntry {
   `,
 })
 export class Conversations {
-  entries: ConversationEntry[] = [
-    {
-      id: 'linkedin-ghostwriter',
-      agent: 'LinkedIn-Ghostwriter',
-      icon: 'history_edu',
-      category: 'Content',
-      preview: 'Revolutionieren Sie Ihre SaaS-Skalierung mit KI-Agenten 🚀 — Die Zukunft des Vertriebs...',
-      time: 'Vor 12 Min.',
-      tokens: 2400,
-    },
-    {
-      id: 'script-savant',
-      agent: 'Script-Savant',
-      icon: 'video_chat',
-      category: 'Content',
-      preview: '5 Gründe warum KI-Agenten deinen Content-Workflow revolutionieren — Hook: Stell dir vor...',
-      time: 'Vor 1 Std.',
-      tokens: 1850,
-    },
-    {
-      id: 'linkedin-ghostwriter',
-      agent: 'LinkedIn-Ghostwriter',
-      icon: 'history_edu',
-      category: 'Content',
-      preview: 'Warum manuelle Prozesse dein Wachstum limitieren — 3 Frameworks für skalierbare...',
-      time: 'Gestern',
-      tokens: 3100,
-    },
-  ];
+  private readonly runHistory = inject(RunHistoryService);
+
+  readonly entries = computed(() =>
+    this.runHistory.runs().map(r => ({
+      id: r.id,
+      agentId: r.agentId,
+      agentName: r.agentName,
+      icon: r.agentIcon,
+      category: r.agentCategory,
+      preview: r.outputSummary,
+      time: this.formatTime(r.timestamp),
+      tokens: r.tokenCount,
+    }))
+  );
+
+  private formatTime(ts: number): string {
+    const diff = Date.now() - ts;
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'Gerade eben';
+    if (mins < 60) return `Vor ${mins} Min.`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `Vor ${hours} Std.`;
+    return 'Gestern';
+  }
 }

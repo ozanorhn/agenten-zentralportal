@@ -1,5 +1,5 @@
-import { Component, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { CreditService } from '../../services/credit.service';
 
 @Component({
   selector: 'app-analytics',
@@ -95,7 +95,7 @@ import { RouterLink } from '@angular/router';
           <div class="bg-surface-container-lowest border border-error/20 p-6 rounded-xl
                       flex flex-col md:flex-row items-center justify-between gap-6
                       hover:border-error/40 transition-all cursor-pointer"
-               (click)="showPaywall.set(true)">
+               (click)="openUpgrade()">
             <div class="flex items-center gap-4">
               <div class="w-12 h-12 bg-error/10 rounded-full flex items-center justify-center">
                 <span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">warning</span>
@@ -115,76 +115,11 @@ import { RouterLink } from '@angular/router';
 
       </div>
 
-      <!-- Paywall Modal Overlay -->
-      @if (showPaywall()) {
-        <div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div class="absolute inset-0 bg-surface/90 backdrop-blur-md" (click)="showPaywall.set(false)"></div>
-          <div class="relative w-full max-w-4xl bg-surface-container-low rounded-2xl overflow-hidden
-                      shadow-2xl border border-white/5 backdrop-blur-xl">
-            <div class="grid grid-cols-1 md:grid-cols-2">
-
-              <!-- Visual Side -->
-              <div class="relative min-h-[400px] overflow-hidden bg-gradient-to-br from-surface-container to-surface-container-lowest">
-                <div class="absolute inset-0 bg-gradient-to-br from-[#0070FF]/10 via-transparent to-secondary/10"></div>
-                <div class="absolute inset-0 canvas-bg opacity-30"></div>
-                <div class="absolute bottom-10 left-10 right-10">
-                  <div class="flex items-center gap-2 mb-4">
-                    <span class="w-3 h-3 bg-secondary rounded-full animate-pulse"></span>
-                    <span class="text-xs uppercase tracking-widest font-bold text-secondary">Enterprise Priority</span>
-                  </div>
-                  <h2 class="font-headline text-4xl font-black text-white leading-tight">
-                    Mach 40 Stunden zu 4 Stunden.
-                  </h2>
-                  <p class="text-on-surface-variant mt-4 text-sm leading-relaxed">
-                    AgentHub Enterprise skaliert deine Automatisierung über einzelne Aufgaben hinaus
-                    in echte, autonome Abteilungen.
-                  </p>
-                </div>
-              </div>
-
-              <!-- Action Side -->
-              <div class="p-10 flex flex-col justify-center">
-                <h3 class="text-xl font-bold mb-6 text-on-surface">Hol dir unsere Enterprise-Automatisierung.</h3>
-                <ul class="space-y-4 mb-10">
-                  @for (feature of enterpriseFeatures; track feature) {
-                    <li class="flex items-start gap-3">
-                      <span class="material-symbols-outlined text-[#0070FF] text-sm mt-1"
-                            style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                      <span class="text-sm text-on-surface-variant">{{ feature }}</span>
-                    </li>
-                  }
-                </ul>
-                <div class="space-y-4">
-                  <button class="w-full py-4 bg-gradient-to-r from-primary-container to-[#0070FF]
-                                 text-white font-black text-lg rounded-md hover:scale-[1.02]
-                                 active:scale-95 transition-all shadow-xl">
-                    Buche einen 15-Minuten AI-Discovery-Call
-                  </button>
-                  <button class="w-full py-3 text-on-surface-variant/50 font-medium hover:text-on-surface
-                                 transition-all text-sm uppercase tracking-widest"
-                          (click)="showPaywall.set(false)">
-                    Vielleicht später (Basic Plan behalten)
-                  </button>
-                </div>
-                <p class="mt-8 text-[10px] text-on-surface-variant/30 text-center uppercase tracking-widest">
-                  Aktuell 12/20 Enterprise-Slots für diesen Monat verfügbar
-                </p>
-              </div>
-
-            </div>
-            <button class="absolute top-6 right-6 p-2 text-on-surface-variant/50 hover:text-on-surface transition-colors"
-                    (click)="showPaywall.set(false)">
-              <span class="material-symbols-outlined">close</span>
-            </button>
-          </div>
-        </div>
-      }
-
     </div>
   `,
 })
 export class Analytics {
-  showPaywall = signal(false);
+  private readonly credit = inject(CreditService);
 
   utilization = [
     { name: 'Lead Enricher', usage: 80, active: true },
@@ -192,9 +127,7 @@ export class Analytics {
     { name: 'SEO Crawler', usage: 8, active: false },
   ];
 
-  enterpriseFeatures = [
-    'Unbegrenzte Agent-Kapazität & High-Speed Inference',
-    'Eigene Custom-Models trainiert auf deinen Firmendaten',
-    'Priority Support & Strategische Implementierung',
-  ];
+  openUpgrade(): void {
+    this.credit.useCredit();
+  }
 }
