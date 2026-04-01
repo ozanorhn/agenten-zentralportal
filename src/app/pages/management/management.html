@@ -1,0 +1,149 @@
+<div class="px-8 py-10 pb-24 md:pb-10">
+
+  <!-- Hero -->
+  <div class="mb-12 max-w-4xl">
+    <span class="text-secondary font-headline font-bold tracking-[0.2em] uppercase text-xs mb-4 block">
+      Data
+    </span>
+    <h1 class="text-5xl md:text-7xl font-black font-headline tracking-tighter text-on-surface mb-6 leading-none">
+      Agent <span class="text-[#0070FF]">Management</span>
+    </h1>
+    <p class="text-on-surface-variant text-xl max-w-2xl font-light leading-relaxed">
+      Verwalte, konfiguriere und skaliere deine autonomen Einheiten in Echtzeit.
+    </p>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+    <div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10">
+      <span class="text-[10px] text-on-surface-variant/60 uppercase tracking-widest font-bold">Aktiv</span>
+      <div class="flex items-baseline gap-2 mt-4">
+        <span class="text-3xl font-headline text-[#0070FF]">24</span>
+        <span class="text-on-surface-variant text-xs">Einheiten</span>
+      </div>
+    </div>
+    <div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10">
+      <span class="text-[10px] text-on-surface-variant/60 uppercase tracking-widest font-bold">Durchsatz</span>
+      <div class="flex items-baseline gap-2 mt-4">
+        <span class="text-3xl font-headline text-on-surface">1.2M</span>
+        <span class="text-on-surface-variant text-xs">Tokens/h</span>
+      </div>
+    </div>
+    <div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10">
+      <span class="text-[10px] text-on-surface-variant/60 uppercase tracking-widest font-bold">Inaktiv</span>
+      <div class="flex items-baseline gap-2 mt-4">
+        <span class="text-3xl font-headline text-on-surface">3</span>
+        <span class="text-on-surface-variant text-xs">Standby</span>
+      </div>
+    </div>
+    <div class="bg-surface-container-low p-6 rounded-xl border border-[#0070FF]/20">
+      <span class="text-[10px] text-[#0070FF] uppercase tracking-widest font-bold">Status</span>
+      <div class="flex items-center gap-2 mt-4">
+        <span class="w-2 h-2 rounded-full bg-[#0070FF] animate-pulse"></span>
+        <span class="text-xl font-headline text-on-surface">Optimal</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="relative mb-6 max-w-sm">
+    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/50 text-xl">search</span>
+    <input
+      type="text"
+      placeholder="Agent suchen..."
+      class="w-full bg-surface-container-highest border-0 rounded-xl pl-10 pr-4 py-3 text-sm text-on-surface
+             focus:ring-1 focus:ring-[#0070FF] placeholder:text-on-surface-variant/30 transition-all"
+    />
+  </div>
+
+  <!-- Agent Table -->
+  <div class="bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/10">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="bg-surface-container-highest/30">
+            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Agent Name / ID</th>
+            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest hidden md:table-cell">Modell & Kern</th>
+            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Status</th>
+            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest hidden lg:table-cell">Letzte Aktivität</th>
+            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest text-right">Aktionen</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (agent of agents; track agent.id; let last = $last) {
+            <tr class="group hover:bg-surface-container-highest/20 transition-colors"
+                [class.border-b]="!last"
+                [class.border-surface-container-highest]="!last">
+              <td class="px-6 py-5">
+                <div class="flex items-center gap-4">
+                  <div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined" [class]="agent.iconColor">{{ agent.icon }}</span>
+                  </div>
+                  <div>
+                    <a [routerLink]="['/agents', agent.id]"
+                       class="text-on-surface font-semibold hover:text-[#0070FF] transition-colors text-sm">
+                      {{ agent.name }}
+                    </a>
+                    <div class="text-on-surface-variant/50 text-xs">ID: {{ agent.agentId }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-5 hidden md:table-cell">
+                <div class="text-on-surface text-sm">{{ agent.model }}</div>
+                <div class="text-on-surface-variant/50 text-xs">{{ agent.core }}</div>
+              </td>
+              <td class="px-6 py-5">
+                <span class="px-3 py-1 rounded-full text-xs font-bold" [class]="getStatusClasses(agent.status)">
+                  {{ getStatusLabel(agent.status) }}
+                </span>
+              </td>
+              <td class="px-6 py-5 text-on-surface-variant/60 text-sm hidden lg:table-cell">{{ agent.lastActivity }}</td>
+              <td class="px-6 py-5 text-right">
+                <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button class="p-2 hover:bg-surface-container-highest rounded-lg transition-colors text-on-surface-variant hover:text-[#0070FF]">
+                    <span class="material-symbols-outlined text-xl">edit</span>
+                  </button>
+                  <button class="p-2 hover:bg-surface-container-highest rounded-lg transition-colors text-on-surface-variant hover:text-[#0070FF]">
+                    <span class="material-symbols-outlined text-xl">content_copy</span>
+                  </button>
+                  <button class="p-2 hover:bg-surface-container-highest rounded-lg transition-colors text-on-surface-variant hover:text-error">
+                    <span class="material-symbols-outlined text-xl">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="px-6 py-4 bg-surface-container-low flex justify-between items-center border-t border-surface-container-highest/50">
+      <span class="text-on-surface-variant/50 text-xs">Zeige 4 von 27 Agenten</span>
+      <div class="flex gap-2">
+        <button class="p-2 rounded-lg bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-colors">
+          <span class="material-symbols-outlined text-sm">chevron_left</span>
+        </button>
+        <button class="px-4 py-2 rounded-lg bg-[#0070FF] text-white text-xs font-bold">1</button>
+        <button class="px-4 py-2 rounded-lg bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-colors text-xs">2</button>
+        <button class="px-4 py-2 rounded-lg bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-colors text-xs">3</button>
+        <button class="p-2 rounded-lg bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-colors">
+          <span class="material-symbols-outlined text-sm">chevron_right</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Info -->
+  <div class="mt-10 p-6 glass-panel kinetic-border rounded-xl flex items-center gap-6">
+    <span class="material-symbols-outlined text-[#0070FF] text-3xl">info</span>
+    <div>
+      <h4 class="text-on-surface font-bold text-sm">System Integrität</h4>
+      <p class="text-on-surface-variant/60 text-xs mt-1">
+        Alle Agenten laufen auf dedizierten Clustern. Latenz im Durchschnitt: 42ms.
+        Nächstes geplantes Wartungsfenster: Sonntag, 03:00 UTC.
+      </p>
+    </div>
+  </div>
+
+</div>

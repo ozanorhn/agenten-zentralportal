@@ -1,0 +1,418 @@
+<div class="min-h-screen bg-surface text-on-surface font-body">
+
+  <!-- Top bar -->
+  <div class="sticky top-[56px] z-30 bg-surface-container-low/80 backdrop-blur-xl border-b border-outline-variant/20
+              flex items-center justify-between px-8 py-4">
+    <div class="flex items-center gap-4">
+      <button (click)="goBack()"
+              class="flex items-center gap-2 text-sm text-on-surface-variant hover:text-on-surface transition-colors">
+        <span class="material-symbols-outlined text-sm">arrow_back</span>
+        Zurück
+      </button>
+      <div class="w-px h-4 bg-outline-variant/30"></div>
+      @if (agentMeta) {
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-[#0070FF]/20 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[#0070FF] text-sm"
+                  style="font-variation-settings:'FILL' 1;">{{ agentMeta.icon }}</span>
+          </div>
+          <span class="text-sm font-bold text-on-surface">{{ agentMeta.name }}</span>
+          <span class="px-2 py-0.5 text-[10px] font-black bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30 uppercase tracking-widest">
+            Fertig
+          </span>
+        </div>
+      }
+    </div>
+
+    <div class="flex items-center gap-3">
+      @if (run()) {
+        <span class="text-[10px] text-outline uppercase tracking-widest hidden sm:block">
+          {{ run()!.tokenCount.toLocaleString() }} Tokens · {{ run()!.agentCategory }}
+        </span>
+      }
+      <button (click)="copyOutput()"
+              class="flex items-center gap-2 px-4 py-2 glass-panel border border-outline-variant/30 rounded-xl
+                     text-sm font-semibold text-on-surface hover:bg-surface-container-high transition-all group">
+        <span class="material-symbols-outlined text-base group-hover:rotate-12 transition-transform">content_copy</span>
+        Kopieren
+      </button>
+      <button (click)="downloadOutput()"
+              class="flex items-center gap-2 px-4 py-2 bg-[#0070FF] hover:bg-blue-600 text-white rounded-xl
+                     text-sm font-semibold transition-all hover:-translate-y-0.5 shadow-[0_0_16px_rgba(0,112,255,0.3)]">
+        <span class="material-symbols-outlined text-base">download</span>
+        Download
+      </button>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="max-w-4xl mx-auto px-8 py-12">
+
+    @if (output()) {
+
+      <!-- ─── EMAIL OUTPUT ─────────────────────────────────────────── -->
+      @if (emailOutput(); as email) {
+        <div class="space-y-6">
+          <div class="flex items-center gap-3 mb-8">
+            <span class="material-symbols-outlined text-[#0070FF]" style="font-variation-settings:'FILL' 1;">alternate_email</span>
+            <h1 class="text-2xl font-headline font-black text-on-surface tracking-tight">Generierte E-Mail</h1>
+          </div>
+
+          <div class="glass-panel border border-outline-variant/20 rounded-2xl overflow-hidden">
+            <!-- Email header -->
+            <div class="bg-surface-container-high/50 px-8 py-5 border-b border-outline-variant/20 space-y-3">
+              <div class="flex items-center gap-3">
+                <span class="text-[10px] uppercase tracking-widest text-outline font-bold w-16">An:</span>
+                <span class="text-sm text-on-surface-variant">[Empfänger-E-Mail]</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-[10px] uppercase tracking-widest text-outline font-bold w-16">Betreff:</span>
+                <span class="text-sm font-semibold text-on-surface">{{ email.subject }}</span>
+              </div>
+            </div>
+            <!-- Email body -->
+            <div class="px-8 py-8 space-y-5 text-on-surface-variant leading-relaxed">
+              <p class="text-on-surface font-semibold">{{ email.greeting }}</p>
+              @for (para of email.body; track $index) {
+                <p>{{ para }}</p>
+              }
+              <p class="text-on-surface font-semibold mt-6 pt-6 border-t border-outline-variant/20">{{ email.cta }}</p>
+              <p class="text-on-surface-variant/60 text-sm mt-8 pt-4 border-t border-outline-variant/10">
+                Mit freundlichen Grüßen<br>
+                <span class="text-on-surface font-semibold">[Dein Name]</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 p-4 bg-[#0070FF]/10 border border-[#0070FF]/20 rounded-xl">
+            <span class="material-symbols-outlined text-[#0070FF]" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+            <p class="text-sm text-on-surface-variant">
+              <span class="text-[#0070FF] font-semibold">Tipp:</span>
+              Personalisiere [Vorname] und [Empfänger-E-Mail] vor dem Versand. A/B-teste den Betreff mit 2 Varianten für optimale Open-Rates.
+            </p>
+          </div>
+        </div>
+      }
+
+      <!-- ─── LINKEDIN POST OUTPUT ─────────────────────────────────── -->
+      @if (linkedInOutput(); as post) {
+        <div class="space-y-6">
+          <div class="flex items-center gap-3 mb-8">
+            <span class="material-symbols-outlined text-[#0070FF]" style="font-variation-settings:'FILL' 1;">history_edu</span>
+            <h1 class="text-2xl font-headline font-black text-on-surface tracking-tight">LinkedIn-Post</h1>
+          </div>
+
+          <!-- Engagement stats -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            @for (stat of [
+              {label: 'Geschätzte Reichweite', value: post.estimatedReach, icon: 'visibility'},
+              {label: 'Engagement-Rate', value: post.estimatedEngagement, icon: 'bar_chart'},
+              {label: 'Hashtags', value: post.hashtags.length + '', icon: 'tag'},
+              {label: 'Lesezeit', value: '~45 Sek.', icon: 'schedule'}
+            ]; track stat.label) {
+              <div class="glass-panel border border-outline-variant/20 rounded-xl p-4">
+                <span class="material-symbols-outlined text-[#0070FF] text-lg block mb-1"
+                      style="font-variation-settings:'FILL' 1;">{{ stat.icon }}</span>
+                <p class="text-xl font-black text-on-surface font-headline">{{ stat.value }}</p>
+                <p class="text-[10px] uppercase tracking-widest text-outline mt-0.5">{{ stat.label }}</p>
+              </div>
+            }
+          </div>
+
+          <!-- Post card (LinkedIn-style) -->
+          <div class="glass-panel border border-outline-variant/20 rounded-2xl p-8">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-12 h-12 rounded-full bg-[#0070FF]/20 flex items-center justify-center">
+                <span class="material-symbols-outlined text-[#0070FF]" style="font-variation-settings:'FILL' 1;">account_circle</span>
+              </div>
+              <div>
+                <p class="text-sm font-bold text-on-surface">[Dein Name]</p>
+                <p class="text-xs text-on-surface-variant">Deine Position · Gerade eben</p>
+              </div>
+            </div>
+
+            <h2 class="text-xl font-headline font-black text-on-surface mb-4 leading-tight">{{ post.headline }}</h2>
+            <div class="space-y-4 text-on-surface-variant leading-relaxed">
+              @for (para of post.body; track $index) {
+                <p>{{ para }}</p>
+              }
+            </div>
+            <p class="mt-6 pt-4 border-t border-outline-variant/20 text-on-surface font-semibold">{{ post.cta }}</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              @for (tag of post.hashtags; track tag) {
+                <span class="text-sm text-[#0070FF] hover:underline cursor-pointer">{{ tag }}</span>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ─── VIDEO SCRIPT OUTPUT ──────────────────────────────────── -->
+      @if (videoOutput(); as script) {
+        <div class="space-y-6">
+          <div class="flex items-center gap-3 mb-8">
+            <span class="material-symbols-outlined text-[#0070FF]" style="font-variation-settings:'FILL' 1;">video_chat</span>
+            <h1 class="text-2xl font-headline font-black text-on-surface tracking-tight">Video-Skript</h1>
+          </div>
+
+          <div class="flex gap-4 mb-2">
+            <div class="glass-panel border border-outline-variant/20 rounded-xl px-4 py-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-[#0070FF] text-base" style="font-variation-settings:'FILL' 1;">schedule</span>
+              <span class="text-sm font-semibold text-on-surface">{{ script.estimatedDuration }}</span>
+            </div>
+            <div class="glass-panel border border-outline-variant/20 rounded-xl px-4 py-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-[#0070FF] text-base" style="font-variation-settings:'FILL' 1;">tag</span>
+              <span class="text-sm font-semibold text-on-surface">{{ script.hashtags.join(' ') }}</span>
+            </div>
+          </div>
+
+          <!-- Title + Hook -->
+          <div class="glass-panel border border-outline-variant/20 rounded-2xl p-8">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="px-2 py-1 text-[10px] font-black bg-[#0070FF]/20 text-[#0070FF] rounded-full uppercase tracking-widest">Titel</span>
+            </div>
+            <h2 class="text-xl font-headline font-black text-on-surface mb-6">{{ script.title }}</h2>
+            <div class="bg-secondary/10 border border-secondary/20 rounded-xl p-5">
+              <p class="text-[10px] uppercase tracking-widest text-secondary font-bold mb-2">⚡ Opening Hook (0–3 Sek.)</p>
+              <p class="text-on-surface leading-relaxed font-semibold">{{ script.hook }}</p>
+            </div>
+          </div>
+
+          <!-- Sections -->
+          @for (section of script.sections; track $index) {
+            <div class="glass-panel border border-outline-variant/20 rounded-2xl p-8">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-base font-headline font-black text-on-surface">{{ section.heading }}</h3>
+                <span class="text-[10px] uppercase tracking-widest text-outline">Abschnitt {{ $index + 1 }}</span>
+              </div>
+              <p class="text-on-surface-variant leading-relaxed mb-5">{{ section.narration }}</p>
+              <div class="bg-surface-container-high rounded-xl p-4 flex items-start gap-3">
+                <span class="material-symbols-outlined text-outline text-base mt-0.5">videocam</span>
+                <p class="text-xs text-on-surface-variant/70 italic">{{ section.visualNote }}</p>
+              </div>
+            </div>
+          }
+
+          <!-- CTA -->
+          <div class="glass-panel border border-secondary/30 rounded-2xl p-8 bg-secondary/5">
+            <p class="text-[10px] uppercase tracking-widest text-secondary font-bold mb-3">📣 Call-to-Action</p>
+            <p class="text-on-surface leading-relaxed font-semibold">{{ script.cta }}</p>
+          </div>
+        </div>
+      }
+
+      <!-- ─── LEAD TABLE OUTPUT ─────────────────────────────────────── -->
+      @if (leadOutput(); as leads) {
+        <div class="space-y-6">
+          <div class="flex items-center gap-3 mb-8">
+            <span class="material-symbols-outlined text-[#0070FF]" style="font-variation-settings:'FILL' 1;">biotech</span>
+            <h1 class="text-2xl font-headline font-black text-on-surface tracking-tight">Lead-Recherche Ergebnisse</h1>
+          </div>
+
+          <!-- Summary stats -->
+          <div class="grid grid-cols-3 gap-4">
+            <div class="glass-panel border border-outline-variant/20 rounded-xl p-5 text-center">
+              <p class="text-3xl font-headline font-black text-on-surface">{{ leads.totalFound }}</p>
+              <p class="text-[10px] uppercase tracking-widest text-outline mt-1">Leads Gefunden</p>
+            </div>
+            <div class="glass-panel border border-emerald-500/30 rounded-xl p-5 text-center bg-emerald-500/5">
+              <p class="text-3xl font-headline font-black text-emerald-400">{{ leads.highScoreCount }}</p>
+              <p class="text-[10px] uppercase tracking-widest text-outline mt-1">Hot Leads</p>
+            </div>
+            <div class="glass-panel border border-outline-variant/20 rounded-xl p-5 text-center">
+              <p class="text-3xl font-headline font-black text-on-surface">{{ leads.leads.length }}</p>
+              <p class="text-[10px] uppercase tracking-widest text-outline mt-1">Top Leads (Preview)</p>
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div class="glass-panel border border-outline-variant/20 rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="border-b border-outline-variant/20 bg-surface-container-high/30">
+                    <th class="text-left px-6 py-4 text-[10px] uppercase tracking-widest text-outline font-bold">Name</th>
+                    <th class="text-left px-6 py-4 text-[10px] uppercase tracking-widest text-outline font-bold">Unternehmen</th>
+                    <th class="text-center px-6 py-4 text-[10px] uppercase tracking-widest text-outline font-bold">Score</th>
+                    <th class="text-center px-6 py-4 text-[10px] uppercase tracking-widest text-outline font-bold">Status</th>
+                    <th class="text-center px-6 py-4 text-[10px] uppercase tracking-widest text-outline font-bold">Aktion</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant/10">
+                  @for (lead of leads.leads; track lead.name) {
+                    <tr class="hover:bg-surface-container-high/20 transition-colors">
+                      <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                          <div class="w-8 h-8 rounded-full bg-[#0070FF]/20 flex items-center justify-center">
+                            <span class="text-xs font-bold text-[#0070FF]">{{ lead.name.charAt(0) }}</span>
+                          </div>
+                          <span class="text-sm font-semibold text-on-surface">{{ lead.name }}</span>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 text-sm text-on-surface-variant">{{ lead.company }}</td>
+                      <td class="px-6 py-4 text-center">
+                        <span class="text-lg font-black font-headline" [class]="getScoreColor(lead.score)">
+                          {{ lead.score }}
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 text-center">
+                        <span class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border"
+                              [class]="getStatusColor(lead.status)">
+                          {{ lead.status }}
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 text-center">
+                        <a [href]="lead.linkedinUrl" target="_blank"
+                           class="p-2 hover:bg-[#0070FF]/10 rounded-lg text-[#0070FF] transition-colors inline-flex">
+                          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1;">open_in_new</span>
+                        </a>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ─── KEYWORD TABLE OUTPUT ──────────────────────────────────── -->
+      @if (keywordOutput(); as kw) {
+        <div class="space-y-6">
+          <div class="flex items-center gap-3 mb-8">
+            <span class="material-symbols-outlined text-[#0070FF]" style="font-variation-settings:'FILL' 1;">manage_search</span>
+            <h1 class="text-2xl font-headline font-black text-on-surface tracking-tight">Keyword-Analyse</h1>
+          </div>
+
+          <div class="glass-panel border border-[#0070FF]/20 bg-[#0070FF]/5 rounded-2xl p-6 flex items-center gap-4">
+            <span class="material-symbols-outlined text-[#0070FF] text-2xl" style="font-variation-settings:'FILL' 1;">emoji_events</span>
+            <div>
+              <p class="text-[10px] uppercase tracking-widest text-outline font-bold">Top-Opportunity</p>
+              <p class="text-lg font-headline font-black text-on-surface">{{ kw.topOpportunity }}</p>
+            </div>
+          </div>
+
+          <div class="glass-panel border border-outline-variant/20 rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="border-b border-outline-variant/20 bg-surface-container-high/30">
+                    <th class="text-left px-6 py-4 text-[10px] uppercase tracking-widest text-outline font-bold">Keyword</th>
+                    <th class="text-right px-6 py-4 text-[10px] uppercase tracking-widest text-outline font-bold">Volumen</th>
+                    <th class="text-center px-6 py-4 text-[10px] uppercase tracking-widest text-outline font-bold">Difficulty</th>
+                    <th class="text-center px-6 py-4 text-[10px] uppercase tracking-widest text-outline font-bold">Position</th>
+                    <th class="text-center px-6 py-4 text-[10px] uppercase tracking-widest text-outline font-bold">Chance</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant/10">
+                  @for (row of kw.keywords; track row.keyword) {
+                    <tr class="hover:bg-surface-container-high/20 transition-colors">
+                      <td class="px-6 py-4 text-sm font-semibold text-on-surface">{{ row.keyword }}</td>
+                      <td class="px-6 py-4 text-right text-sm font-bold text-[#0070FF]">{{ row.volume.toLocaleString() }}</td>
+                      <td class="px-6 py-4">
+                        <div class="flex items-center gap-2 justify-center">
+                          <div class="h-1.5 w-20 bg-surface-container-highest rounded-full overflow-hidden">
+                            <div class="h-full rounded-full transition-all"
+                                 [style.width.%]="row.difficulty"
+                                 [class]="row.difficulty < 40 ? 'bg-emerald-500' : row.difficulty < 65 ? 'bg-amber-500' : 'bg-red-500'">
+                            </div>
+                          </div>
+                          <span class="text-xs text-on-surface-variant w-6">{{ row.difficulty }}</span>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 text-center text-sm text-on-surface-variant">
+                        {{ row.currentPosition ?? '–' }}
+                      </td>
+                      <td class="px-6 py-4 text-center">
+                        <span class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border"
+                              [class]="getOpportunityColor(row.opportunity)">
+                          {{ row.opportunity }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ─── SYNC REPORT OUTPUT ────────────────────────────────────── -->
+      @if (syncOutput(); as sync) {
+        <div class="space-y-6">
+          <div class="flex items-center gap-3 mb-8">
+            <span class="material-symbols-outlined text-[#0070FF]" style="font-variation-settings:'FILL' 1;">schema</span>
+            <h1 class="text-2xl font-headline font-black text-on-surface tracking-tight">Sync-Report</h1>
+          </div>
+
+          <!-- Stats grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
+            @for (stat of [
+              {label: 'Gesamt', value: sync.totalRecords, color: 'text-on-surface'},
+              {label: 'Synchronisiert', value: sync.synced, color: 'text-emerald-400'},
+              {label: 'Duplikate', value: sync.duplicatesRemoved, color: 'text-amber-400'},
+              {label: 'Angereichert', value: sync.enriched, color: 'text-[#0070FF]'},
+              {label: 'Fehler', value: sync.errors, color: 'text-red-400'}
+            ]; track stat.label) {
+              <div class="glass-panel border border-outline-variant/20 rounded-xl p-4 text-center">
+                <p class="text-2xl font-headline font-black" [class]="stat.color">{{ stat.value.toLocaleString() }}</p>
+                <p class="text-[10px] uppercase tracking-widest text-outline mt-1">{{ stat.label }}</p>
+              </div>
+            }
+          </div>
+
+          <!-- Progress bar -->
+          <div class="glass-panel border border-outline-variant/20 rounded-xl p-5">
+            <div class="flex justify-between text-xs font-semibold mb-2">
+              <span class="text-on-surface-variant">Synchronisierungsfortschritt</span>
+              <span class="text-emerald-400">{{ ((sync.synced / sync.totalRecords) * 100).toFixed(1) }}%</span>
+            </div>
+            <div class="h-2 bg-surface-container-highest rounded-full overflow-hidden">
+              <div class="h-full bg-emerald-500 rounded-full transition-all duration-1000"
+                   [style.width.%]="(sync.synced / sync.totalRecords) * 100">
+              </div>
+            </div>
+          </div>
+
+          <!-- Sync items -->
+          <div class="glass-panel border border-outline-variant/20 rounded-2xl overflow-hidden">
+            <div class="divide-y divide-outline-variant/10">
+              @for (item of sync.syncItems; track item.source) {
+                <div class="flex items-center justify-between px-6 py-5 hover:bg-surface-container-high/20 transition-colors">
+                  <div class="flex items-center gap-4">
+                    <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;"
+                          [class]="getSyncStatusColor(item.status)">
+                      {{ getSyncStatusIcon(item.status) }}
+                    </span>
+                    <div>
+                      <p class="text-sm font-semibold text-on-surface">{{ item.source }} → {{ item.target }}</p>
+                      <p class="text-xs text-on-surface-variant mt-0.5">{{ item.recordCount.toLocaleString() }} Records · {{ item.lastSync }}</p>
+                    </div>
+                  </div>
+                  <span class="text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full border"
+                        [class]="item.status === 'success' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
+                                 item.status === 'error' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
+                                 'bg-amber-500/20 text-amber-400 border-amber-500/30'">
+                    {{ item.status === 'success' ? 'Erfolg' : item.status === 'error' ? 'Fehler' : 'Läuft' }}
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+    } @else {
+      <div class="text-center py-24 text-on-surface-variant">
+        <span class="material-symbols-outlined text-4xl block mb-4 opacity-30">hourglass_empty</span>
+        <p>Kein Output gefunden. Bitte starte den Workflow erneut.</p>
+        <button (click)="goBack()"
+                class="mt-4 px-6 py-3 bg-[#0070FF] text-white rounded-xl font-semibold hover:bg-blue-600 transition-colors">
+          Zurück zum Agenten
+        </button>
+      </div>
+    }
+
+  </div>
+</div>

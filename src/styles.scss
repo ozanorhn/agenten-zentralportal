@@ -1,1 +1,219 @@
-/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+// ─── CSS Custom Properties ────────────────────────────────────────────────────
+// Light Mode (Default)
+:root {
+  --color-surface:                    240 242 248;
+  --color-surface-dim:                232 234 242;
+  --color-surface-container-lowest:   255 255 255;
+  --color-surface-container-low:      232 234 242;
+  --color-surface-container:          224 226 236;
+  --color-surface-container-high:     216 218 230;
+  --color-surface-container-highest:  204 208 220;
+  --color-surface-variant:            221 224 237;
+  --color-surface-bright:             245 246 251;
+  --color-surface-tint:               0 88 203;
+  --color-background:                 240 242 248;
+
+  --color-on-surface:                 26 28 34;
+  --color-on-surface-variant:         68 71 90;
+  --color-on-background:              26 28 34;
+  --color-inverse-surface:            46 48 56;
+  --color-inverse-on-surface:         240 242 248;
+
+  --color-primary:                    0 88 203;
+  --color-primary-container:          26 133 255;
+  --color-primary-fixed:              214 226 255;
+  --color-primary-fixed-dim:          172 199 255;
+  --color-on-primary:                 255 255 255;
+  --color-on-primary-container:       255 255 255;
+  --color-on-primary-fixed:           0 25 69;
+  --color-on-primary-fixed-variant:   0 66 156;
+  --color-inverse-primary:            176 198 255;
+
+  --color-secondary:                  192 57 13;
+  --color-secondary-container:        250 92 28;
+  --color-secondary-fixed:            255 219 207;
+  --color-secondary-fixed-dim:        255 181 156;
+  --color-on-secondary:               255 255 255;
+  --color-on-secondary-container:     255 255 255;
+  --color-on-secondary-fixed:         57 12 0;
+  --color-on-secondary-fixed-variant: 131 39 0;
+
+  --color-tertiary:                   88 91 106;
+  --color-tertiary-container:         221 224 239;
+  --color-tertiary-fixed:             224 226 237;
+  --color-tertiary-fixed-dim:         196 198 208;
+  --color-on-tertiary:                255 255 255;
+  --color-on-tertiary-container:      24 27 35;
+  --color-on-tertiary-fixed:          24 27 35;
+  --color-on-tertiary-fixed-variant:  68 71 79;
+
+  --color-error:                      186 26 26;
+  --color-error-container:            255 218 214;
+  --color-on-error:                   255 255 255;
+  --color-on-error-container:         65 0 2;
+
+  --color-outline:                    117 120 138;
+  --color-outline-variant:            196 198 214;
+
+  // Utility overlays (theme-aware)
+  --glass-bg:                         rgba(255, 255, 255, 0.65);
+  --glass-border:                     rgba(0, 0, 0, 0.06);
+  --kinetic-border-shadow:            inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+  --canvas-dot:                       rgba(0, 0, 0, 0.04);
+  --scrollbar-track:                  rgb(240, 242, 248);
+  --scrollbar-thumb:                  rgb(196, 198, 214);
+  --scrollbar-thumb-hover:            rgb(117, 120, 138);
+}
+
+// Dark Mode
+.dark {
+  --color-surface:                    17 19 23;
+  --color-surface-dim:                17 19 23;
+  --color-surface-container-lowest:   12 14 18;
+  --color-surface-container-low:      26 28 32;
+  --color-surface-container:          30 32 36;
+  --color-surface-container-high:     40 42 46;
+  --color-surface-container-highest:  51 53 57;
+  --color-surface-variant:            51 53 57;
+  --color-surface-bright:             55 57 62;
+  --color-surface-tint:               176 198 255;
+  --color-background:                 17 19 23;
+
+  --color-on-surface:                 226 226 232;
+  --color-on-surface-variant:         194 198 216;
+  --color-on-background:              226 226 232;
+  --color-inverse-surface:            226 226 232;
+  --color-inverse-on-surface:         47 48 53;
+
+  --color-primary:                    176 198 255;
+  --color-primary-container:          86 141 255;
+  --color-primary-fixed:              217 226 255;
+  --color-primary-fixed-dim:          176 198 255;
+  --color-on-primary:                 0 45 111;
+  --color-on-primary-container:       0 38 97;
+  --color-on-primary-fixed:           0 25 69;
+  --color-on-primary-fixed-variant:   0 66 156;
+  --color-inverse-primary:            0 88 203;
+
+  --color-secondary:                  255 181 156;
+  --color-secondary-container:        250 92 28;
+  --color-secondary-fixed:            255 219 207;
+  --color-secondary-fixed-dim:        255 181 156;
+  --color-on-secondary:               92 25 0;
+  --color-on-secondary-container:     81 21 0;
+  --color-on-secondary-fixed:         57 12 0;
+  --color-on-secondary-fixed-variant: 131 39 0;
+
+  --color-tertiary:                   196 198 208;
+  --color-tertiary-container:         142 144 154;
+  --color-tertiary-fixed:             224 226 237;
+  --color-tertiary-fixed-dim:         196 198 208;
+  --color-on-tertiary:                45 48 56;
+  --color-on-tertiary-container:      39 42 50;
+  --color-on-tertiary-fixed:          24 27 35;
+  --color-on-tertiary-fixed-variant:  68 71 79;
+
+  --color-error:                      255 180 171;
+  --color-error-container:            147 0 10;
+  --color-on-error:                   105 0 5;
+  --color-on-error-container:         255 218 214;
+
+  --color-outline:                    140 144 161;
+  --color-outline-variant:            66 70 85;
+
+  // Utility overlays
+  --glass-bg:                         rgba(51, 53, 57, 0.4);
+  --glass-border:                     rgba(140, 144, 161, 0.15);
+  --kinetic-border-shadow:            inset 0 0 0 1px rgba(140, 144, 161, 0.15);
+  --canvas-dot:                       rgba(255, 255, 255, 0.05);
+  --scrollbar-track:                  rgb(17, 19, 23);
+  --scrollbar-thumb:                  rgb(66, 70, 85);
+  --scrollbar-thumb-hover:            rgb(140, 144, 161);
+}
+
+// ─── Base ─────────────────────────────────────────────────────────────────────
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+  display: inline-block;
+  line-height: 1;
+}
+
+// ─── Utility Classes ──────────────────────────────────────────────────────────
+
+// Glass panel — semi-transparent frosted surface (theme-aware)
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+// Kinetic border — subtle inset glow instead of hard lines
+.kinetic-border {
+  box-shadow: var(--kinetic-border-shadow);
+}
+
+// Canvas background — subtle dot grid
+.canvas-bg {
+  background-image: radial-gradient(circle at 2px 2px, var(--canvas-dot) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+// Gradient glow border for special cards
+.glow-border {
+  position: relative;
+}
+
+.glow-border::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(to bottom right, rgba(176, 198, 255, 0.2), rgba(255, 181, 156, 0.1), transparent);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+// Custom scrollbar
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+// Theme transition — smooth switch on all elements
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}

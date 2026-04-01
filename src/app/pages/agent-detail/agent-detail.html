@@ -1,0 +1,257 @@
+<div class="flex h-[calc(100vh-56px)] overflow-hidden relative">
+
+  <!-- Loading Overlay -->
+  @if (isSubmitting()) {
+    <div class="absolute inset-0 z-50 flex flex-col items-center justify-center
+                bg-surface/90 backdrop-blur-xl">
+      <!-- Animated agent icon -->
+      <div class="relative mb-8">
+        <div class="w-24 h-24 rounded-3xl bg-[#0070FF]/20 flex items-center justify-center
+                    shadow-[0_0_60px_rgba(0,112,255,0.4)] animate-pulse">
+          @if (agentMeta) {
+            <span class="material-symbols-outlined text-[#0070FF] text-5xl"
+                  style="font-variation-settings:'FILL' 1;">{{ agentMeta.icon }}</span>
+          } @else {
+            <span class="material-symbols-outlined text-[#0070FF] text-5xl"
+                  style="font-variation-settings:'FILL' 1;">smart_toy</span>
+          }
+        </div>
+        <!-- Orbiting ring -->
+        <div class="absolute inset-0 rounded-3xl border-2 border-[#0070FF]/30 animate-spin"
+             style="animation-duration: 3s;"></div>
+      </div>
+
+      <h2 class="text-2xl font-headline font-black text-on-surface mb-2 tracking-tight">
+        Workflow läuft…
+      </h2>
+      <p class="text-sm text-on-surface-variant mb-8">{{ progressLabel() }}</p>
+
+      <!-- Progress bar -->
+      <div class="w-72">
+        <div class="flex justify-between text-[10px] uppercase tracking-widest text-outline font-bold mb-2">
+          <span>Fortschritt</span>
+          <span class="text-[#0070FF]">{{ progress() }}%</span>
+        </div>
+        <div class="h-2 bg-surface-container-high rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-[#0070FF] to-primary rounded-full transition-all duration-100"
+               [style.width.%]="progress()">
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Left Panel: Input Controls -->
+  <section class="w-[380px] flex-shrink-0 border-r border-outline-variant/20 bg-surface-container-low
+                  flex flex-col p-8 space-y-8 overflow-y-auto">
+    <header>
+      <a routerLink="/dashboard"
+         class="flex items-center gap-2 text-on-surface-variant/50 hover:text-on-surface text-sm mb-6 transition-colors">
+        <span class="material-symbols-outlined text-sm">arrow_back</span>
+        Zurück zum Marketplace
+      </a>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="w-2 h-2 rounded-full bg-secondary animate-pulse shadow-[0_0_8px_#ffb59c]"></span>
+        <span class="text-[10px] font-bold tracking-[0.2em] text-secondary uppercase">Agent Live</span>
+      </div>
+      @if (agentMeta) {
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 rounded-xl bg-[#0070FF]/20 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[#0070FF]"
+                  style="font-variation-settings:'FILL' 1;">{{ agentMeta.icon }}</span>
+          </div>
+          <div>
+            <h1 class="text-2xl font-headline font-black tracking-tighter text-on-surface">{{ agentMeta.name }}</h1>
+            <span class="text-[10px] uppercase tracking-widest text-outline font-bold">{{ agentMeta.category }}</span>
+          </div>
+        </div>
+        <p class="text-on-surface-variant text-sm mt-2 opacity-70">{{ agentMeta.description }}</p>
+      } @else {
+        <h1 class="text-3xl font-headline font-black tracking-tighter text-on-surface">KI-Agent</h1>
+        <p class="text-on-surface-variant text-sm mt-2 opacity-70">
+          Definiere deine Parameter und starte die Generierung.
+        </p>
+      }
+    </header>
+
+    <div class="space-y-6">
+      <!-- Primary input (label changes per agent) -->
+      <div class="space-y-2">
+        <label class="block text-[10px] font-bold tracking-widest text-outline uppercase px-1">
+          {{ agentMeta?.inputLabel ?? 'Zielgruppe' }}
+        </label>
+        <input
+          type="text"
+          [placeholder]="agentMeta?.inputPlaceholder ?? 'z.B. CTOs in deutschen SaaS Unternehmen'"
+          [value]="targetAudience()"
+          (input)="targetAudience.set($any($event.target).value)"
+          class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 text-sm text-on-surface
+                 focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]
+                 placeholder:text-on-surface-variant/30 transition-all"
+        />
+      </div>
+
+      <!-- Website URL -->
+      <div class="space-y-2">
+        <label class="block text-[10px] font-bold tracking-widest text-outline uppercase px-1">
+          Website-URL
+        </label>
+        <div class="relative">
+          <input
+            type="url"
+            placeholder="https://ihre-firma.de"
+            [value]="websiteUrl()"
+            (input)="websiteUrl.set($any($event.target).value)"
+            class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 pl-12 text-sm text-on-surface
+                   focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]
+                   placeholder:text-on-surface-variant/30 transition-all"
+          />
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">link</span>
+        </div>
+      </div>
+
+      <!-- Tone of Voice -->
+      <div class="space-y-2">
+        <label class="block text-[10px] font-bold tracking-widest text-outline uppercase px-1">
+          Tone of Voice
+        </label>
+        <select
+          [value]="toneOfVoice()"
+          (change)="toneOfVoice.set($any($event.target).value)"
+          class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 text-sm text-on-surface
+                 focus:ring-1 focus:ring-[#0070FF] transition-all appearance-none cursor-pointer">
+          @for (opt of toneOptions; track opt) {
+            <option [value]="opt">{{ opt }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Skills Matrix -->
+      <div class="space-y-4 pt-2">
+        <p class="text-[10px] font-bold tracking-widest text-outline uppercase px-1">Fähigkeiten-Matrix</p>
+        @for (skill of skills(); track skill.label) {
+          <div class="space-y-1.5">
+            <div class="flex justify-between text-xs font-bold uppercase tracking-widest text-on-surface-variant">
+              <span>{{ skill.label }}</span>
+              <span class="text-[#0070FF]">{{ skill.value }}%</span>
+            </div>
+            <div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+              <div class="h-full bg-[#0070FF] rounded-full transition-all duration-700"
+                   [style.width.%]="skill.value"></div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="pt-2">
+        <button
+          (click)="submitWorkflow()"
+          [disabled]="isSubmitting()"
+          class="w-full py-4 bg-[#0070FF] hover:bg-primary-container text-white font-black rounded-xl
+                 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group
+                 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100">
+          <span>{{ isSubmitting() ? 'Läuft…' : 'Workflow starten' }}</span>
+          <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform"
+                style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Agent Tip -->
+    <div class="mt-auto glass-panel rounded-2xl p-4 border border-outline-variant/20">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-8 h-8 rounded-lg bg-[#0070FF]/20 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[#0070FF] text-sm">smart_toy</span>
+        </div>
+        <span class="text-xs font-bold text-on-surface">Pro-Tipp vom Agenten</span>
+      </div>
+      <p class="text-xs text-on-surface-variant leading-relaxed">
+        {{ agentMeta?.tip ?? 'Füge spezifische Pain Points hinzu, um die Resonanz bei deiner Zielgruppe um bis zu 40% zu steigern.' }}
+      </p>
+    </div>
+  </section>
+
+  <!-- Right Panel: Canvas -->
+  <section class="flex-1 bg-surface-container-lowest overflow-y-auto canvas-bg relative p-12">
+    <div class="max-w-4xl mx-auto space-y-12">
+
+      <!-- Generated Content Preview Card -->
+      <div class="glass-panel border border-outline-variant/20 rounded-[2rem] p-12 shadow-2xl relative">
+        <div class="absolute top-8 right-8 px-4 py-1.5 glass-panel border border-outline-variant/30 rounded-full">
+          <span class="text-[10px] font-black tracking-widest text-primary uppercase">
+            @if (agentMeta) { {{ agentMeta.name }} Preview } @else { Preview }
+          </span>
+        </div>
+
+        <article>
+          <h2 class="text-4xl font-headline font-black tracking-tight text-on-surface mb-8">
+            @if (agentMeta?.category === 'SEO') {
+              Keyword-Analyse bereit 🔍
+            } @else if (agentMeta?.category === 'Data') {
+              Daten-Pipeline aktiv 📊
+            } @else if (agentMeta?.id === 'linkedin-ghostwriter') {
+              LinkedIn-Post generiert 🚀
+            } @else {
+              Ergebnis bereit — starte den Workflow! ✨
+            }
+          </h2>
+          <div class="space-y-6 text-on-surface-variant leading-relaxed text-lg font-light">
+            <p>
+              Die Zukunft des Vertriebs ist nicht mehr manuell. Während Ihre Konkurrenz noch händisch
+              Outreach-Listen pflegt, setzen Marktführer bereits auf autonome Intelligence-Layer.
+            </p>
+            <p class="border-l-2 border-[#0070FF] pl-6 italic">
+              "Die Effizienzsteigerung durch Agentic Workflows ist der größte Hebel im 21. Jahrhundert."
+            </p>
+            <p>
+              Konfiguriere die Parameter links und klicke auf
+              <span class="text-on-surface font-semibold">"Workflow starten"</span>
+              — der Agent verarbeitet deine Anfrage in ~3 Sekunden.
+            </p>
+          </div>
+        </article>
+
+        <!-- Edit Controls -->
+        <div class="mt-12 pt-8 border-t border-outline-variant/20 flex items-center justify-between">
+          <div class="flex gap-4">
+            <button class="p-2 hover:bg-surface-container-high rounded-lg text-on-surface-variant transition-colors">
+              <span class="material-symbols-outlined">format_bold</span>
+            </button>
+            <button class="p-2 hover:bg-surface-container-high rounded-lg text-on-surface-variant transition-colors">
+              <span class="material-symbols-outlined">format_italic</span>
+            </button>
+            <button class="p-2 hover:bg-surface-container-high rounded-lg text-on-surface-variant transition-colors">
+              <span class="material-symbols-outlined">link</span>
+            </button>
+          </div>
+          <span class="text-[10px] text-outline uppercase tracking-widest">Bereit zur Generierung</span>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="flex flex-col sm:flex-row gap-4 items-center justify-center pb-12">
+        <button
+          (click)="submitWorkflow()"
+          [disabled]="isSubmitting()"
+          class="px-10 py-4 bg-gradient-to-r from-[#0070FF] to-primary-container text-white font-black rounded-xl
+                 shadow-[0_0_20px_rgba(0,112,255,0.3)] hover:shadow-[0_0_30px_rgba(0,112,255,0.5)]
+                 hover:-translate-y-1 transition-all flex items-center gap-3 relative overflow-hidden group
+                 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0">
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">rocket_launch</span>
+          <span>{{ isSubmitting() ? 'Workflow läuft…' : 'Workflow starten' }}</span>
+          <div class="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Chart miniature -->
+    <div class="h-24 flex items-end gap-1.5 px-12 mb-8 opacity-30">
+      @for (height of chartBars; track $index) {
+        <div class="flex-1 bg-[#0070FF]/40 rounded-t hover:bg-[#0070FF]/70 transition-all cursor-pointer"
+             [style.height.%]="height"></div>
+      }
+    </div>
+  </section>
+
+</div>

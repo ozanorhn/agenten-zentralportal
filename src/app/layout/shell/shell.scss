@@ -1,0 +1,5 @@
+// Active nav link overrides — the routerLinkActive class handles most,
+// but we suppress opacity for the active link
+:host ::ng-deep a.text-primary {
+  opacity: 1 !important;
+}
