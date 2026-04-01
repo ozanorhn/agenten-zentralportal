@@ -33,6 +33,9 @@ jobs:
       - name: Build Angular app
         run: npm run build -- --configuration production --base-href "/agenten-zentralportal/"
 
+      - name: Copy index.html as 404.html
+        run: cp ./dist/ki-portal/browser/index.html ./dist/ki-portal/browser/404.html
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
