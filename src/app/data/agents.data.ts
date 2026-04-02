@@ -66,9 +66,9 @@ export const AGENTS: AgentMeta[] = [
   {
     id: 'lead-researcher',
     name: 'Lead-Researcher',
-    description: 'Durchsucht das Web und LinkedIn-Daten nach qualifizierten Leads — inklusive Scoring, Kontaktdaten und Kaufbereitschafts-Analyse.',
+    description: 'Scrapt das Web nach Neukunden-Signalen: Finanzierungsrunden, Stellenanzeigen oder Technologiewechsel in Echtzeit.',
     icon: 'biotech',
-    category: 'Data',
+    category: 'Sales',
     skills: [
       { label: 'Datenqualität', value: 94 },
       { label: 'Lead-Scoring', value: 89 },
@@ -110,6 +110,24 @@ export const AGENTS: AgentMeta[] = [
     tip: 'Richte zunächst einen Test-Sync mit 100 Records durch. So erkennst du Mapping-Fehler bevor sie sich multiplizieren.',
     inputLabel: 'Primäre Datenquelle',
     inputPlaceholder: 'z.B. HubSpot CRM',
+  },
+  {
+    id: 'firmen-finder',
+    name: 'Firmen-Finder',
+    description: 'Findet Unternehmen in deiner Zielstadt nach Branche — mit Kontaktdaten, Adresse und Website auf Knopfdruck.',
+    icon: 'location_city',
+    category: 'Sales',
+    badgeLabel: 'NEU',
+    badgeVariant: 'primary',
+    skills: [
+      { label: 'Datenpräzision', value: 96 },
+      { label: 'Branchen-Matching', value: 93 },
+      { label: 'Kontaktdaten', value: 89 },
+      { label: 'Skalierbarkeit', value: 98 },
+    ],
+    tip: 'Je spezifischer die Branche, desto gezielter die Ergebnisse. Probiere "Webagenturen" statt "IT" oder "Steuerberater" statt "Finanzen".',
+    inputLabel: 'Branche',
+    inputPlaceholder: 'z.B. Webagenturen',
   },
   {
     id: 'script-savant',

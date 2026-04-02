@@ -5,9 +5,10 @@ import { RunHistoryService } from '../../services/run-history.service';
 import { AgentOutputService } from '../../services/agent-output.service';
 import { NotificationService } from '../../services/notification.service';
 import { AGENTS_MAP } from '../../data/agents.data';
-import { AgentOutput, MarkdownOutput, RunRecord } from '../../models/interfaces';
+import { AgentOutput, CompanyListOutput, CompanyRow, MarkdownOutput, RunRecord } from '../../models/interfaces';
 
 const LEAD_RESEARCHER_WEBHOOK = 'https://n8n.eom.de/webhook/ac9a9c6c-a2f0-4389-9462-06cc82bebe8b';
+const FIRMEN_FINDER_WEBHOOK = 'https://n8n.eom.de/webhook/3ecd15d2-2606-4ca3-b44e-b4c39208a39d';
 
 @Component({
   selector: 'app-agent-detail',
@@ -32,6 +33,10 @@ export class AgentDetail {
   readonly toneOfVoice = signal('Professionell & Sachlich');
 
   readonly isLeadResearcher = this.agentId === 'lead-researcher';
+  readonly isFirmenFinder = this.agentId === 'firmen-finder';
+
+  readonly industry = signal('');
+  readonly city = signal('');
 
   readonly isSubmitting = signal(false);
   readonly progress = signal(0);
@@ -53,6 +58,15 @@ export class AgentDetail {
   ]);
 
   readonly chartBars = [40, 65, 55, 90, 75, 45, 60, 85, 30, 50, 70, 95];
+
+  private readonly PROGRESS_LABELS_FIRMEN = [
+    'Initialisiere Agent…',
+    'Verbinde mit Verzeichnis-Datenbank…',
+    'Suche Unternehmen in der Region…',
+    'Filtere nach Branche…',
+    'Extrahiere Kontaktdaten…',
+    'Firmenliste fertig ✓',
+  ];
 
   private readonly PROGRESS_LABELS_LEAD = [
     'Initialisiere Agent…',
@@ -80,6 +94,8 @@ export class AgentDetail {
 
     if (this.isLeadResearcher) {
       this.runLeadResearcherWorkflow();
+    } else if (this.isFirmenFinder) {
+      this.runFirmenFinderWorkflow();
     } else {
       this.runGenericWorkflow();
     }
@@ -177,6 +193,77 @@ export class AgentDetail {
     }
 
     return content;
+  }
+
+  private runFirmenFinderWorkflow(): void {
+    const labels = this.PROGRESS_LABELS_FIRMEN;
+    this.progressLabel.set(labels[0]);
+
+    const startTime = Date.now();
+    const minDuration = 3000;
+
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const pct = Math.min(Math.round((elapsed / minDuration) * 80), 80);
+      this.progress.set(pct);
+      if (pct >= 60) this.progressLabel.set(labels[4]);
+      else if (pct >= 40) this.progressLabel.set(labels[3]);
+      else if (pct >= 20) this.progressLabel.set(labels[2]);
+      else if (pct >= 5)  this.progressLabel.set(labels[1]);
+    }, 80);
+
+    const body = {
+      industry: this.industry(),
+      city: this.city(),
+    };
+
+    this.http.post(FIRMEN_FINDER_WEBHOOK, body, { responseType: 'text' }).subscribe({
+      next: (response: string) => {
+        clearInterval(interval);
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, minDuration - elapsed);
+
+        setTimeout(() => {
+          this.progress.set(100);
+          this.progressLabel.set(labels[5]);
+          setTimeout(() => this.completeFirmenFinder(response), 400);
+        }, remaining);
+      },
+      error: () => {
+        clearInterval(interval);
+        this.webhookError.set(true);
+        this.progress.set(100);
+        this.progressLabel.set('Fehler beim Abrufen der Daten');
+        setTimeout(() => {
+          this.isSubmitting.set(false);
+        }, 800);
+      },
+    });
+  }
+
+  private completeFirmenFinder(rawResponse: string): void {
+    let companies: CompanyRow[] = [];
+    try {
+      const parsed = JSON.parse(rawResponse);
+      // n8n may return a full array OR just the first item as a single object
+      const arr: unknown[] = Array.isArray(parsed) ? parsed : [parsed];
+      companies = arr
+        .map((item) => (item as { contactInfo?: CompanyRow })?.contactInfo)
+        .filter((c): c is CompanyRow => !!c);
+    } catch {
+      // Malformed JSON — proceed with empty list
+    }
+
+    const output: CompanyListOutput = {
+      type: 'company-list',
+      companies,
+      industry: this.industry(),
+      city: this.city(),
+    };
+
+    const summary = `${companies.length} Unternehmen gefunden in ${this.city()}`;
+    const input = { industry: this.industry(), city: this.city() };
+    this.saveAndNavigate(output, summary, input);
   }
 
   private runGenericWorkflow(): void {

@@ -53,6 +53,16 @@ export class Dashboard implements OnInit, OnDestroy {
     },
     // ── Standard agents ─────────────────────────────────────────────────
     {
+      id: 'firmen-finder',
+      name: 'Firmen-Finder',
+      description:
+        'Findet Unternehmen in deiner Zielstadt nach Branche — mit Kontaktdaten, Adresse und Website auf Knopfdruck.',
+      icon: 'location_city',
+      category: 'Sales',
+      badgeLabel: 'NEU',
+      badgeVariant: 'primary',
+    },
+    {
       id: 'cold-mail-cyborg',
       name: 'Cold-Mail-Cyborg',
       description:

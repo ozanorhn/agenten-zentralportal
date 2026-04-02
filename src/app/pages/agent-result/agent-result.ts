@@ -14,6 +14,7 @@ import {
   KeywordTableOutput,
   SyncReportOutput,
   MarkdownOutput,
+  CompanyListOutput,
 } from '../../models/interfaces';
 import { AGENTS_MAP } from '../../data/agents.data';
 
@@ -62,6 +63,9 @@ export class AgentResult {
   readonly markdownOutput = computed(() =>
     this.output()?.type === 'markdown' ? this.output() as MarkdownOutput : null
   );
+  readonly companyListOutput = computed(() =>
+    this.output()?.type === 'company-list' ? this.output() as CompanyListOutput : null
+  );
 
   readonly renderedMarkdown = computed((): SafeHtml | null => {
     const md = this.markdownOutput();
@@ -100,6 +104,7 @@ export class AgentResult {
       case 'keyword-table': return `Top-Chance: ${output.topOpportunity}`;
       case 'sync-report': return `${output.synced} von ${output.totalRecords} Records synchronisiert`;
       case 'markdown': return output.companyName ? `Sales Briefing: ${output.companyName}` : 'Sales Briefing';
+      case 'company-list': return `${output.companies.length} Unternehmen in ${output.city}`;
     }
   }
 
@@ -217,6 +222,12 @@ export class AgentResult {
         break;
       case 'markdown':
         lines.push(out.content);
+        break;
+      case 'company-list':
+        lines.push(`Branche: ${out.industry} | Stadt: ${out.city}`, '');
+        out.companies.forEach(c => {
+          lines.push(`${c.companyName} | ${c.fullAddress} | ${c.phoneNumber} | ${c.website ?? '–'}`);
+        });
         break;
     }
     return lines.join('\n');

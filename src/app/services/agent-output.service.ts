@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {
   AgentOutput,
+  CompanyListOutput,
   EmailOutput,
   LinkedInPostOutput,
   VideoScriptOutput,
@@ -32,6 +33,8 @@ export class AgentOutputService {
         return this.generateKeywordTable(audience, url);
       case 'sync-master':
         return this.generateSyncReport();
+      case 'firmen-finder':
+        return this.generateCompanyList(input.industry || 'Webagenturen', input.city || 'Hannover');
       default:
         return this.generateColdEmail(audience, url, tone);
     }
@@ -161,6 +164,18 @@ export class AgentOutputService {
       type: 'keyword-table',
       keywords,
       topOpportunity: `ki agenten ${base}`,
+    };
+  }
+
+  private generateCompanyList(industry: string, city: string): CompanyListOutput {
+    return {
+      type: 'company-list',
+      industry,
+      city,
+      companies: [
+        { companyName: 'Beispiel GmbH', street: 'Musterstraße 1', city: `30159 ${city}`, fullAddress: `Musterstraße 1, 30159 ${city}`, phoneNumber: '0511 123456', website: 'https://www.beispiel.de' },
+        { companyName: 'Demo AG', street: 'Testweg 5', city: `30169 ${city}`, fullAddress: `Testweg 5, 30169 ${city}`, phoneNumber: '0511 654321', website: null },
+      ],
     };
   }
 

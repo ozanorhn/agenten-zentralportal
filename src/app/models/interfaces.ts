@@ -7,6 +7,8 @@ export interface RunInputData {
   toneOfVoice?: string;
   topic?: string;
   keyword?: string;
+  industry?: string;
+  city?: string;
 }
 
 export interface RunRecord {
@@ -31,7 +33,8 @@ export type AgentOutput =
   | LeadTableOutput
   | KeywordTableOutput
   | SyncReportOutput
-  | MarkdownOutput;
+  | MarkdownOutput
+  | CompanyListOutput;
 
 export interface EmailOutput {
   type: 'email';
@@ -121,6 +124,22 @@ export interface MarkdownOutput {
   content: string;
   companyName?: string;
   websiteUrl?: string;
+}
+
+export interface CompanyRow {
+  companyName: string;
+  street: string;
+  city: string;
+  fullAddress: string;
+  phoneNumber: string;
+  website: string | null;
+}
+
+export interface CompanyListOutput {
+  type: 'company-list';
+  companies: CompanyRow[];
+  industry: string;
+  city: string;
 }
 
 // ─── Notifications ────────────────────────────────────────────────────────────

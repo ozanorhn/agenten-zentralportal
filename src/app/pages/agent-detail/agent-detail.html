@@ -124,6 +124,43 @@
             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">link</span>
           </div>
         </div>
+      } @else if (isFirmenFinder) {
+        <!-- Firmen-Finder: Branche + Stadt -->
+        <div class="space-y-2">
+          <label class="block text-[10px] font-bold tracking-widest text-outline uppercase px-1">
+            Branche
+          </label>
+          <div class="relative">
+            <input
+              type="text"
+              placeholder="z.B. Webagenturen"
+              [value]="industry()"
+              (input)="industry.set($any($event.target).value)"
+              class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 pl-12 text-sm text-on-surface
+                     focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]
+                     placeholder:text-on-surface-variant/30 transition-all"
+            />
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">category</span>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-[10px] font-bold tracking-widest text-outline uppercase px-1">
+            Stadt
+          </label>
+          <div class="relative">
+            <input
+              type="text"
+              placeholder="z.B. Hannover"
+              [value]="city()"
+              (input)="city.set($any($event.target).value)"
+              class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 pl-12 text-sm text-on-surface
+                     focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]
+                     placeholder:text-on-surface-variant/30 transition-all"
+            />
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">location_on</span>
+          </div>
+        </div>
       } @else {
         <!-- Generic agents: Zielgruppe + Website + Tone of Voice -->
         <div class="space-y-2">
@@ -238,6 +275,10 @@
               Keyword-Analyse bereit 🔍
             } @else if (agentMeta.category === 'Data') {
               Daten-Pipeline aktiv 📊
+            } @else if (agentMeta.id === 'lead-researcher') {
+              Sales Briefing erstellen 📋
+            } @else if (agentMeta.id === 'firmen-finder') {
+              Unternehmen finden 🏢
             } @else if (agentMeta.id === 'linkedin-ghostwriter') {
               LinkedIn-Post generiert 🚀
             } @else {
