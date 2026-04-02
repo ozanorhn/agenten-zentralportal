@@ -1,10 +1,13 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { RunHistoryService } from '../../services/run-history.service';
 import { AgentOutputService } from '../../services/agent-output.service';
 import { NotificationService } from '../../services/notification.service';
 import { AGENTS_MAP } from '../../data/agents.data';
-import { RunRecord } from '../../models/interfaces';
+import { AgentOutput, MarkdownOutput, RunRecord } from '../../models/interfaces';
+
+const LEAD_RESEARCHER_WEBHOOK = 'https://n8n.eom.de/webhook/ac9a9c6c-a2f0-4389-9462-06cc82bebe8b';
 
 @Component({
   selector: 'app-agent-detail',
@@ -15,6 +18,7 @@ import { RunRecord } from '../../models/interfaces';
 export class AgentDetail {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly http = inject(HttpClient);
   private readonly runHistory = inject(RunHistoryService);
   private readonly agentOutput = inject(AgentOutputService);
   private readonly notifService = inject(NotificationService);
@@ -23,12 +27,16 @@ export class AgentDetail {
   readonly agentMeta = AGENTS_MAP[this.agentId];
 
   readonly targetAudience = signal('');
+  readonly companyName = signal('');
   readonly websiteUrl = signal('');
   readonly toneOfVoice = signal('Professionell & Sachlich');
+
+  readonly isLeadResearcher = this.agentId === 'lead-researcher';
 
   readonly isSubmitting = signal(false);
   readonly progress = signal(0);
   readonly progressLabel = signal('Initialisiere Agent…');
+  readonly webhookError = signal(false);
 
   readonly toneOptions = [
     'Professionell & Sachlich',
@@ -44,8 +52,16 @@ export class AgentDetail {
     { label: 'Conversion Rate', value: 91 },
   ]);
 
-  // Dummy chart bars
   readonly chartBars = [40, 65, 55, 90, 75, 45, 60, 85, 30, 50, 70, 95];
+
+  private readonly PROGRESS_LABELS_LEAD = [
+    'Initialisiere Agent…',
+    'Verbinde mit Recherche-Engine…',
+    'Analysiere Website-Daten…',
+    'Erstelle Sales-Briefing…',
+    'Finalisiere Dokument…',
+    'Briefing fertig ✓',
+  ];
 
   private readonly PROGRESS_LABELS = [
     'Initialisiere Agent…',
@@ -58,10 +74,114 @@ export class AgentDetail {
 
   submitWorkflow(): void {
     if (this.isSubmitting()) return;
-
     this.isSubmitting.set(true);
     this.progress.set(0);
-    this.progressLabel.set(this.PROGRESS_LABELS[0]);
+    this.webhookError.set(false);
+
+    if (this.isLeadResearcher) {
+      this.runLeadResearcherWorkflow();
+    } else {
+      this.runGenericWorkflow();
+    }
+  }
+
+  private runLeadResearcherWorkflow(): void {
+    const labels = this.PROGRESS_LABELS_LEAD;
+    this.progressLabel.set(labels[0]);
+
+    const startTime = Date.now();
+    const minDuration = 3000;
+
+    // Animate progress to 80% while waiting for webhook
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const pct = Math.min(Math.round((elapsed / minDuration) * 80), 80);
+      this.progress.set(pct);
+      if (pct >= 60) this.progressLabel.set(labels[4]);
+      else if (pct >= 40) this.progressLabel.set(labels[3]);
+      else if (pct >= 20) this.progressLabel.set(labels[2]);
+      else if (pct >= 5)  this.progressLabel.set(labels[1]);
+    }, 80);
+
+    const body = {
+      companyName: this.companyName(),
+      websiteUrl: this.websiteUrl(),
+    };
+
+    this.http.post(LEAD_RESEARCHER_WEBHOOK, body, { responseType: 'text' }).subscribe({
+      next: (response: string) => {
+        clearInterval(interval);
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, minDuration - elapsed);
+
+        setTimeout(() => {
+          this.progress.set(100);
+          this.progressLabel.set(labels[5]);
+          setTimeout(() => this.completeLeadResearcher(response), 400);
+        }, remaining);
+      },
+      error: () => {
+        clearInterval(interval);
+        this.webhookError.set(true);
+        this.progress.set(100);
+        this.progressLabel.set('Fehler beim Abrufen der Daten');
+        setTimeout(() => {
+          this.isSubmitting.set(false);
+        }, 800);
+      },
+    });
+  }
+
+  private completeLeadResearcher(rawResponse: string): void {
+    const output: MarkdownOutput = {
+      type: 'markdown',
+      content: this.extractMarkdownContent(rawResponse),
+      companyName: this.companyName(),
+      websiteUrl: this.websiteUrl(),
+    };
+
+    this.saveAndNavigate(output, `Sales Briefing: ${this.companyName()}`);
+  }
+
+  private extractMarkdownContent(raw: string): string {
+    let content = raw.trim();
+
+    // Try to extract from JSON (handles single and double-encoded responses)
+    for (let i = 0; i < 2; i++) {
+      if (!content.startsWith('{') && !content.startsWith('[')) break;
+      try {
+        const parsed = JSON.parse(content);
+        const obj = Array.isArray(parsed) ? parsed[0] : parsed;
+        const extracted: unknown = obj?.briefing ?? obj?.output ?? obj?.body ?? obj?.content;
+        if (typeof extracted === 'string') {
+          content = extracted;
+        } else {
+          break;
+        }
+      } catch {
+        // Malformed JSON — try regex extraction as fallback
+        const match = raw.match(/"(?:briefing|output|body|content)"\s*:\s*"([\s\S]+?)"\s*[,}]/);
+        if (match) {
+          content = match[1].replace(/\\n/g, '\n').replace(/\\r/g, '').replace(/\\"/g, '"');
+        }
+        break;
+      }
+    }
+
+    // Strip leading type-prefix artifact e.g. "markdown\n" that n8n may prepend
+    content = content.replace(/^markdown\r?\n/, '');
+
+    // If no real newlines but literal \n sequences exist, unescape them
+    if (!content.includes('\n') && content.includes('\\n')) {
+      content = content.replace(/\\n/g, '\n');
+    }
+
+    return content;
+  }
+
+  private runGenericWorkflow(): void {
+    const labels = this.PROGRESS_LABELS;
+    this.progressLabel.set(labels[0]);
 
     const totalMs = 3000;
     const intervalMs = 80;
@@ -73,21 +193,20 @@ export class AgentDetail {
       const pct = Math.min(Math.round((current / steps) * 100), 100);
       this.progress.set(pct);
 
-      // Update label at milestone percentages
-      if (pct >= 90) this.progressLabel.set(this.PROGRESS_LABELS[5]);
-      else if (pct >= 70) this.progressLabel.set(this.PROGRESS_LABELS[4]);
-      else if (pct >= 50) this.progressLabel.set(this.PROGRESS_LABELS[3]);
-      else if (pct >= 30) this.progressLabel.set(this.PROGRESS_LABELS[2]);
-      else if (pct >= 10) this.progressLabel.set(this.PROGRESS_LABELS[1]);
+      if (pct >= 90) this.progressLabel.set(labels[5]);
+      else if (pct >= 70) this.progressLabel.set(labels[4]);
+      else if (pct >= 50) this.progressLabel.set(labels[3]);
+      else if (pct >= 30) this.progressLabel.set(labels[2]);
+      else if (pct >= 10) this.progressLabel.set(labels[1]);
 
       if (pct >= 100) {
         clearInterval(interval);
-        this.finishWorkflow();
+        this.finishGenericWorkflow();
       }
     }, intervalMs);
   }
 
-  private finishWorkflow(): void {
+  private finishGenericWorkflow(): void {
     const input = {
       targetAudience: this.targetAudience(),
       websiteUrl: this.websiteUrl(),
@@ -96,16 +215,29 @@ export class AgentDetail {
 
     const output = this.agentOutput.generateOutput(this.agentId, input);
 
-    // Build output summary
     let summary = '';
     switch (output.type) {
-      case 'email': summary = output.subject; break;
+      case 'email':         summary = output.subject; break;
       case 'linkedin-post': summary = output.headline; break;
-      case 'video-script': summary = output.title; break;
-      case 'lead-table': summary = `${output.totalFound} Leads gefunden`; break;
+      case 'video-script':  summary = output.title; break;
+      case 'lead-table':    summary = `${output.totalFound} Leads gefunden`; break;
       case 'keyword-table': summary = `Top-Chance: ${output.topOpportunity}`; break;
-      case 'sync-report': summary = `${output.synced}/${output.totalRecords} Records sync`; break;
+      case 'sync-report':   summary = `${output.synced}/${output.totalRecords} Records sync`; break;
+      case 'markdown':      summary = output.companyName ?? 'Bericht'; break;
     }
+
+    this.saveAndNavigate(output, summary, input);
+  }
+
+  private saveAndNavigate(
+    output: AgentOutput,
+    summary: string,
+    input?: Record<string, string | undefined>,
+  ): void {
+    const resolvedInput = input ?? {
+      companyName: this.companyName(),
+      websiteUrl: this.websiteUrl(),
+    };
 
     const record: RunRecord = {
       id: `run-${Date.now()}`,
@@ -114,7 +246,7 @@ export class AgentDetail {
       agentIcon: this.agentMeta?.icon ?? 'smart_toy',
       agentCategory: (this.agentMeta?.category ?? 'Sales') as RunRecord['agentCategory'],
       timestamp: Date.now(),
-      inputData: input,
+      inputData: resolvedInput,
       outputSummary: summary,
       fullOutput: output,
       tokenCount: Math.floor(Math.random() * 800) + 400,

@@ -1,5 +1,4 @@
-import { Component, inject } from '@angular/core';
-import { CreditService } from '../../services/credit.service';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-analytics',
@@ -119,15 +118,11 @@ import { CreditService } from '../../services/credit.service';
   `,
 })
 export class Analytics {
-  private readonly credit = inject(CreditService);
-
   utilization = [
     { name: 'Lead Enricher', usage: 80, active: true },
     { name: 'Content Architect', usage: 12, active: false },
     { name: 'SEO Crawler', usage: 8, active: false },
   ];
 
-  openUpgrade(): void {
-    this.credit.useCredit();
-  }
+  openUpgrade(): void {}
 }

@@ -2,6 +2,7 @@
 
 export interface RunInputData {
   targetAudience?: string;
+  companyName?: string;
   websiteUrl?: string;
   toneOfVoice?: string;
   topic?: string;
@@ -29,7 +30,8 @@ export type AgentOutput =
   | VideoScriptOutput
   | LeadTableOutput
   | KeywordTableOutput
-  | SyncReportOutput;
+  | SyncReportOutput
+  | MarkdownOutput;
 
 export interface EmailOutput {
   type: 'email';
@@ -75,9 +77,11 @@ export interface LeadTableOutput {
 export interface LeadRow {
   name: string;
   company: string;
+  role?: string;
   score: number;
   status: 'Hot' | 'Warm' | 'Cold';
   linkedinUrl: string;
+  sourceUrl?: string;
 }
 
 export interface KeywordTableOutput {
@@ -110,6 +114,13 @@ export interface SyncItem {
   status: 'success' | 'pending' | 'error';
   recordCount: number;
   lastSync: string;
+}
+
+export interface MarkdownOutput {
+  type: 'markdown';
+  content: string;
+  companyName?: string;
+  websiteUrl?: string;
 }
 
 // ─── Notifications ────────────────────────────────────────────────────────────

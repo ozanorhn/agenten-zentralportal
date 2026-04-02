@@ -1,6 +1,6 @@
-import { Component, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
-import { CreditService } from '../../services/credit.service';
+import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 export interface Agent {
   id: string;
@@ -18,11 +18,24 @@ export interface Agent {
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class Dashboard {
+export class Dashboard implements OnInit, OnDestroy {
   private readonly router = inject(Router);
-  protected readonly credit = inject(CreditService);
+  private readonly route = inject(ActivatedRoute);
 
   activeCategory = signal<string>('Alle');
+
+  private paramSub!: Subscription;
+
+  ngOnInit(): void {
+    this.paramSub = this.route.queryParamMap.subscribe(params => {
+      const cat = params.get('category');
+      this.activeCategory.set(cat ?? 'Alle');
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.paramSub.unsubscribe();
+  }
 
   categories = ['Alle', 'Sales', 'Content', 'SEO', 'Data'];
 
@@ -99,9 +112,6 @@ export class Dashboard {
   }
 
   startWorkflow(agentId: string): void {
-    if (this.credit.useCredit()) {
-      this.router.navigate(['/agents', agentId]);
-    }
-    // If useCredit() returns false, CreditService shows the paywall automatically
+    this.router.navigate(['/agents', agentId]);
   }
 }

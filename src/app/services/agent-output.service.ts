@@ -27,7 +27,7 @@ export class AgentOutputService {
       case 'script-savant':
         return this.generateVideoScript(audience, url, tone);
       case 'lead-researcher':
-        return this.generateLeadTable(audience);
+        return this.generateLeadTable(input.companyName || audience, input.websiteUrl || url);
       case 'top-ranker-bot':
         return this.generateKeywordTable(audience, url);
       case 'sync-master':
@@ -118,26 +118,29 @@ export class AgentOutputService {
     };
   }
 
-  private generateLeadTable(audience: string): LeadTableOutput {
-    const companies = ['TechVentures GmbH', 'Scale.io AG', 'Nexus Digital', 'Primo Software', 'DataBridge GmbH', 'CloudPilot AG', 'Wachstum Labs', 'StrategyCore'];
+  private generateLeadTable(companyName: string, websiteUrl: string): LeadTableOutput {
+    const domain = websiteUrl.replace(/https?:\/\/(www\.)?/, '').replace(/\/$/, '') || companyName.toLowerCase();
     const firstNames = ['Thomas', 'Julia', 'Markus', 'Sarah', 'Felix', 'Anna', 'David', 'Lisa'];
     const lastNames = ['Müller', 'Schmidt', 'Weber', 'Fischer', 'Becker', 'Wagner', 'Hoffmann', 'Schulz'];
+    const roles = ['Head of Sales', 'Marketing Director', 'CEO', 'Head of Growth', 'VP Sales', 'CMO', 'Business Development Manager', 'Head of Digital'];
 
     const leads = Array.from({ length: 8 }, (_, i) => {
       const score = Math.floor(Math.random() * 40) + 60;
       return {
         name: `${firstNames[i]} ${lastNames[i]}`,
-        company: companies[i],
+        company: companyName,
+        role: roles[i],
         score,
         status: (score >= 80 ? 'Hot' : score >= 65 ? 'Warm' : 'Cold') as 'Hot' | 'Warm' | 'Cold',
         linkedinUrl: `https://linkedin.com/in/${firstNames[i].toLowerCase()}-${lastNames[i].toLowerCase()}`,
+        sourceUrl: `https://${domain}`,
       };
     }).sort((a, b) => b.score - a.score);
 
     return {
       type: 'lead-table',
       leads,
-      totalFound: 142,
+      totalFound: Math.floor(Math.random() * 80) + 80,
       highScoreCount: leads.filter(l => l.score >= 80).length,
     };
   }

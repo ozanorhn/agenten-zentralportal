@@ -3,3 +3,11 @@
 :host ::ng-deep a.text-primary {
   opacity: 1 !important;
 }
+
+// Category nav active state (query-param based, can't use routerLinkActive)
+a.nav-category-active {
+  color: #0070FF !important;
+  border-left: 4px solid #0070FF;
+  background: linear-gradient(to right, rgba(0, 112, 255, 0.12), transparent);
+  opacity: 1 !important;
+}

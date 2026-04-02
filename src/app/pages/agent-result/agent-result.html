@@ -233,6 +233,7 @@
                   <tr class="border-b border-outline-variant/20 bg-surface-container-high/30">
                     <th class="text-left px-6 py-4 text-[10px] uppercase tracking-widest text-outline font-bold">Name</th>
                     <th class="text-left px-6 py-4 text-[10px] uppercase tracking-widest text-outline font-bold">Unternehmen</th>
+                    <th class="text-left px-6 py-4 text-[10px] uppercase tracking-widest text-outline font-bold hidden sm:table-cell">Rolle</th>
                     <th class="text-center px-6 py-4 text-[10px] uppercase tracking-widest text-outline font-bold">Score</th>
                     <th class="text-center px-6 py-4 text-[10px] uppercase tracking-widest text-outline font-bold">Status</th>
                     <th class="text-center px-6 py-4 text-[10px] uppercase tracking-widest text-outline font-bold">Aktion</th>
@@ -250,6 +251,7 @@
                         </div>
                       </td>
                       <td class="px-6 py-4 text-sm text-on-surface-variant">{{ lead.company }}</td>
+                      <td class="px-6 py-4 text-sm text-on-surface-variant hidden sm:table-cell">{{ lead.role ?? '–' }}</td>
                       <td class="px-6 py-4 text-center">
                         <span class="text-lg font-black font-headline" [class]="getScoreColor(lead.score)">
                           {{ lead.score }}
@@ -399,6 +401,32 @@
                 </div>
               }
             </div>
+          </div>
+        </div>
+      }
+
+      <!-- ─── MARKDOWN / SALES BRIEFING OUTPUT ────────────────────── -->
+      @if (markdownOutput(); as md) {
+        <div class="space-y-6">
+          <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[#0070FF]" style="font-variation-settings:'FILL' 1;">description</span>
+              <h1 class="text-2xl font-headline font-black text-on-surface tracking-tight">Sales Briefing</h1>
+            </div>
+            @if (md.companyName) {
+              <div class="flex items-center gap-2 px-4 py-2 glass-panel border border-[#0070FF]/30 rounded-xl">
+                <span class="material-symbols-outlined text-[#0070FF] text-base" style="font-variation-settings:'FILL' 1;">business</span>
+                <span class="text-sm font-bold text-on-surface">{{ md.companyName }}</span>
+                @if (md.websiteUrl) {
+                  <a [href]="md.websiteUrl" target="_blank"
+                     class="text-xs text-[#0070FF] hover:underline ml-1">{{ md.websiteUrl }}</a>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="glass-panel border border-outline-variant/20 rounded-2xl p-8 md-content"
+               [innerHTML]="renderedMarkdown()">
           </div>
         </div>
       }

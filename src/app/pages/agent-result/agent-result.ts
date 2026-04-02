@@ -1,5 +1,7 @@
-import { Component, inject, signal, computed } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Component, inject, signal, computed, ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { marked } from 'marked';
 import { RunHistoryService } from '../../services/run-history.service';
 import { AgentOutputService } from '../../services/agent-output.service';
 import { ToastService } from '../../services/toast.service';
@@ -11,6 +13,7 @@ import {
   LeadTableOutput,
   KeywordTableOutput,
   SyncReportOutput,
+  MarkdownOutput,
 } from '../../models/interfaces';
 import { AGENTS_MAP } from '../../data/agents.data';
 
@@ -20,10 +23,12 @@ import { AGENTS_MAP } from '../../data/agents.data';
   imports: [],
   templateUrl: './agent-result.html',
   styleUrl: './agent-result.scss',
+  encapsulation: ViewEncapsulation.None,
 })
 export class AgentResult {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly sanitizer = inject(DomSanitizer);
   private readonly runHistory = inject(RunHistoryService);
   private readonly agentOutputService = inject(AgentOutputService);
   private readonly toastService = inject(ToastService);
@@ -54,11 +59,21 @@ export class AgentResult {
   readonly syncOutput = computed(() =>
     this.output()?.type === 'sync-report' ? this.output() as SyncReportOutput : null
   );
+  readonly markdownOutput = computed(() =>
+    this.output()?.type === 'markdown' ? this.output() as MarkdownOutput : null
+  );
+
+  readonly renderedMarkdown = computed((): SafeHtml | null => {
+    const md = this.markdownOutput();
+    if (!md?.content) return null;
+    const result = marked.parse(md.content);
+    const html = typeof result === 'string' ? result : '';
+    return this.sanitizer.bypassSecurityTrustHtml(html);
+  });
 
   private resolveRun(): RunRecord | null {
     const existing = this.runHistory.getLatestForAgent(this.agentId);
     if (existing) return existing;
-    // Fallback: generate output so the page always works
     const output = this.agentOutputService.generateOutput(this.agentId, {});
     const summary = this.buildSummary(output);
     const fallback: RunRecord = {
@@ -84,6 +99,7 @@ export class AgentResult {
       case 'lead-table': return `${output.totalFound} Leads gefunden, ${output.highScoreCount} Hot Leads`;
       case 'keyword-table': return `Top-Chance: ${output.topOpportunity}`;
       case 'sync-report': return `${output.synced} von ${output.totalRecords} Records synchronisiert`;
+      case 'markdown': return output.companyName ? `Sales Briefing: ${output.companyName}` : 'Sales Briefing';
     }
   }
 
@@ -97,12 +113,17 @@ export class AgentResult {
   }
 
   downloadOutput(): void {
+    const out = this.output();
+    // For markdown, download as .md file
+    const isMarkdown = out?.type === 'markdown';
     const text = this.buildTextVersion();
-    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const mimeType = isMarkdown ? 'text/markdown;charset=utf-8' : 'text/plain;charset=utf-8';
+    const ext = isMarkdown ? 'md' : 'txt';
+    const blob = new Blob([text], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${this.agentId}-output-${Date.now()}.txt`;
+    a.download = `${this.agentId}-output-${Date.now()}.${ext}`;
     a.click();
     URL.revokeObjectURL(url);
     this.toastService.show('Datei wird heruntergeladen…', 'info');
@@ -193,6 +214,9 @@ export class AgentResult {
         out.syncItems.forEach(s => {
           lines.push(`${s.source} → ${s.target}: ${s.status} (${s.recordCount} Records)`);
         });
+        break;
+      case 'markdown':
+        lines.push(out.content);
         break;
     }
     return lines.join('\n');

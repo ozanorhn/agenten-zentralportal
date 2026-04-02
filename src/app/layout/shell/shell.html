@@ -90,17 +90,31 @@
           </p>
           <nav class="space-y-1">
             @for (item of section.items; track item.route + item.label) {
-              <a
-                [routerLink]="item.route"
-                routerLinkActive="text-[#0070FF] border-l-4 border-[#0070FF] bg-gradient-to-r from-[#0070FF]/20 to-transparent"
-                [routerLinkActiveOptions]="{ exact: false }"
-                class="flex items-center gap-3 px-4 py-3 font-body font-medium text-sm tracking-wide uppercase
-                       text-on-surface-variant/60 hover:text-on-surface hover:bg-surface-container-highest/30
-                       hover:translate-x-1 transition-all duration-300"
-              >
-                <span class="material-symbols-outlined">{{ item.icon }}</span>
-                {{ item.label }}
-              </a>
+              @if (item.queryParams) {
+                <a
+                  [routerLink]="item.route"
+                  [queryParams]="item.queryParams"
+                  [class.nav-category-active]="isCategoryActive(item.queryParams['category'])"
+                  class="flex items-center gap-3 px-4 py-3 font-body font-medium text-sm tracking-wide uppercase
+                         text-on-surface-variant/60 hover:text-on-surface hover:bg-surface-container-highest/30
+                         hover:translate-x-1 transition-all duration-300"
+                >
+                  <span class="material-symbols-outlined">{{ item.icon }}</span>
+                  {{ item.label }}
+                </a>
+              } @else {
+                <a
+                  [routerLink]="item.route"
+                  routerLinkActive="text-[#0070FF] border-l-4 border-[#0070FF] bg-gradient-to-r from-[#0070FF]/20 to-transparent"
+                  [routerLinkActiveOptions]="{ exact: false }"
+                  class="flex items-center gap-3 px-4 py-3 font-body font-medium text-sm tracking-wide uppercase
+                         text-on-surface-variant/60 hover:text-on-surface hover:bg-surface-container-highest/30
+                         hover:translate-x-1 transition-all duration-300"
+                >
+                  <span class="material-symbols-outlined">{{ item.icon }}</span>
+                  {{ item.label }}
+                </a>
+              }
             }
           </nav>
         </div>
@@ -127,8 +141,10 @@
   <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50
               bg-surface-container-low/95 backdrop-blur-2xl px-4 py-4
               flex justify-between items-center border-t border-outline-variant/20">
-    @for (item of mobileNavItems; track item.route) {
-      <a [routerLink]="item.route" routerLinkActive="text-[#0070FF]"
+    @for (item of mobileNavItems; track item.route + item.label) {
+      <a [routerLink]="item.route" [queryParams]="item.queryParams ?? null"
+         [class.nav-category-active]="item.queryParams ? isCategoryActive(item.queryParams['category']) : false"
+         routerLinkActive="text-[#0070FF]"
          class="flex flex-col items-center gap-1 text-on-surface-variant/50">
         <span class="material-symbols-outlined text-xl">{{ item.icon }}</span>
         <span class="text-[9px] uppercase tracking-widest font-bold">{{ item.label }}</span>
@@ -137,7 +153,6 @@
   </nav>
 
   <!-- Global Modals -->
-  <app-paywall-modal />
   <app-booking-modal [visible]="showBooking()" (close)="showBooking.set(false)" />
 
 </div>

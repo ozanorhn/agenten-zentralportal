@@ -21,23 +21,35 @@
              style="animation-duration: 3s;"></div>
       </div>
 
-      <h2 class="text-2xl font-headline font-black text-on-surface mb-2 tracking-tight">
-        Workflow läuft…
-      </h2>
-      <p class="text-sm text-on-surface-variant mb-8">{{ progressLabel() }}</p>
+      @if (webhookError()) {
+        <h2 class="text-2xl font-headline font-black text-red-400 mb-2 tracking-tight">Verbindungsfehler</h2>
+        <p class="text-sm text-on-surface-variant mb-6 text-center max-w-xs">
+          Der Webhook konnte nicht erreicht werden.<br>Bitte prüfe die Verbindung und versuche es erneut.
+        </p>
+        <button (click)="isSubmitting.set(false); webhookError.set(false)"
+                class="px-6 py-3 bg-surface-container-high hover:bg-surface-container-highest text-on-surface
+                       font-semibold rounded-xl transition-all border border-outline-variant/30">
+          Zurück zum Formular
+        </button>
+      } @else {
+        <h2 class="text-2xl font-headline font-black text-on-surface mb-2 tracking-tight">
+          Workflow läuft…
+        </h2>
+        <p class="text-sm text-on-surface-variant mb-8">{{ progressLabel() }}</p>
 
-      <!-- Progress bar -->
-      <div class="w-72">
-        <div class="flex justify-between text-[10px] uppercase tracking-widest text-outline font-bold mb-2">
-          <span>Fortschritt</span>
-          <span class="text-[#0070FF]">{{ progress() }}%</span>
-        </div>
-        <div class="h-2 bg-surface-container-high rounded-full overflow-hidden">
-          <div class="h-full bg-gradient-to-r from-[#0070FF] to-primary rounded-full transition-all duration-100"
-               [style.width.%]="progress()">
+        <!-- Progress bar -->
+        <div class="w-72">
+          <div class="flex justify-between text-[10px] uppercase tracking-widest text-outline font-bold mb-2">
+            <span>Fortschritt</span>
+            <span class="text-[#0070FF]">{{ progress() }}%</span>
+          </div>
+          <div class="h-2 bg-surface-container-high rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-[#0070FF] to-primary rounded-full transition-all duration-100"
+                 [style.width.%]="progress()">
+            </div>
           </div>
         </div>
-      </div>
+      }
     </div>
   }
 
@@ -75,56 +87,93 @@
     </header>
 
     <div class="space-y-6">
-      <!-- Primary input (label changes per agent) -->
-      <div class="space-y-2">
-        <label class="block text-[10px] font-bold tracking-widest text-outline uppercase px-1">
-          {{ agentMeta?.inputLabel ?? 'Zielgruppe' }}
-        </label>
-        <input
-          type="text"
-          [placeholder]="agentMeta?.inputPlaceholder ?? 'z.B. CTOs in deutschen SaaS Unternehmen'"
-          [value]="targetAudience()"
-          (input)="targetAudience.set($any($event.target).value)"
-          class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 text-sm text-on-surface
-                 focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]
-                 placeholder:text-on-surface-variant/30 transition-all"
-        />
-      </div>
+      @if (isLeadResearcher) {
+        <!-- Lead Researcher: Firmenname + Website -->
+        <div class="space-y-2">
+          <label class="block text-[10px] font-bold tracking-widest text-outline uppercase px-1">
+            Firmenname
+          </label>
+          <div class="relative">
+            <input
+              type="text"
+              placeholder="z.B. EOM"
+              [value]="companyName()"
+              (input)="companyName.set($any($event.target).value)"
+              class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 pl-12 text-sm text-on-surface
+                     focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]
+                     placeholder:text-on-surface-variant/30 transition-all"
+            />
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">business</span>
+          </div>
+        </div>
 
-      <!-- Website URL -->
-      <div class="space-y-2">
-        <label class="block text-[10px] font-bold tracking-widest text-outline uppercase px-1">
-          Website-URL
-        </label>
-        <div class="relative">
+        <div class="space-y-2">
+          <label class="block text-[10px] font-bold tracking-widest text-outline uppercase px-1">
+            Website-URL
+          </label>
+          <div class="relative">
+            <input
+              type="url"
+              placeholder="https://www.ihre-firma.de/"
+              [value]="websiteUrl()"
+              (input)="websiteUrl.set($any($event.target).value)"
+              class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 pl-12 text-sm text-on-surface
+                     focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]
+                     placeholder:text-on-surface-variant/30 transition-all"
+            />
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">link</span>
+          </div>
+        </div>
+      } @else {
+        <!-- Generic agents: Zielgruppe + Website + Tone of Voice -->
+        <div class="space-y-2">
+          <label class="block text-[10px] font-bold tracking-widest text-outline uppercase px-1">
+            {{ agentMeta?.inputLabel ?? 'Zielgruppe' }}
+          </label>
           <input
-            type="url"
-            placeholder="https://ihre-firma.de"
-            [value]="websiteUrl()"
-            (input)="websiteUrl.set($any($event.target).value)"
-            class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 pl-12 text-sm text-on-surface
+            type="text"
+            [placeholder]="agentMeta?.inputPlaceholder ?? 'z.B. CTOs in deutschen SaaS Unternehmen'"
+            [value]="targetAudience()"
+            (input)="targetAudience.set($any($event.target).value)"
+            class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 text-sm text-on-surface
                    focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]
                    placeholder:text-on-surface-variant/30 transition-all"
           />
-          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">link</span>
         </div>
-      </div>
 
-      <!-- Tone of Voice -->
-      <div class="space-y-2">
-        <label class="block text-[10px] font-bold tracking-widest text-outline uppercase px-1">
-          Tone of Voice
-        </label>
-        <select
-          [value]="toneOfVoice()"
-          (change)="toneOfVoice.set($any($event.target).value)"
-          class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 text-sm text-on-surface
-                 focus:ring-1 focus:ring-[#0070FF] transition-all appearance-none cursor-pointer">
-          @for (opt of toneOptions; track opt) {
-            <option [value]="opt">{{ opt }}</option>
-          }
-        </select>
-      </div>
+        <div class="space-y-2">
+          <label class="block text-[10px] font-bold tracking-widest text-outline uppercase px-1">
+            Website-URL
+          </label>
+          <div class="relative">
+            <input
+              type="url"
+              placeholder="https://ihre-firma.de"
+              [value]="websiteUrl()"
+              (input)="websiteUrl.set($any($event.target).value)"
+              class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 pl-12 text-sm text-on-surface
+                     focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]
+                     placeholder:text-on-surface-variant/30 transition-all"
+            />
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">link</span>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-[10px] font-bold tracking-widest text-outline uppercase px-1">
+            Tone of Voice
+          </label>
+          <select
+            [value]="toneOfVoice()"
+            (change)="toneOfVoice.set($any($event.target).value)"
+            class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 text-sm text-on-surface
+                   focus:ring-1 focus:ring-[#0070FF] transition-all appearance-none cursor-pointer">
+            @for (opt of toneOptions; track opt) {
+              <option [value]="opt">{{ opt }}</option>
+            }
+          </select>
+        </div>
+      }
 
       <!-- Skills Matrix -->
       <div class="space-y-4 pt-2">

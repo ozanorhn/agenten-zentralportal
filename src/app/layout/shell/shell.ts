@@ -1,15 +1,15 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 import { NotificationService } from '../../services/notification.service';
 import { NotificationDropdown } from '../../components/notification-dropdown/notification-dropdown';
-import { PaywallModal } from '../../components/paywall-modal/paywall-modal';
 import { BookingModal } from '../../components/booking-modal/booking-modal';
 
 interface NavItem {
   label: string;
   icon: string;
   route: string;
+  queryParams?: Record<string, string>;
 }
 
 interface NavSection {
@@ -19,13 +19,14 @@ interface NavSection {
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NotificationDropdown, PaywallModal, BookingModal],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NotificationDropdown, BookingModal],
   templateUrl: './shell.html',
   styleUrl: './shell.scss',
 })
 export class Shell {
   readonly theme = inject(ThemeService);
   readonly notifService = inject(NotificationService);
+  readonly router = inject(Router);
 
   showNotifications = signal(false);
   showBooking = signal(false);
@@ -34,20 +35,27 @@ export class Shell {
     this.showNotifications.update(v => !v);
   }
 
+  isCategoryActive(category: string): boolean {
+    return this.router.url.includes(`category=${category}`);
+  }
+
   navSections: NavSection[] = [
     {
       label: 'Hauptnavigation',
       items: [
-        { label: 'Agenten', icon: 'bolt', route: '/dashboard' },
+        { label: 'Sales', icon: 'trending_up', route: '/agents', queryParams: { category: 'Sales' } },
+        { label: 'Content', icon: 'edit_note', route: '/agents', queryParams: { category: 'Content' } },
+        { label: 'SEO', icon: 'manage_search', route: '/agents', queryParams: { category: 'SEO' } },
+        { label: 'Data', icon: 'analytics', route: '/agents', queryParams: { category: 'Data' } },
+      ],
+    },
+    {
+      label: 'Admin',
+      items: [
         { label: 'Conversations', icon: 'chat', route: '/conversations' },
         { label: 'Analytics', icon: 'bar_chart', route: '/analytics' },
         { label: 'Management', icon: 'tune', route: '/management' },
         { label: 'History', icon: 'history', route: '/conversations' },
-      ],
-    },
-    {
-      label: 'Admin / CEO',
-      items: [
         { label: 'CEO Dashboard', icon: 'speed', route: '/ceo-dashboard' },
         { label: 'Reporting Bot', icon: 'summarize', route: '/reporting-bot' },
       ],
@@ -55,10 +63,10 @@ export class Shell {
   ];
 
   mobileNavItems: NavItem[] = [
-    { label: 'Agenten', icon: 'bolt', route: '/dashboard' },
-    { label: 'Analytics', icon: 'bar_chart', route: '/analytics' },
-    { label: 'Mgmt', icon: 'tune', route: '/management' },
-    { label: 'CEO', icon: 'speed', route: '/ceo-dashboard' },
-    { label: 'Report', icon: 'summarize', route: '/reporting-bot' },
+    { label: 'Sales', icon: 'trending_up', route: '/agents', queryParams: { category: 'Sales' } },
+    { label: 'Content', icon: 'edit_note', route: '/agents', queryParams: { category: 'Content' } },
+    { label: 'SEO', icon: 'manage_search', route: '/agents', queryParams: { category: 'SEO' } },
+    { label: 'Data', icon: 'analytics', route: '/agents', queryParams: { category: 'Data' } },
+    { label: 'Admin', icon: 'admin_panel_settings', route: '/analytics' },
   ];
 }

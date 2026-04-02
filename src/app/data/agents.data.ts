@@ -75,9 +75,9 @@ export const AGENTS: AgentMeta[] = [
       { label: 'Recherche-Tiefe', value: 97 },
       { label: 'Datenschutz', value: 100 },
     ],
-    tip: 'Nutze Nischen-Filter: Branche + Unternehmensgröße + Wachstumsphase. Damit reduzierst du die Outreach-Zeit um 70%.',
-    inputLabel: 'Zielgruppe',
-    inputPlaceholder: 'z.B. E-Commerce-Manager in DACH-Unternehmen mit 50+ MA',
+    tip: 'Je präziser der Firmenname und die URL, desto genauer das Lead-Scoring. Probiere auch Tochterunternehmen oder Marken.',
+    inputLabel: 'Firmenname',
+    inputPlaceholder: 'z.B. EOM',
   },
   {
     id: 'top-ranker-bot',
