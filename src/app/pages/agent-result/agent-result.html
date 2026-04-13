@@ -46,7 +46,9 @@
   </div>
 
   <!-- Main content -->
-  <div class="max-w-4xl mx-auto px-8 py-12">
+  <div class="mx-auto px-8 py-12"
+       [class.max-w-4xl]="!geoAuditOutput()"
+       [class.max-w-6xl]="!!geoAuditOutput()">
 
     @if (output()) {
 
@@ -476,18 +478,969 @@
         </div>
       }
 
-      <!-- ─── MARKDOWN / SALES BRIEFING OUTPUT ────────────────────── -->
+      <!-- ─── SOCIAL MEDIA OUTPUT ──────────────────────────────── -->
+      @if (socialMediaOutput(); as sm) {
+        <div class="space-y-6">
+          <div class="flex items-center gap-3 mb-8">
+            <span class="material-symbols-outlined text-[#0070FF]" style="font-variation-settings:'FILL' 1;">campaign</span>
+            <div>
+              <h1 class="text-2xl font-headline font-black text-on-surface tracking-tight">Social-Media-Paket</h1>
+              <p class="text-sm text-on-surface-variant mt-0.5">Thema: {{ sm.topic }}</p>
+            </div>
+          </div>
+
+          <!-- Meta chips -->
+          <div class="flex flex-wrap gap-3 mb-6">
+            <span class="px-3 py-1.5 text-xs font-semibold bg-[#0070FF]/10 text-[#0070FF] border border-[#0070FF]/20 rounded-full">
+              Brand Voice: {{ sm.brandVoice }}
+            </span>
+            <span class="px-3 py-1.5 text-xs font-semibold bg-surface-container-high text-on-surface-variant border border-outline-variant/30 rounded-full">
+              Zielgruppe: {{ sm.targetAudience }}
+            </span>
+          </div>
+
+          <!-- Platform cards -->
+          <div class="grid gap-4">
+
+            <!-- Twitter / X -->
+            <div class="glass-panel border border-outline-variant/20 rounded-2xl p-6">
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-xl bg-black flex items-center justify-center">
+                    <span class="text-white font-black text-sm">X</span>
+                  </div>
+                  <span class="text-sm font-bold text-on-surface">Twitter / X</span>
+                  <span class="px-2 py-0.5 text-[10px] font-black bg-surface-container-high text-outline rounded-full border border-outline-variant/30 uppercase tracking-widest">
+                    max. 280 Zeichen
+                  </span>
+                </div>
+                <button (click)="copySocialPlatform(sm.twitter, 'Twitter')"
+                        class="flex items-center gap-1.5 px-3 py-1.5 glass-panel border border-outline-variant/30 rounded-lg
+                               text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all hover:bg-surface-container-high">
+                  <span class="material-symbols-outlined text-sm">content_copy</span>
+                  Kopieren
+                </button>
+              </div>
+              <p class="text-on-surface leading-relaxed whitespace-pre-wrap text-sm">{{ sm.twitter }}</p>
+            </div>
+
+            <!-- LinkedIn -->
+            <div class="glass-panel border border-outline-variant/20 rounded-2xl p-6">
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-xl bg-[#0A66C2] flex items-center justify-center">
+                    <span class="text-white font-black text-xs">in</span>
+                  </div>
+                  <span class="text-sm font-bold text-on-surface">LinkedIn</span>
+                  <span class="px-2 py-0.5 text-[10px] font-black bg-surface-container-high text-outline rounded-full border border-outline-variant/30 uppercase tracking-widest">
+                    Post
+                  </span>
+                </div>
+                <button (click)="copySocialPlatform(sm.linkedin, 'LinkedIn')"
+                        class="flex items-center gap-1.5 px-3 py-1.5 glass-panel border border-outline-variant/30 rounded-lg
+                               text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all hover:bg-surface-container-high">
+                  <span class="material-symbols-outlined text-sm">content_copy</span>
+                  Kopieren
+                </button>
+              </div>
+              <p class="text-on-surface leading-relaxed whitespace-pre-wrap text-sm">{{ sm.linkedin }}</p>
+            </div>
+
+            <!-- Reddit -->
+            <div class="glass-panel border border-outline-variant/20 rounded-2xl p-6">
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-xl bg-[#FF4500] flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white text-base" style="font-variation-settings:'FILL' 1;">forum</span>
+                  </div>
+                  <span class="text-sm font-bold text-on-surface">Reddit</span>
+                </div>
+                <button (click)="copySocialPlatform(sm.redditTitle + '\n\n' + sm.redditBody, 'Reddit')"
+                        class="flex items-center gap-1.5 px-3 py-1.5 glass-panel border border-outline-variant/30 rounded-lg
+                               text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all hover:bg-surface-container-high">
+                  <span class="material-symbols-outlined text-sm">content_copy</span>
+                  Kopieren
+                </button>
+              </div>
+              <p class="text-[10px] uppercase tracking-widest text-outline font-bold mb-1">Titel</p>
+              <p class="text-on-surface font-semibold text-sm mb-4">{{ sm.redditTitle }}</p>
+              <p class="text-[10px] uppercase tracking-widest text-outline font-bold mb-1">Body</p>
+              <p class="text-on-surface leading-relaxed whitespace-pre-wrap text-sm">{{ sm.redditBody }}</p>
+            </div>
+
+            <!-- Instagram -->
+            <div class="glass-panel border border-outline-variant/20 rounded-2xl p-6">
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-xl flex items-center justify-center"
+                       style="background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)">
+                    <span class="material-symbols-outlined text-white text-base" style="font-variation-settings:'FILL' 1;">photo_camera</span>
+                  </div>
+                  <span class="text-sm font-bold text-on-surface">Instagram</span>
+                  <span class="px-2 py-0.5 text-[10px] font-black bg-surface-container-high text-outline rounded-full border border-outline-variant/30 uppercase tracking-widest">
+                    Caption
+                  </span>
+                </div>
+                <button (click)="copySocialPlatform(sm.instagramCaption, 'Instagram')"
+                        class="flex items-center gap-1.5 px-3 py-1.5 glass-panel border border-outline-variant/30 rounded-lg
+                               text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all hover:bg-surface-container-high">
+                  <span class="material-symbols-outlined text-sm">content_copy</span>
+                  Kopieren
+                </button>
+              </div>
+              <p class="text-on-surface leading-relaxed whitespace-pre-wrap text-sm">{{ sm.instagramCaption }}</p>
+            </div>
+
+          </div>
+        </div>
+      }
+
+      <!-- ─── CONTENT STRATEGY OUTPUT ────────────────────────────── -->
+      @if (contentStrategyOutput(); as cs) {
+        <div class="space-y-8 content-strategy-view">
+
+          <!-- Hero Section -->
+          <section class="rounded-[2rem] border border-[#0070FF]/20 overflow-hidden relative"
+                   style="background:
+                     radial-gradient(circle at top left, rgba(0, 112, 255, 0.28), transparent 42%),
+                     radial-gradient(circle at 85% 20%, rgba(34, 211, 238, 0.16), transparent 24%),
+                     linear-gradient(135deg, rgba(7, 16, 31, 0.98), rgba(7, 25, 54, 0.94));
+                     box-shadow:
+                     0 28px 90px rgba(6, 13, 28, 0.42),
+                     inset 0 1px 0 rgba(255, 255, 255, 0.04);">
+            <div class="pointer-events-none absolute -right-[10%] -bottom-[35%] h-96 w-96 blur-xl"
+                 style="background: radial-gradient(circle, rgba(0, 112, 255, 0.24), transparent 68%);"></div>
+            <div class="relative p-6 md:p-8 xl:p-10 space-y-8">
+              <div class="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+                <div class="space-y-5">
+                  <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur">
+                    <span class="material-symbols-outlined text-[#7DB4FF] text-base" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+                    <span class="text-[10px] font-black uppercase tracking-[0.24em] text-[#B8D5FF]">Content Strategy Ready</span>
+                  </div>
+
+                  <div class="space-y-3">
+                    <p class="text-[11px] font-black uppercase tracking-[0.28em] text-[#8FB8FF]">SEO-optimiertes Content Briefing</p>
+                    <h1 class="text-3xl md:text-5xl font-headline font-black tracking-tight text-white max-w-4xl">
+                      {{ cs.primaryTopic }}
+                    </h1>
+                    <p class="max-w-3xl text-sm md:text-base leading-relaxed text-blue-50/80">
+                      Umfassende Keyword-Strategie mit Suchintentionen, Wettbewerbsanalyse und priorisierten Content-Opportunities.
+                    </p>
+                  </div>
+
+                  <div class="flex flex-wrap gap-3">
+                    <div class="px-4 py-3 rounded-2xl border border-white/10 bg-white/5 backdrop-blur">
+                      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-100/45">Zielgruppe</p>
+                      <p class="text-sm font-semibold text-white truncate max-w-xs">{{ cs.targetAudience }}</p>
+                    </div>
+                    <div class="px-4 py-3 rounded-2xl border border-white/10 bg-white/5 backdrop-blur">
+                      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-100/45">Content-Typ</p>
+                      <p class="text-sm font-semibold text-white">{{ cs.contentType }}</p>
+                    </div>
+                    <div class="px-4 py-3 rounded-2xl border border-white/10 bg-white/5 backdrop-blur">
+                      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-100/45">Keyword-Cluster</p>
+                      <p class="text-sm font-semibold text-white">{{ cs.primaryKeywords.length + cs.longTailKeywords.length }}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Top Keyword Stats -->
+                <div class="grid gap-3 sm:grid-cols-3 xl:w-[36rem]">
+                  <div class="rounded-3xl border border-white/10 bg-slate-950/35 p-4 backdrop-blur">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-100/45 mb-2">⬆️ Höchstes Volumen</p>
+                    @if (contentStrategyTopKeyword(); as topKeyword) {
+                      <p class="text-base font-black text-white leading-tight line-clamp-2">{{ topKeyword.keyword }}</p>
+                      <p class="mt-2 text-sm text-blue-50/70">
+                        <span class="font-black text-white">{{ topKeyword.searchVolume | number }}</span>
+                        <span class="font-light text-[11px]"> Suchanfragen/Mo.</span>
+                      </p>
+                    } @else {
+                      <p class="text-sm text-blue-50/70">–</p>
+                    }
+                  </div>
+
+                  <div class="rounded-3xl border border-white/10 bg-slate-950/35 p-4 backdrop-blur">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-100/45 mb-2">✓ Beste Chancen</p>
+                    @if (contentStrategyLowestDifficultyKeyword(); as lowKeyword) {
+                      <p class="text-base font-black text-white leading-tight line-clamp-2">{{ lowKeyword.keyword }}</p>
+                      <p class="mt-2 text-sm text-blue-50/70">
+                        <span class="font-black text-white">KD {{ lowKeyword.keywordDifficulty }}</span>
+                        <span class="font-light text-[11px]"> (leicht)</span>
+                      </p>
+                    } @else {
+                      <p class="text-sm text-blue-50/70">–</p>
+                    }
+                  </div>
+
+                  <div class="rounded-3xl border border-white/10 bg-slate-950/35 p-4 backdrop-blur">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-100/45 mb-2">💰 Höchster CPC</p>
+                    @if (contentStrategyHighestCpcKeyword(); as cpcKeyword) {
+                      <p class="text-base font-black text-white leading-tight line-clamp-2">{{ cpcKeyword.keyword }}</p>
+                      <p class="mt-2 text-sm text-blue-50/70">
+                        <span class="font-black text-white">{{ cpcKeyword.cpc | number:'1.2-2' }} €</span>
+                        <span class="font-light text-[11px]"> pro Klick</span>
+                      </p>
+                    } @else {
+                      <p class="text-sm text-blue-50/70">–</p>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Main Content Grid: Brief + Keywords Dashboard -->
+          <div class="grid gap-6 2xl:grid-cols-3">
+            <!-- Brief Section (2 cols on 2xl) -->
+            <section class="glass-panel border border-outline-variant/20 rounded-[2rem] overflow-hidden 2xl:col-span-2">
+              <div class="px-6 py-5 border-b border-outline-variant/20 flex items-center gap-3 bg-surface-container-high/30">
+                <span class="material-symbols-outlined text-[#0070FF] text-2xl" style="font-variation-settings:'FILL' 1;">summarize</span>
+                <div>
+                  <p class="text-[10px] font-black tracking-[0.22em] text-outline uppercase">Executive Brief</p>
+                  <p class="text-xs text-on-surface-variant">Strategisches Briefing & Handlungsempfehlungen</p>
+                </div>
+              </div>
+
+              <div class="space-y-6 px-6 md:px-8 py-8 md:py-10 max-h-[800px] overflow-y-auto">
+                @if (renderedContentStrategyBrief()) {
+                  <div class="md-content content-strategy-brief prose prose-invert prose-sm max-w-none
+                              prose-headings:font-headline prose-headings:tracking-tight
+                              prose-h1:text-3xl prose-h1:font-black prose-h1:text-white prose-h1:mb-5 prose-h1:mt-6 prose-h1:first:mt-0
+                              prose-h2:text-xl prose-h2:font-black prose-h2:text-white prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-l-4 prose-h2:border-[#0070FF] prose-h2:pl-4
+                              prose-h3:text-base prose-h3:font-bold prose-h3:text-blue-100 prose-h3:mt-6 prose-h3:mb-2 prose-h3:flex prose-h3:items-center prose-h3:gap-2
+                              prose-h3:before:content-['▸'] prose-h3:before:text-[#0070FF] prose-h3:before:font-black
+                              prose-p:text-sm prose-p:leading-relaxed prose-p:text-on-surface-variant prose-p:my-3
+                              prose-strong:text-white prose-strong:font-black prose-strong:bg-[#0070FF]/20 prose-strong:px-1.5 prose-strong:py-0.5 prose-strong:rounded
+                              prose-em:text-[#7DB4FF] prose-em:not-italic prose-em:font-semibold
+                              prose-li:my-1 prose-li:text-on-surface-variant prose-li:text-sm
+                              prose-li:marker:text-[#0070FF] prose-li:marker:font-black
+                              prose-ul:my-4 prose-ol:my-4
+                              prose-table:border-outline-variant/20
+                              prose-th:bg-[#0070FF]/10 prose-th:border-outline-variant/20 prose-th:font-black prose-th:text-on-surface
+                              prose-td:border-outline-variant/10 prose-td:py-2
+                              prose-blockquote:border-l-4 prose-blockquote:border-[#0070FF] prose-blockquote:pl-4 prose-blockquote:py-3 prose-blockquote:italic prose-blockquote:text-blue-100/90 prose-blockquote:my-4 prose-blockquote:bg-[#0070FF]/10 prose-blockquote:rounded-r-lg
+                              prose-code:text-[#7DB4FF] prose-code:bg-[#0070FF]/15 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:font-mono prose-code:text-xs
+                              prose-hr:my-6 prose-hr:border-[#0070FF]/30 prose-hr:border-t-2"
+                       [innerHTML]="renderedContentStrategyBrief()"></div>
+                } @else {
+                  <div class="rounded-2xl border border-dashed border-outline-variant/40 p-8 text-center">
+                    <span class="material-symbols-outlined text-outline text-3xl mb-2 block">draft</span>
+                    <p class="text-sm text-on-surface-variant">Kein Briefing-Text vorhanden.</p>
+                  </div>
+                }
+              </div>
+            </section>
+
+            <!-- Dashboard Stats (1 col on 2xl) -->
+            <section class="glass-panel border border-outline-variant/20 rounded-[2rem] overflow-hidden flex flex-col">
+              <div class="px-6 py-5 border-b border-outline-variant/20 flex items-center gap-3 bg-surface-container-high/30">
+                <span class="material-symbols-outlined text-[#0070FF] text-2xl" style="font-variation-settings:'FILL' 1;">dashboard</span>
+                <div>
+                  <p class="text-[10px] font-black tracking-[0.2em] text-outline uppercase">Analyse</p>
+                  <p class="text-xs text-on-surface-variant">Übersicht & Metriken</p>
+                </div>
+              </div>
+
+              <div class="p-6 space-y-4 flex-1">
+                <div class="grid gap-3">
+                  <div class="rounded-2xl border border-outline-variant/20 bg-surface-container/40 p-4 text-center">
+                    <p class="text-xs font-black uppercase tracking-widest text-outline mb-2">Keywords (Primary)</p>
+                    <p class="text-3xl font-headline font-black text-[#0070FF]">{{ cs.primaryKeywords.length }}</p>
+                  </div>
+                  <div class="rounded-2xl border border-outline-variant/20 bg-surface-container/40 p-4 text-center">
+                    <p class="text-xs font-black uppercase tracking-widest text-outline mb-2">Long-Tail Chancen</p>
+                    <p class="text-3xl font-headline font-black text-emerald-400">{{ cs.longTailKeywords.length }}</p>
+                  </div>
+                  <div class="rounded-2xl border border-outline-variant/20 bg-surface-container/40 p-4 text-center">
+                    <p class="text-xs font-black uppercase tracking-widest text-outline mb-2">FAQ-Fragen</p>
+                    <p class="text-3xl font-headline font-black text-violet-400">{{ cs.questionBasedKeywords.length }}</p>
+                  </div>
+                  <div class="rounded-2xl border border-outline-variant/20 bg-surface-container/40 p-4 text-center">
+                    <p class="text-xs font-black uppercase tracking-widest text-outline mb-2">Verwandte Themen</p>
+                    <p class="text-3xl font-headline font-black text-cyan-400">{{ cs.relatedTopics.length }}</p>
+                  </div>
+                </div>
+
+                @if (cs.competitorUrls.length > 0) {
+                  <div class="space-y-3 pt-2 border-t border-outline-variant/20">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-[#7DB4FF]">📊 Wettbewerber</p>
+                    <div class="flex flex-col gap-2">
+                      @for (url of cs.competitorUrls.slice(0, 3); track url) {
+                        <a [href]="url"
+                           target="_blank"
+                           class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-[#0070FF]/20 bg-surface/50 hover:bg-surface-container text-xs text-on-surface-variant hover:text-on-surface transition-colors truncate">
+                          <span class="material-symbols-outlined text-[10px]">open_in_new</span>
+                          <span class="truncate">{{ formatCompetitorUrl(url) }}</span>
+                        </a>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </section>
+          </div>
+
+          <!-- Keywords Table -->
+          @if ((contentStrategyOutput()?.keywords?.length ?? 0) > 0) {
+            <section class="glass-panel border border-outline-variant/20 rounded-[2rem] overflow-hidden">
+              <div class="px-6 py-5 border-b border-outline-variant/20 flex items-center gap-3 bg-surface-container-high/30">
+                <span class="material-symbols-outlined text-[#0070FF] text-2xl" style="font-variation-settings:'FILL' 1;">table_chart</span>
+                <div>
+                  <p class="text-[10px] font-black tracking-[0.22em] text-outline uppercase">Keyword Metriken</p>
+                  <p class="text-xs text-on-surface-variant">DataForSEO Ergebnisse mit Volumen, Schwierigkeit & CPC</p>
+                </div>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="border-b border-outline-variant/20 bg-surface-container-high/30">
+                      <th class="text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest text-outline">Keyword</th>
+                      <th class="text-center px-4 py-4 text-[10px] font-black uppercase tracking-widest text-outline">Volumen</th>
+                      <th class="text-center px-4 py-4 text-[10px] font-black uppercase tracking-widest text-outline">KD</th>
+                      <th class="text-center px-4 py-4 text-[10px] font-black uppercase tracking-widest text-outline">Konkurrenz</th>
+                      <th class="text-center px-4 py-4 text-[10px] font-black uppercase tracking-widest text-outline">CPC</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-outline-variant/10">
+                    @for (kw of (contentStrategyOutput()?.keywords ?? []).slice(0, 10); track kw.keyword) {
+                      <tr class="hover:bg-surface-container-high/20 transition-colors">
+                        <td class="px-6 py-4 font-semibold text-on-surface">{{ kw.keyword }}</td>
+                        <td class="px-4 py-4 text-center">
+                          <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#0070FF]/15 text-[#0070FF]">
+                            {{ kw.searchVolume ? (kw.searchVolume | number) : '–' }}
+                          </span>
+                        </td>
+                        <td class="px-4 py-4 text-center">
+                          @if (kw.keywordDifficulty !== null) {
+                            <span [class]="kw.keywordDifficulty <= 15 ? 'text-emerald-400 font-black' : kw.keywordDifficulty <= 40 ? 'text-blue-400 font-black' : 'text-red-400 font-black'">
+                              {{ kw.keywordDifficulty }}
+                            </span>
+                          } @else {
+                            <span class="text-outline">–</span>
+                          }
+                        </td>
+                        <td class="px-4 py-4 text-center text-on-surface-variant text-xs">{{ kw.competition ?? '–' }}</td>
+                        <td class="px-4 py-4 text-center font-semibold">
+                          @if (kw.cpc) {
+                            <span class="text-on-surface">{{ kw.cpc | number:'1.2-2' }} €</span>
+                          } @else {
+                            <span class="text-outline">–</span>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              @if (((contentStrategyOutput()?.keywords?.length ?? 0) - 10) > 0) {
+                <div class="px-6 py-4 border-t border-outline-variant/20 text-center text-sm text-on-surface-variant">
+                  <p class="font-semibold">{{ (contentStrategyOutput()?.keywords?.length ?? 0) - 10 }} weitere Keywords…</p>
+                </div>
+              }
+            </section>
+          }
+
+          <!-- Primary Keywords, Questions & Related Topics Grid -->
+          <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <!-- Primary Keywords -->
+            @if (cs.primaryKeywords.length > 0) {
+              <section class="glass-panel border border-outline-variant/20 rounded-[2rem] overflow-hidden">
+                <div class="px-6 py-5 border-b border-outline-variant/20 flex items-center gap-3 bg-surface-container-high/30">
+                  <span class="material-symbols-outlined text-[#0070FF] text-2xl" style="font-variation-settings:'FILL' 1;">key_visualizer</span>
+                  <div>
+                    <p class="text-[10px] font-black tracking-[0.2em] text-outline uppercase">Primary Keywords</p>
+                    <p class="text-xs text-on-surface-variant">Kernbegriffe des Clusters</p>
+                  </div>
+                </div>
+
+                <div class="p-6 space-y-3">
+                  @for (keyword of cs.primaryKeywords; track keyword) {
+                    <div class="px-4 py-3 rounded-xl border border-[#0070FF]/15 bg-[#0070FF]/8 text-sm font-semibold text-on-surface hover:border-[#0070FF]/40 transition-colors">
+                      {{ keyword }}
+                    </div>
+                  }
+                </div>
+              </section>
+            }
+
+            <!-- FAQ Questions -->
+            @if (cs.questionBasedKeywords.length > 0) {
+              <section class="glass-panel border border-outline-variant/20 rounded-[2rem] overflow-hidden">
+                <div class="px-6 py-5 border-b border-outline-variant/20 flex items-center gap-3 bg-surface-container-high/30">
+                  <span class="material-symbols-outlined text-violet-400 text-2xl" style="font-variation-settings:'FILL' 1;">help_center</span>
+                  <div>
+                    <p class="text-[10px] font-black tracking-[0.2em] text-outline uppercase">{{ cs.questionBasedKeywords.length }} FAQ-Fragen</p>
+                    <p class="text-xs text-on-surface-variant">Häufig gestellte Fragen</p>
+                  </div>
+                </div>
+
+                <div class="p-6 space-y-3 max-h-[500px] overflow-y-auto">
+                  @for (question of cs.questionBasedKeywords; track question; let idx = $index) {
+                    <div class="group">
+                      <div class="flex items-start gap-3 rounded-xl border border-outline-variant/15 bg-surface-container/35 px-4 py-3 hover:bg-surface-container/50 transition-colors cursor-help">
+                        <span class="font-black text-sm text-violet-400 mt-0.5 min-w-[1.5rem]">Q{{ idx + 1 }}</span>
+                        <p class="text-sm leading-relaxed text-on-surface-variant">{{ question }}</p>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </section>
+            }
+
+            <!-- Related Topics -->
+            @if (cs.relatedTopics.length > 0) {
+              <section class="glass-panel border border-outline-variant/20 rounded-[2rem] overflow-hidden">
+                <div class="px-6 py-5 border-b border-outline-variant/20 flex items-center gap-3 bg-surface-container-high/30">
+                  <span class="material-symbols-outlined text-cyan-400 text-2xl" style="font-variation-settings:'FILL' 1;">hub</span>
+                  <div>
+                    <p class="text-[10px] font-black tracking-[0.2em] text-outline uppercase">{{ cs.relatedTopics.length }} Topics</p>
+                    <p class="text-xs text-on-surface-variant">Themen-Erweiterungen</p>
+                  </div>
+                </div>
+
+                <div class="p-6 space-y-2">
+                  @for (topic of cs.relatedTopics; track topic) {
+                    <div class="px-4 py-2.5 rounded-xl border border-outline-variant/15 bg-surface-container/35 text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container/50 transition-colors">
+                      {{ topic }}
+                    </div>
+                  }
+                </div>
+              </section>
+            }
+          </div>
+
+          <!-- Long-Tail Keywords by Intent -->
+          @if (contentStrategyIntentGroups().length > 0) {
+            <section class="space-y-4">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-[#0070FF] text-2xl" style="font-variation-settings:'FILL' 1;">timeline</span>
+                <div>
+                  <p class="text-[10px] font-black tracking-[0.2em] text-outline uppercase">Long-Tail Keywords nach Intent</p>
+                  <p class="text-sm text-on-surface-variant">Insgesamt {{ cs.longTailKeywords.length }} Keywords, gruppiert nach Suchintention (Informational, Commercial, Transactional)</p>
+                </div>
+              </div>
+
+              <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                @for (group of contentStrategyIntentGroups(); track group.key) {
+                  <div class="glass-panel border rounded-[2rem] p-6"
+                       [class]="getIntentCardClass(group.key)">
+                    <div class="flex items-start justify-between gap-4 mb-5">
+                      <div class="flex items-center gap-3">
+                        <div class="inline-flex items-center justify-center w-10 h-10 rounded-xl" [class]="getIntentBadgeBackgroundClass(group.key)">
+                          <span class="material-symbols-outlined text-base" [class]="getIntentIconColor(group.key)">{{ group.icon }}</span>
+                        </div>
+                        <div>
+                          <p class="text-sm font-black text-on-surface">{{ group.label }}</p>
+                          <p class="text-[10px] text-on-surface-variant mt-0.5">{{ group.description }}</p>
+                        </div>
+                      </div>
+                      <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border"
+                            [class]="getIntentBadgeClass(group.key)">
+                        {{ group.items.length }}
+                      </span>
+                    </div>
+
+                    <div class="space-y-2 max-h-[350px] overflow-y-auto">
+                      @for (item of group.items; track item.keyword) {
+                        <div class="px-3 py-2.5 rounded-lg border border-white/5 bg-white/3 text-sm text-on-surface-variant hover:border-white/10 hover:text-on-surface transition-colors">
+                          {{ item.keyword }}
+                          <span class="text-[10px] text-outline/60 ml-1">({{ item.intent }})</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </section>
+          }
+
+          @if (cs.keywords.length > 0) {
+            <section class="glass-panel border border-outline-variant/20 rounded-[2rem] overflow-hidden">
+              <div class="px-6 py-5 border-b border-outline-variant/20 flex items-center justify-between gap-4">
+                <div>
+                  <p class="text-[10px] font-black tracking-[0.2em] text-outline uppercase">Keyword Snapshot</p>
+                  <p class="text-sm text-on-surface-variant">Messwerte aus dem Webhook inklusive Trend, CPC und Wettbewerb.</p>
+                </div>
+                <span class="px-3 py-1 rounded-full border border-outline-variant/20 text-[10px] font-black uppercase tracking-[0.18em] text-outline">
+                  {{ cs.keywords.length }} Keywords
+                </span>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="border-b border-outline-variant/20 text-[10px] font-black uppercase tracking-[0.18em] text-outline">
+                      <th class="text-left px-6 py-3">Keyword</th>
+                      <th class="text-right px-4 py-3">Suchvolumen</th>
+                      <th class="text-center px-4 py-3">KD</th>
+                      <th class="text-center px-4 py-3">Wettbewerb</th>
+                      <th class="text-right px-4 py-3">CPC</th>
+                      <th class="text-left px-4 py-3 w-36">Trend (12 Mo.)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (kw of cs.keywords; track kw.keyword) {
+                      <tr class="border-b border-outline-variant/10 hover:bg-surface-container-high/40 transition-colors">
+                        <td class="px-6 py-4">
+                          <p class="font-semibold text-on-surface">{{ kw.keyword }}</p>
+                          @if (kw.competitionIndex !== null) {
+                            <p class="text-xs text-on-surface-variant">Competition Index {{ kw.competitionIndex }}</p>
+                          }
+                        </td>
+                        <td class="px-4 py-4 text-right text-on-surface-variant">
+                          {{ kw.searchVolume !== null ? kw.searchVolume.toLocaleString('de') : '—' }}
+                        </td>
+                        <td class="px-4 py-4 text-center">
+                          <span class="px-2 py-1 rounded-full text-[11px] font-black border"
+                                [class]="getKdBg(kw.keywordDifficulty)">
+                            {{ kw.keywordDifficulty !== null ? kw.keywordDifficulty : '—' }}
+                          </span>
+                        </td>
+                        <td class="px-4 py-4 text-center">
+                          @if (kw.competition) {
+                            <span class="px-2 py-1 rounded-full text-[11px] font-black border"
+                                  [class]="getIntentBadgeClass(kw.competition.toLowerCase() === 'low' ? 'informational' : kw.competition.toLowerCase() === 'medium' ? 'commercial' : 'transactional')">
+                              {{ kw.competition }}
+                            </span>
+                          } @else {
+                            <span class="text-on-surface-variant">—</span>
+                          }
+                        </td>
+                        <td class="px-4 py-4 text-right text-on-surface-variant">
+                          {{ kw.cpc !== null ? (kw.cpc | number:'1.2-2') + ' €' : '—' }}
+                        </td>
+                        <td class="px-4 py-4">
+                          @if (kw.monthlySearches.length > 0) {
+                            <div class="flex items-end gap-px h-9">
+                              @for (m of kw.monthlySearches; track $index) {
+                                <div class="flex-1 bg-[#0070FF]/40 rounded-sm hover:bg-[#0070FF]/70 transition-colors"
+                                     [style.height.%]="(m.searchVolume / getMaxSearchVolume(kw.monthlySearches)) * 100"
+                                     [title]="getMonthLabel(m.month) + ' ' + m.year + ': ' + m.searchVolume"
+                                     style="min-height: 2px;">
+                                </div>
+                              }
+                            </div>
+                          } @else {
+                            <span class="text-outline text-xs">—</span>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          }
+
+        </div>
+      }
+
+      <!-- ─── GEO AUDIT DASHBOARD ───────────────────────────────── -->
+      @if (geoAuditOutput(); as audit) {
+        <div class="space-y-8 geo-audit-view">
+          <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+            <div class="space-y-4">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-[#0070FF]" style="font-variation-settings:'FILL' 1;">travel_explore</span>
+                <div>
+                  <h1 class="text-3xl font-headline font-black text-on-surface tracking-tight">GEO Site Audit</h1>
+                  <p class="text-sm text-on-surface-variant">Executive-Ansicht fuer Crawler-Zugriff, Strukturprobleme und priorisierte Seiten.</p>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap gap-3">
+                <div class="flex items-center gap-2 px-4 py-3 glass-panel border border-[#0070FF]/25 rounded-2xl">
+                  <span class="material-symbols-outlined text-[#0070FF] text-base" style="font-variation-settings:'FILL' 1;">language</span>
+                  <div>
+                    <p class="text-[10px] uppercase tracking-widest text-outline font-bold">Domain</p>
+                    <p class="text-sm font-semibold text-on-surface break-all">{{ formatAuditDomain(audit.summary.domain) }}</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2 px-4 py-3 glass-panel border border-outline-variant/20 rounded-2xl">
+                  <span class="material-symbols-outlined text-outline text-base">inventory_2</span>
+                  <div>
+                    <p class="text-[10px] uppercase tracking-widest text-outline font-bold">Audit-Scope</p>
+                    <p class="text-sm font-semibold text-on-surface">{{ audit.summary.totalProcessed }} von {{ audit.summary.totalFound }} Seiten geprueft</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            @if (audit.summary.domain) {
+              <a [href]="audit.summary.domain"
+                 target="_blank"
+                 class="inline-flex items-center gap-2 px-4 py-3 bg-[#0070FF] hover:bg-blue-600 text-white rounded-xl text-sm font-semibold transition-all hover:-translate-y-0.5 shadow-[0_0_16px_rgba(0,112,255,0.25)]">
+                <span class="material-symbols-outlined text-base">open_in_new</span>
+                Website oeffnen
+              </a>
+            }
+          </div>
+
+          @if (audit.summary.totalProcessed === 0) {
+            <div class="glass-panel border border-outline-variant/20 rounded-3xl p-10 text-center">
+              <div class="w-16 h-16 mx-auto rounded-2xl bg-[#0070FF]/12 flex items-center justify-center mb-5">
+                <span class="material-symbols-outlined text-[#0070FF] text-3xl" style="font-variation-settings:'FILL' 1;">radar</span>
+              </div>
+              <h2 class="text-2xl font-headline font-black text-on-surface mb-3">Noch kein Audit-Lauf vorhanden</h2>
+              <p class="text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
+                Starte den GEO-Agenten mit einer Domain und einem Seitenlimit. Danach erscheinen hier Score-Karten,
+                Top-Probleme, priorisierte Seiten und konkrete Handlungsempfehlungen.
+              </p>
+            </div>
+          } @else {
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div class="glass-panel border border-outline-variant/20 rounded-2xl p-5">
+                <p class="text-[10px] uppercase tracking-widest text-outline font-bold">Durchschnitt</p>
+                <div class="mt-3 flex items-end justify-between gap-3">
+                  <p class="text-4xl font-headline font-black text-on-surface geo-score-number">{{ audit.summary.averageScore }}</p>
+                  <span class="px-3 py-1 text-[10px] uppercase tracking-widest font-black rounded-full border"
+                        [class]="getGeoScoreBadgeClass(audit.summary.averageScore)">
+                    /100
+                  </span>
+                </div>
+                <p class="text-sm text-on-surface-variant mt-3">Gesamtbild ueber alle geprueften Seiten.</p>
+              </div>
+
+              <div class="glass-panel border border-outline-variant/20 rounded-2xl p-5">
+                <p class="text-[10px] uppercase tracking-widest text-outline font-bold">Seiten geprueft</p>
+                <div class="mt-3 flex items-end justify-between gap-3">
+                  <p class="text-4xl font-headline font-black text-on-surface geo-score-number">{{ audit.summary.totalProcessed }}</p>
+                  <span class="text-sm text-on-surface-variant">von {{ audit.summary.totalFound }}</span>
+                </div>
+                <p class="text-sm text-on-surface-variant mt-3">So viele URLs sind wirklich in die Bewertung eingeflossen.</p>
+              </div>
+
+              <div class="glass-panel border border-outline-variant/20 rounded-2xl p-5">
+                <p class="text-[10px] uppercase tracking-widest text-outline font-bold">Beste Seite</p>
+                <div class="mt-3 flex items-end justify-between gap-3">
+                  <p class="text-4xl font-headline font-black text-on-surface geo-score-number">{{ audit.summary.bestPage?.score ?? '–' }}</p>
+                  @if (audit.summary.bestPage) {
+                    <span class="px-3 py-1 text-[10px] uppercase tracking-widest font-black rounded-full border"
+                          [class]="getGeoScoreBadgeClass(audit.summary.bestPage.score)">
+                      {{ audit.summary.bestPage.score }}/100
+                    </span>
+                  }
+                </div>
+                <p class="text-sm text-on-surface-variant mt-3 truncate">{{ audit.summary.bestPage?.path ?? 'Noch keine Seite vorhanden' }}</p>
+              </div>
+
+              <div class="glass-panel border border-outline-variant/20 rounded-2xl p-5">
+                <p class="text-[10px] uppercase tracking-widest text-outline font-bold">Crawler-Status</p>
+                <div class="mt-3 flex flex-wrap items-center gap-3">
+                  <span class="px-3 py-1 text-[10px] uppercase tracking-widest font-black rounded-full border"
+                        [class]="getGeoStatusBadgeClass(audit.botStatus)">
+                    {{ getGeoStatusLabel(audit.botStatus) }}
+                  </span>
+                </div>
+                <p class="text-sm text-on-surface-variant mt-3">{{ getGeoStatusDescription(audit.botStatus) }}</p>
+              </div>
+            </div>
+
+            <div class="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+              <div class="glass-panel border border-outline-variant/20 rounded-3xl p-6">
+                <div class="flex items-center gap-3 mb-6">
+                  <span class="material-symbols-outlined text-[#0070FF]" style="font-variation-settings:'FILL' 1;">gpp_good</span>
+                  <div>
+                    <h2 class="text-xl font-headline font-black text-on-surface">Crawler & Verteilung</h2>
+                    <p class="text-sm text-on-surface-variant">Technische Zugriffsbarriere plus Score-Spektrum im aktuellen Audit-Lauf.</p>
+                  </div>
+                </div>
+
+                <div class="rounded-2xl border p-5 mb-6" [class]="getGeoStatusBadgeClass(audit.botStatus)">
+                  <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined mt-0.5"
+                          [class]="audit.botStatus.firewallBlocked || audit.botStatus.cloudflareBlocksAll ? 'text-current' : 'text-current'">
+                      {{ audit.botStatus.cloudflareBlocksAll ? 'shield_lock' : audit.botStatus.firewallBlocked ? 'warning' : 'verified' }}
+                    </span>
+                    <div>
+                      <p class="text-sm font-bold">{{ getGeoStatusLabel(audit.botStatus) }}</p>
+                      <p class="text-sm opacity-90 mt-1">{{ getGeoStatusDescription(audit.botStatus) }}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space-y-4">
+                  @for (bucket of geoDistributionItems(); track bucket.range) {
+                    <div class="space-y-2">
+                      <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-2">
+                          <span class="material-symbols-outlined text-sm"
+                                [class]="bucket.tone === 'green' ? 'text-emerald-400' :
+                                         bucket.tone === 'yellow' ? 'text-amber-400' :
+                                         bucket.tone === 'orange' ? 'text-orange-400' :
+                                         'text-red-400'">
+                            circle
+                          </span>
+                          <span class="text-sm font-semibold text-on-surface">{{ bucket.label }}</span>
+                          <span class="text-xs text-on-surface-variant">{{ bucket.range }}</span>
+                        </div>
+                        <span class="text-sm font-bold text-on-surface geo-score-number">{{ bucket.count }}</span>
+                      </div>
+                      <div class="h-2 rounded-full bg-surface-container-highest overflow-hidden">
+                        <div class="h-full rounded-full transition-all duration-700"
+                             [class]="getGeoToneFillClass(bucket.tone)"
+                             [style.width.%]="audit.summary.totalProcessed ? (bucket.count / audit.summary.totalProcessed) * 100 : 0">
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div class="glass-panel border border-outline-variant/20 rounded-3xl p-6">
+                <div class="flex items-center gap-3 mb-6">
+                  <span class="material-symbols-outlined text-[#0070FF]" style="font-variation-settings:'FILL' 1;">priority_high</span>
+                  <div>
+                    <h2 class="text-xl font-headline font-black text-on-surface">Top-Probleme</h2>
+                    <p class="text-sm text-on-surface-variant">Diese Themen tauchen seitenuebergreifend am haeufigsten auf.</p>
+                  </div>
+                </div>
+
+                @if (geoTopIssuesPreview().length) {
+                  <div class="space-y-4">
+                    @for (issue of geoTopIssuesPreview(); track issue.issue) {
+                      <div class="space-y-2">
+                        <div class="flex items-start justify-between gap-4">
+                          <div>
+                            <p class="text-sm font-semibold text-on-surface">{{ issue.issue }}</p>
+                            <p class="text-xs text-on-surface-variant">{{ issue.count }} Seiten betroffen</p>
+                          </div>
+                          <span class="text-sm font-black text-on-surface geo-score-number">{{ issue.percent }}%</span>
+                        </div>
+                        <div class="h-2 rounded-full bg-surface-container-highest overflow-hidden">
+                          <div class="h-full rounded-full bg-[#0070FF] transition-all duration-700"
+                               [style.width.%]="issue.percent">
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <p class="text-sm text-on-surface-variant">Keine aggregierten Probleme verfuegbar.</p>
+                }
+              </div>
+            </div>
+
+            <div class="grid gap-6 lg:grid-cols-2">
+              <div class="glass-panel border border-outline-variant/20 rounded-3xl p-6">
+                <div class="flex items-center justify-between gap-4 mb-5">
+                  <div>
+                    <p class="text-[10px] uppercase tracking-widest text-outline font-bold">Beste Seite</p>
+                    <h2 class="text-xl font-headline font-black text-on-surface mt-1">Was schon gut funktioniert</h2>
+                  </div>
+                  @if (geoBestPage(); as bestPage) {
+                    <span class="px-4 py-2 text-sm font-black rounded-2xl border geo-score-number"
+                          [class]="getGeoScoreBadgeClass(bestPage.score)">
+                      {{ bestPage.score }}/100
+                    </span>
+                  }
+                </div>
+
+                @if (geoBestPage(); as bestPage) {
+                  <p class="text-sm font-semibold text-on-surface break-all">{{ bestPage.path }}</p>
+                  <p class="text-sm text-on-surface-variant mt-2">{{ bestPage.title || 'Diese Seite setzt aktuell den Benchmark im Audit.' }}</p>
+                  <div class="flex flex-wrap gap-2 mt-5">
+                    @if (bestPage.failed.length) {
+                      @for (issue of bestPage.failed.slice(0, 4); track issue) {
+                        <span class="px-3 py-1 text-[10px] uppercase tracking-widest font-bold rounded-full border border-outline-variant/20 bg-surface-container-high">
+                          {{ issue }}
+                        </span>
+                      }
+                    } @else {
+                      <span class="text-sm text-emerald-400">Keine offenen Findings auf dem Snapshot vorhanden.</span>
+                    }
+                  </div>
+                } @else {
+                  <p class="text-sm text-on-surface-variant">Fuer diesen Lauf liegt noch kein Best-Page-Snapshot vor.</p>
+                }
+              </div>
+
+              <div class="glass-panel border border-outline-variant/20 rounded-3xl p-6">
+                <div class="flex items-center justify-between gap-4 mb-5">
+                  <div>
+                    <p class="text-[10px] uppercase tracking-widest text-outline font-bold">Schwaechste Seite</p>
+                    <h2 class="text-xl font-headline font-black text-on-surface mt-1">Hier lohnt sich der erste Fix</h2>
+                  </div>
+                  @if (geoWorstPage(); as worstPage) {
+                    <span class="px-4 py-2 text-sm font-black rounded-2xl border geo-score-number"
+                          [class]="getGeoScoreBadgeClass(worstPage.score)">
+                      {{ worstPage.score }}/100
+                    </span>
+                  }
+                </div>
+
+                @if (geoWorstPage(); as worstPage) {
+                  <p class="text-sm font-semibold text-on-surface break-all">{{ worstPage.path }}</p>
+                  <p class="text-sm text-on-surface-variant mt-2">{{ worstPage.title || 'Diese Seite vereint aktuell die meisten offenen Signale.' }}</p>
+                  <div class="flex flex-wrap gap-2 mt-5">
+                    @for (issue of worstPage.failed.slice(0, 5); track issue) {
+                      <span class="px-3 py-1 text-[10px] uppercase tracking-widest font-bold rounded-full border border-amber-500/25 bg-amber-500/10 text-amber-200">
+                        {{ issue }}
+                      </span>
+                    }
+                  </div>
+                } @else {
+                  <p class="text-sm text-on-surface-variant">Fuer diesen Lauf liegt noch kein Worst-Page-Snapshot vor.</p>
+                }
+              </div>
+            </div>
+
+            <div class="glass-panel border border-outline-variant/20 rounded-3xl p-6">
+              <div class="flex items-center justify-between gap-4 mb-6 flex-wrap">
+                <div>
+                  <h2 class="text-xl font-headline font-black text-on-surface">Schwaechste Seiten</h2>
+                  <p class="text-sm text-on-surface-variant">Komprimierte Prioritaetenliste fuer Content-, Schema- und Struktur-Fixes.</p>
+                </div>
+                <span class="px-3 py-1 text-[10px] uppercase tracking-widest font-black rounded-full border border-outline-variant/20 bg-surface-container-high">
+                  {{ geoWeakestPages().length }} Seiten in der Liste
+                </span>
+              </div>
+
+              <div class="space-y-4">
+                @for (page of geoWeakestPages(); track page.path) {
+                  <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/20 p-5">
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                      <div class="min-w-0">
+                        <div class="flex flex-wrap items-center gap-3 mb-2">
+                          <span class="px-3 py-1 text-xs font-black rounded-full border geo-score-number"
+                                [class]="getGeoScoreBadgeClass(page.score)">
+                            {{ page.score }}/100
+                          </span>
+                          <span class="text-xs text-on-surface-variant">{{ page.failedCount }} Findings</span>
+                        </div>
+                        <p class="text-sm font-semibold text-on-surface break-all">{{ page.path }}</p>
+                        <p class="text-sm text-on-surface-variant mt-2">{{ page.title || 'Ohne Titel geliefert' }}</p>
+                      </div>
+
+                      @if (resolveAuditPageUrl(audit.summary.domain, page.path); as pageUrl) {
+                        <a [href]="pageUrl"
+                           target="_blank"
+                           class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[#0070FF]/25 text-sm font-semibold text-[#0070FF] hover:bg-[#0070FF]/10 transition-colors">
+                          <span class="material-symbols-outlined text-base">open_in_new</span>
+                          Seite oeffnen
+                        </a>
+                      }
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mt-4">
+                      @for (issue of page.failed.slice(0, 6); track issue) {
+                        <span class="px-3 py-1 text-[10px] uppercase tracking-widest font-bold rounded-full border border-outline-variant/20 bg-surface-container-high">
+                          {{ issue }}
+                        </span>
+                      }
+                      @if (page.failed.length > 6) {
+                        <span class="px-3 py-1 text-[10px] uppercase tracking-widest font-bold rounded-full border border-outline-variant/20 bg-surface-container-high text-on-surface-variant">
+                          +{{ page.failed.length - 6 }} weitere
+                        </span>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+              <div class="glass-panel border border-outline-variant/20 rounded-3xl p-6">
+                <div class="flex items-center gap-3 mb-6">
+                  <span class="material-symbols-outlined text-[#0070FF]" style="font-variation-settings:'FILL' 1;">bolt</span>
+                  <div>
+                    <h2 class="text-xl font-headline font-black text-on-surface">Empfohlene naechste Schritte</h2>
+                    <p class="text-sm text-on-surface-variant">Frontend-seitig aus den staerksten Signalen im Audit abgeleitet.</p>
+                  </div>
+                </div>
+
+                @if (geoRecommendations().length) {
+                  <div class="space-y-4">
+                    @for (recommendation of geoRecommendations(); track recommendation.title) {
+                      <div class="rounded-2xl border p-4" [class]="getGeoRecommendationClass(recommendation.tone)">
+                        <div class="flex items-start gap-3">
+                          <span class="material-symbols-outlined mt-0.5 text-[#0070FF]" style="font-variation-settings:'FILL' 1;">
+                            {{ recommendation.icon }}
+                          </span>
+                          <div>
+                            <p class="text-sm font-bold text-on-surface">{{ recommendation.title }}</p>
+                            <p class="text-sm text-on-surface-variant mt-1">{{ recommendation.body }}</p>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <p class="text-sm text-on-surface-variant">Noch keine Empfehlungen ableitbar.</p>
+                }
+              </div>
+
+              <div class="glass-panel border border-outline-variant/20 rounded-3xl p-6">
+                <div class="flex items-center gap-3 mb-6">
+                  <span class="material-symbols-outlined text-[#0070FF]" style="font-variation-settings:'FILL' 1;">emoji_events</span>
+                  <div>
+                    <h2 class="text-xl font-headline font-black text-on-surface">Starke Seiten</h2>
+                    <p class="text-sm text-on-surface-variant">Diese URLs liefern aktuell die besten GEO-Signale im geprueften Sample.</p>
+                  </div>
+                </div>
+
+                <div class="space-y-3">
+                  @for (page of geoTopPagesPreview(); track page.path) {
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/20 px-4 py-4">
+                      <div class="flex items-start justify-between gap-4">
+                        <div class="min-w-0">
+                          <p class="text-sm font-semibold text-on-surface break-all">{{ page.path }}</p>
+                          <p class="text-xs text-on-surface-variant mt-1">{{ page.title || 'Ohne Titel geliefert' }}</p>
+                        </div>
+                        <span class="px-3 py-1 text-xs font-black rounded-full border geo-score-number"
+                              [class]="getGeoScoreBadgeClass(page.score)">
+                          {{ page.score }}
+                        </span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            @if (audit.errors.length) {
+              <div class="glass-panel border border-red-500/20 rounded-3xl p-6">
+                <div class="flex items-center gap-3 mb-5">
+                  <span class="material-symbols-outlined text-red-400" style="font-variation-settings:'FILL' 1;">error</span>
+                  <div>
+                    <h2 class="text-xl font-headline font-black text-on-surface">Nicht erreichbare Seiten</h2>
+                    <p class="text-sm text-on-surface-variant">Diese URLs konnten waehrend des Laufs nicht vollstaendig verarbeitet werden.</p>
+                  </div>
+                </div>
+
+                <div class="space-y-3">
+                  @for (error of audit.errors; track error.errorMsg + (error.pageUrl ?? '')) {
+                    <div class="rounded-2xl border border-red-500/15 bg-red-500/10 px-4 py-4">
+                      <p class="text-sm font-semibold text-on-surface">{{ error.errorMsg }}</p>
+                      @if (error.pageUrl) {
+                        <p class="text-xs text-on-surface-variant mt-1 break-all">{{ error.pageUrl }}</p>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          }
+        </div>
+      }
+
+      <!-- ─── MARKDOWN / TEXT REPORT OUTPUT ───────────────────────── -->
       @if (markdownOutput(); as md) {
         <div class="space-y-6">
           <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
             <div class="flex items-center gap-3">
               <span class="material-symbols-outlined text-[#0070FF]" style="font-variation-settings:'FILL' 1;">description</span>
-              <h1 class="text-2xl font-headline font-black text-on-surface tracking-tight">Sales Briefing</h1>
+              <h1 class="text-2xl font-headline font-black text-on-surface tracking-tight">{{ markdownTitle() }}</h1>
             </div>
-            @if (md.companyName) {
+            @if (formatMarkdownSubject(md); as subject) {
               <div class="flex items-center gap-2 px-4 py-2 glass-panel border border-[#0070FF]/30 rounded-xl">
-                <span class="material-symbols-outlined text-[#0070FF] text-base" style="font-variation-settings:'FILL' 1;">business</span>
-                <span class="text-sm font-bold text-on-surface">{{ md.companyName }}</span>
+                <span class="material-symbols-outlined text-[#0070FF] text-base" style="font-variation-settings:'FILL' 1;">
+                  {{ isGeoSiteAudit ? 'language' : 'business' }}
+                </span>
+                <span class="text-sm font-bold text-on-surface">{{ subject }}</span>
                 @if (md.websiteUrl) {
                   <a [href]="md.websiteUrl" target="_blank"
                      class="text-xs text-[#0070FF] hover:underline ml-1">{{ md.websiteUrl }}</a>

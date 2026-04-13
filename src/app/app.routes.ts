@@ -55,9 +55,34 @@ export const routes: Routes = [
           import('./pages/ceo-dashboard/ceo-dashboard').then((m) => m.CeoDashboard),
       },
       {
+        path: 'kpi-dashboard',
+        loadComponent: () =>
+          import('./pages/kpi-dashboard/kpi-dashboard').then((m) => m.KpiDashboardComponent),
+      },
+      {
         path: 'reporting-bot',
         loadComponent: () =>
           import('./pages/reporting-bot/reporting-bot').then((m) => m.ReportingBot),
+      },
+      {
+        path: 'fehler-melden',
+        loadComponent: () =>
+          import('./pages/error-form/error-form').then((m) => m.ErrorFormComponent),
+      },
+      {
+        path: 'kontakt',
+        loadComponent: () =>
+          import('./pages/contact/contact').then((m) => m.ContactComponent),
+      },
+      {
+        path: 'idee-einreichen',
+        loadComponent: () =>
+          import('./pages/idea-form/idea-form').then((m) => m.IdeaFormComponent),
+      },
+      {
+        path: 'success/:type',
+        loadComponent: () =>
+          import('./pages/success/success').then((m) => m.SuccessComponent),
       },
     ],
   },

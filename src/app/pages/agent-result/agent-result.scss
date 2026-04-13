@@ -2,6 +2,19 @@
   display: block;
 }
 
+.geo-audit-view {
+  .geo-score-number {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+  }
+
+  .glass-panel {
+    box-shadow:
+      0 24px 70px rgba(5, 12, 24, 0.24),
+      inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  }
+}
+
 /* ── Markdown / Sales Briefing Rendering ─────────────────────────── */
 .md-content {
   color: var(--color-on-surface-variant);
@@ -102,5 +115,31 @@
     overflow-x: auto;
     margin-bottom: 1rem;
     code { background: none; padding: 0; }
+  }
+}
+
+.content-strategy-brief {
+  p > strong:first-child {
+    display: inline-block;
+    margin-right: 0.4rem;
+    color: #dceaff;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+}
+
+.content-strategy-analysis {
+  ul,
+  ol {
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  li {
+    padding: 0.85rem 0.95rem;
+    border: 1px solid color-mix(in srgb, var(--color-outline-variant) 18%, transparent);
+    border-radius: 1rem;
+    background: color-mix(in srgb, var(--color-surface-container-high) 22%, transparent);
+    list-style-position: inside;
   }
 }

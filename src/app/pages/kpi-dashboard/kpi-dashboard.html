@@ -1,0 +1,214 @@
+<div class="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl bg-[#10B981]/10 border border-[#10B981]/20 flex items-center justify-center flex-shrink-0">
+        <span class="material-symbols-outlined text-[#10B981] text-2xl" style="font-variation-settings:'FILL' 1">bar_chart</span>
+      </div>
+      <div>
+        <h1 class="text-2xl font-bold text-on-surface font-headline">KPI Dashboard</h1>
+        <p class="text-sm text-on-surface-variant/60 mt-0.5">Überblick über alle Automations-Kennzahlen</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#10B981]/10 border border-[#10B981]/20 w-fit">
+      <span class="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
+      <span class="text-xs text-[#10B981] font-medium">{{ statusText() }}</span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (state() === 'loading') {
+    <div class="flex flex-col items-center justify-center py-24 gap-4">
+      <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 animate-spin">progress_activity</span>
+      <p class="text-sm text-on-surface-variant/50">Daten werden aus Google Sheets geladen…</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (state() === 'error') {
+    <div class="flex flex-col items-center justify-center py-24 gap-4 text-center">
+      <div class="w-14 h-14 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+        <span class="material-symbols-outlined text-red-400 text-2xl" style="font-variation-settings:'FILL' 1">error</span>
+      </div>
+      <div>
+        <h3 class="text-base font-semibold text-on-surface mb-1">Daten konnten nicht geladen werden</h3>
+        <p class="text-sm text-on-surface-variant/50">{{ errorMsg() }}</p>
+      </div>
+      <button
+        (click)="retry()"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container-high border border-outline-variant/30
+               text-sm font-medium text-on-surface hover:bg-surface-container-highest transition-all"
+      >
+        <span class="material-symbols-outlined text-base">refresh</span>
+        Erneut versuchen
+      </button>
+    </div>
+  }
+
+  <!-- Content -->
+  @if (state() === 'ready') {
+
+    <!-- Period Selector -->
+    <div class="flex flex-wrap gap-2">
+      @for (p of periods; track p.key) {
+        <button
+          (click)="setPeriod(p.key)"
+          [class.bg-[#0070FF]]="currentPeriod() === p.key"
+          [class.text-white]="currentPeriod() === p.key"
+          [class.border-[#0070FF]]="currentPeriod() === p.key"
+          [class.bg-surface-container-high]="currentPeriod() !== p.key"
+          [class.text-on-surface-variant]="currentPeriod() !== p.key"
+          [class.border-outline-variant/30]="currentPeriod() !== p.key"
+          class="px-4 py-2 rounded-xl border text-sm font-medium transition-all hover:border-[#0070FF]/50"
+        >{{ p.label }}</button>
+      }
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <div class="bg-surface-container rounded-2xl border border-outline-variant/20 p-5 space-y-2">
+        <p class="text-xs uppercase tracking-widest text-on-surface-variant/40 font-bold">Ausführungen</p>
+        <p class="text-3xl font-black text-on-surface font-headline">{{ kpiExecutions() }}</p>
+        <p class="text-xs text-on-surface-variant/50">{{ kpiExecSub() }}</p>
+        <span
+          class="inline-block text-xs font-semibold px-2 py-0.5 rounded-full"
+          [ngClass]="{
+            'bg-emerald-500/10 text-emerald-400': kpiExecChange().cls === 'up',
+            'bg-red-500/10 text-red-400': kpiExecChange().cls === 'down',
+            'bg-surface-container-high text-on-surface-variant/40': kpiExecChange().cls === 'neutral'
+          }"
+        >{{ kpiExecChange().label }}</span>
+      </div>
+
+      <div class="bg-surface-container rounded-2xl border border-outline-variant/20 p-5 space-y-2">
+        <p class="text-xs uppercase tracking-widest text-on-surface-variant/40 font-bold">Zeit gespart</p>
+        <p class="text-3xl font-black text-[#F59E0B] font-headline">{{ kpiTimeSaved() }}</p>
+        <p class="text-xs text-on-surface-variant/50">{{ kpiTimeSub() }}</p>
+        <span
+          class="inline-block text-xs font-semibold px-2 py-0.5 rounded-full"
+          [ngClass]="{
+            'bg-emerald-500/10 text-emerald-400': kpiTimeChange().cls === 'up',
+            'bg-red-500/10 text-red-400': kpiTimeChange().cls === 'down',
+            'bg-surface-container-high text-on-surface-variant/40': kpiTimeChange().cls === 'neutral'
+          }"
+        >{{ kpiTimeChange().label }}</span>
+      </div>
+
+      <div class="bg-surface-container rounded-2xl border border-outline-variant/20 p-5 space-y-2">
+        <p class="text-xs uppercase tracking-widest text-on-surface-variant/40 font-bold">Wert erzeugt</p>
+        <p class="text-3xl font-black text-[#10B981] font-headline">{{ kpiValue() }}</p>
+        <p class="text-xs text-on-surface-variant/50">{{ kpiValueSub() }}</p>
+        <span
+          class="inline-block text-xs font-semibold px-2 py-0.5 rounded-full"
+          [ngClass]="{
+            'bg-emerald-500/10 text-emerald-400': kpiValueChange().cls === 'up',
+            'bg-red-500/10 text-red-400': kpiValueChange().cls === 'down',
+            'bg-surface-container-high text-on-surface-variant/40': kpiValueChange().cls === 'neutral'
+          }"
+        >{{ kpiValueChange().label }}</span>
+      </div>
+
+      <div class="bg-surface-container rounded-2xl border border-outline-variant/20 p-5 space-y-2">
+        <p class="text-xs uppercase tracking-widest text-on-surface-variant/40 font-bold">Ø pro Ausführung</p>
+        <p class="text-3xl font-black text-[#0070FF] font-headline">{{ kpiAvg() }}</p>
+        <p class="text-xs text-on-surface-variant/50">{{ kpiAvgSub() }}</p>
+        <span
+          class="inline-block text-xs font-semibold px-2 py-0.5 rounded-full"
+          [ngClass]="{
+            'bg-emerald-500/10 text-emerald-400': kpiAvgChange().cls === 'up',
+            'bg-red-500/10 text-red-400': kpiAvgChange().cls === 'down',
+            'bg-surface-container-high text-on-surface-variant/40': kpiAvgChange().cls === 'neutral'
+          }"
+        >{{ kpiAvgChange().label }}</span>
+      </div>
+
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-surface-container rounded-2xl border border-outline-variant/20 p-6">
+        <p class="text-sm font-semibold text-on-surface mb-0.5">Ausführungen pro Tag</p>
+        <p class="text-xs text-on-surface-variant/40 mb-5">Anzahl täglicher Workflow-Ausführungen</p>
+        <div class="h-52">
+          <canvas #chartExecDaily></canvas>
+        </div>
+      </div>
+      <div class="bg-surface-container rounded-2xl border border-outline-variant/20 p-6">
+        <p class="text-sm font-semibold text-on-surface mb-0.5">Zeitersparnis pro Tag</p>
+        <p class="text-xs text-on-surface-variant/40 mb-5">Eingesparte Minuten nach Tag</p>
+        <div class="h-52">
+          <canvas #chartTimeSaved></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-surface-container rounded-2xl border border-outline-variant/20 p-6">
+        <p class="text-sm font-semibold text-on-surface mb-0.5">Wertschöpfung nach Prozess</p>
+        <p class="text-xs text-on-surface-variant/40 mb-5">Top-Prozesse nach generiertem Netto-Wert (€)</p>
+        <div class="h-52">
+          <canvas #chartValueByProcess></canvas>
+        </div>
+      </div>
+      <div class="bg-surface-container rounded-2xl border border-outline-variant/20 p-6">
+        <p class="text-sm font-semibold text-on-surface mb-0.5">Trigger-Typen</p>
+        <p class="text-xs text-on-surface-variant/40 mb-5">Verteilung automatisch vs. manuell</p>
+        <div class="h-52">
+          <canvas #chartTriggerTypes></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Process Table -->
+    <div class="bg-surface-container rounded-2xl border border-outline-variant/20 overflow-hidden">
+      <div class="px-6 py-5 border-b border-outline-variant/10">
+        <p class="text-sm font-semibold text-on-surface">Prozess-Übersicht</p>
+      </div>
+
+      @if (processStats().length === 0) {
+        <div class="flex flex-col items-center justify-center py-16 gap-3 text-center">
+          <span class="material-symbols-outlined text-3xl text-on-surface-variant/20">shield</span>
+          <p class="text-sm text-on-surface-variant/40">Keine Daten für diesen Zeitraum</p>
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-outline-variant/10">
+                <th class="text-left px-6 py-3 text-xs font-bold uppercase tracking-widest text-on-surface-variant/40">Prozess</th>
+                <th class="text-right px-6 py-3 text-xs font-bold uppercase tracking-widest text-on-surface-variant/40">Ausführungen</th>
+                <th class="text-right px-6 py-3 text-xs font-bold uppercase tracking-widest text-on-surface-variant/40">Zeit gespart</th>
+                <th class="text-right px-6 py-3 text-xs font-bold uppercase tracking-widest text-on-surface-variant/40">Netto-Wert</th>
+                <th class="px-6 py-3 text-xs font-bold uppercase tracking-widest text-on-surface-variant/40 w-32">Anteil</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of processStats(); track p.name) {
+                <tr class="border-b border-outline-variant/5 hover:bg-surface-container-high/50 transition-colors">
+                  <td class="px-6 py-3.5">
+                    <div class="flex items-center gap-2.5">
+                      <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" [style.background]="p.color"></span>
+                      <span class="text-on-surface font-medium truncate max-w-[200px]">{{ p.name }}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-3.5 text-right text-on-surface-variant">{{ p.executions }}</td>
+                  <td class="px-6 py-3.5 text-right text-[#F59E0B] font-medium">{{ formatTime(p.timeSaved) }}</td>
+                  <td class="px-6 py-3.5 text-right text-[#10B981] font-medium">{{ formatNetValue(p.netValue) }}</td>
+                  <td class="px-6 py-3.5">
+                    <div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+                      <div class="h-full rounded-full transition-all" [style.width.%]="p.share" [style.background]="p.color"></div>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+  }
+</div>

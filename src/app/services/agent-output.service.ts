@@ -3,11 +3,15 @@ import {
   AgentOutput,
   CompanyListOutput,
   EmailOutput,
+  GeoAuditOutput,
   LinkedInPostOutput,
+  MarkdownOutput,
   VideoScriptOutput,
   LeadTableOutput,
   KeywordTableOutput,
   SyncReportOutput,
+  SocialMediaOutput,
+  ContentStrategyOutput,
   RunInputData,
 } from '../models/interfaces';
 
@@ -31,10 +35,20 @@ export class AgentOutputService {
         return this.generateLeadTable(input.companyName || audience, input.websiteUrl || url);
       case 'top-ranker-bot':
         return this.generateKeywordTable(audience, url);
+      case 'geo-site-audit':
+        return this.generateGeoSiteAuditPlaceholder(input.domain || input.websiteUrl || 'beispiel.de');
       case 'sync-master':
         return this.generateSyncReport();
       case 'firmen-finder':
         return this.generateCompanyList(input.industry || 'Webagenturen', input.city || 'Hannover');
+      case 'social-media-wizard':
+        return this.generateSocialMediaPlaceholder(input.topic || 'KI im Vertrieb', input.brandVoice || '', input.targetAudience || audience);
+      case 'content-strategy-bot':
+        return this.generateContentStrategyPlaceholder(
+          input.primaryTopic || 'KI im Marketing',
+          input.targetAudience || audience,
+          input.contentType || 'Insight',
+        );
       default:
         return this.generateColdEmail(audience, url, tone);
     }
@@ -167,6 +181,40 @@ export class AgentOutputService {
     };
   }
 
+  private generateGeoSiteAuditPlaceholder(domain: string): GeoAuditOutput {
+    const normalizedDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '') || 'beispiel.de';
+
+    return {
+      type: 'geo-audit',
+      summary: {
+        domain: `https://${normalizedDomain}`,
+        totalFound: 0,
+        totalProcessed: 0,
+        averageScore: 0,
+        bestPage: null,
+        worstPage: null,
+      },
+      botStatus: {
+        firewallBlocked: false,
+      },
+      totals: {
+        totalFound: 0,
+        totalProcessed: 0,
+        averageScore: 0,
+      },
+      distribution: {
+        green: 0,
+        yellow: 0,
+        orange: 0,
+        red: 0,
+      },
+      topIssues: [],
+      topPages: [],
+      worstPages: [],
+      errors: [],
+    };
+  }
+
   private generateCompanyList(industry: string, city: string): CompanyListOutput {
     return {
       type: 'company-list',
@@ -193,6 +241,58 @@ export class AgentOutputService {
         { source: 'LinkedIn Ads', target: 'Google Sheets', status: 'pending', recordCount: 891, lastSync: 'Läuft...' },
         { source: 'Notion DB', target: 'Airtable', status: 'success', recordCount: 456, lastSync: 'Vor 12 Min.' },
         { source: 'Stripe Events', target: 'Slack Webhook', status: 'error', recordCount: 35, lastSync: 'Fehler' },
+      ],
+    };
+  }
+
+  private generateSocialMediaPlaceholder(topic: string, brandVoice: string, targetAudience: string): SocialMediaOutput {
+    return {
+      type: 'social-media',
+      topic,
+      brandVoice,
+      targetAudience,
+      twitter: `🚀 ${topic} — Das verändert alles.\n\nWer jetzt nicht handelt, verliert den Anschluss.\n\n#KI #Automation #Growth`,
+      linkedin: `Ich habe etwas gelernt, das ich sofort teilen möchte:\n\n${topic}\n\nDas ist kein Hype. Das ist Realität.\n\nWie geht ihr damit um? Schreibt es in die Kommentare.\n\n#KI #Innovation #Vertrieb`,
+      redditTitle: `${topic} — meine ehrlichen Erfahrungen nach 3 Monaten`,
+      redditBody: `Ich wollte hier mal transparent teilen, was ich in den letzten Monaten mit dem Thema "${topic}" erlebt habe...\n\nEs gibt viel Hype, aber auch echte Substanz. Fragt mich gerne alles.`,
+      instagramCaption: `${topic} ✨\n\nDas Spiel hat sich verändert — bist du bereit?\n\nSave this post für später 👇\n\n#KI #Business #Wachstum #Automation #Erfolg`,
+    };
+  }
+
+  private generateContentStrategyPlaceholder(
+    primaryTopic: string,
+    targetAudience: string,
+    contentType: string,
+  ): ContentStrategyOutput {
+    return {
+      type: 'content-strategy',
+      primaryTopic,
+      targetAudience,
+      contentType,
+      brief: `## Executive Summary\n**Ziel:** Ein strategisches Content-Piece für ${targetAudience} rund um ${primaryTopic}.`,
+      structuredAnalysis: `# Structured Analysis\n\n## Primary Opportunities\n- ${primaryTopic}\n- Praxisbeispiele\n- ROI und Umsetzung`,
+      primaryKeywords: [primaryTopic, 'Marketing Automation', 'Künstliche Intelligenz im Marketing'],
+      longTailKeywords: [
+        { keyword: 'Wie KI den ROI im Marketing steigert', intent: 'informational' },
+        { keyword: 'KI Marketing Software vergleichen', intent: 'commercial' },
+        { keyword: 'Agentur für KI Marketing beauftragen', intent: 'transactional' },
+      ],
+      questionBasedKeywords: [
+        'Wie verbessert KI meine Marketingstrategie?',
+        'Welche Tools eignen sich für kleine Teams?',
+      ],
+      relatedTopics: ['Customer Journey', 'Marketing Automation', 'Programmatic Advertising'],
+      competitorUrls: [],
+      keywords: [
+        {
+          keyword: primaryTopic,
+          searchVolume: 480,
+          keywordDifficulty: 24,
+          competition: 'MEDIUM',
+          competitionIndex: 34,
+          cpc: 8.51,
+          monthlySearches: [],
+        },
       ],
     };
   }

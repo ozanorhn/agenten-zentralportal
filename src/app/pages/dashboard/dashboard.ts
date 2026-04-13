@@ -95,12 +95,42 @@ export class Dashboard implements OnInit, OnDestroy {
       category: 'SEO',
     },
     {
+      id: 'geo-site-audit',
+      name: 'Geo Site Audit',
+      description:
+        'Crawlt deine Sitemap und erstellt einen GEO-Audit mit Rankings, KI-Signalen und den wichtigsten siteweiten Baustellen.',
+      icon: 'travel_explore',
+      category: 'SEO',
+      badgeLabel: 'LIVE',
+      badgeVariant: 'primary',
+    },
+    {
+      id: 'content-strategy-bot',
+      name: 'Content-Strategy-Bot',
+      description:
+        'Analysiert dein Thema, findet Suchvolumen und Keyword-Difficulty, identifiziert Wettbewerber-URLs und liefert einen vollständigen Content-Strategie-Plan.',
+      icon: 'article',
+      category: 'SEO',
+      badgeLabel: 'NEU',
+      badgeVariant: 'primary',
+    },
+    {
       id: 'sync-master',
       name: 'Sync-Master 3000',
       description:
         'Hält dein CRM und deine Marketing-Tools synchron. Erkennt Duplikate und bereichert Profile automatisch an.',
       icon: 'schema',
       category: 'Data',
+    },
+    {
+      id: 'social-media-wizard',
+      name: 'Social-Media-Wizard',
+      description:
+        'Generiert plattformoptimierten Content für Twitter, LinkedIn, Reddit und Instagram — auf deine Brand Voice und Zielgruppe zugeschnitten.',
+      icon: 'campaign',
+      category: 'Content',
+      badgeLabel: 'NEU',
+      badgeVariant: 'primary',
     },
     {
       id: 'script-savant',

@@ -1,0 +1,196 @@
+<div class="min-h-screen bg-surface text-on-surface font-body flex items-start justify-center px-4 py-12">
+  <div class="w-full max-w-2xl">
+
+    <!-- Back button -->
+    <a routerLink="/" class="inline-flex items-center gap-2 text-sm text-on-surface-variant/60 hover:text-on-surface mb-8 transition-colors">
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      Zurück
+    </a>
+
+    <!-- Card -->
+    <div class="bg-surface-container rounded-2xl border border-outline-variant/20 shadow-[0_8px_32px_rgba(0,0,0,0.12)] overflow-hidden">
+
+      <!-- Header -->
+      <div class="px-8 pt-8 pb-6 border-b border-outline-variant/10">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="w-12 h-12 rounded-xl bg-[#0070FF]/10 border border-[#0070FF]/20 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[#0070FF] text-2xl" style="font-variation-settings:'FILL' 1">lightbulb</span>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-on-surface font-headline">Idee einreichen</h1>
+            <p class="text-sm text-on-surface-variant/60 mt-0.5">Teile uns mit, welchen Prozess du automatisieren möchtest.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form (ngSubmit)="submit()" class="px-8 py-8 space-y-6">
+
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-on-surface">
+            Idee / kurze Prozessbeschreibung <span class="text-[#0070FF] ml-0.5">*</span>
+          </label>
+          <textarea
+            [(ngModel)]="prozessbeschreibung"
+            name="prozessbeschreibung"
+            placeholder="Beschreibe kurz, welchen Prozess du automatisieren möchtest…"
+            required
+            rows="4"
+            class="w-full px-4 py-3 bg-surface-container-high border border-outline-variant/30 rounded-xl
+                   text-on-surface placeholder:text-on-surface-variant/30 text-sm
+                   focus:outline-none focus:border-[#0070FF]/60 focus:ring-2 focus:ring-[#0070FF]/10
+                   resize-none transition-all"
+          ></textarea>
+        </div>
+
+        <div class="space-y-3">
+          <label class="block text-sm font-semibold text-on-surface">
+            Wie oft tritt der Workflow ein? <span class="text-[#0070FF] ml-0.5">*</span>
+          </label>
+          <div class="flex flex-wrap gap-3">
+            @for (opt of ['Täglich', 'Wöchentlich', 'Monatlich', 'Seltener']; track opt) {
+              <button
+                type="button"
+                (click)="selectHaeufigkeit(opt)"
+                [class.border-[#0070FF]]="haeufigkeit() === opt"
+                [class.bg-[#0070FF]/10]="haeufigkeit() === opt"
+                [class.text-[#0070FF]]="haeufigkeit() === opt"
+                class="px-5 py-2.5 rounded-xl border border-outline-variant/30 text-sm font-medium
+                       text-on-surface-variant bg-surface-container-high
+                       hover:border-[#0070FF]/50 hover:bg-[#0070FF]/5 transition-all"
+              >{{ opt }}</button>
+            }
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-on-surface">
+            Wie lange dauert die Aufgabe? (in Minuten) <span class="text-[#0070FF] ml-0.5">*</span>
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="zeitaufwand"
+            name="zeitaufwand"
+            placeholder="z.B. 15 Minuten"
+            required
+            class="w-full px-4 py-3 bg-surface-container-high border border-outline-variant/30 rounded-xl
+                   text-on-surface placeholder:text-on-surface-variant/30 text-sm
+                   focus:outline-none focus:border-[#0070FF]/60 focus:ring-2 focus:ring-[#0070FF]/10
+                   transition-all"
+          />
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-on-surface">
+            Ist dieser Workflow für dich? <span class="text-[#0070FF] ml-0.5">*</span>
+          </label>
+          <select
+            [(ngModel)]="bereich"
+            name="bereich"
+            required
+            class="w-full px-4 py-3 bg-surface-container-high border border-outline-variant/30 rounded-xl
+                   text-on-surface text-sm
+                   focus:outline-none focus:border-[#0070FF]/60 focus:ring-2 focus:ring-[#0070FF]/10
+                   transition-all appearance-none"
+          >
+            <option value="" disabled selected>Bitte auswählen…</option>
+            <option value="Nur für mich">Nur für mich</option>
+            <option value="Mein Bereich/Team">Mein Bereich / Team</option>
+            <option value="Ganz EOM">Ganz EOM</option>
+          </select>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-on-surface">Gibt es wichtige Tools, auf die man Zugriff benötigt?</label>
+          <input
+            type="text"
+            [(ngModel)]="tools"
+            name="tools"
+            placeholder="z.B. Slack, E-Mail, Sistrix, Monday…"
+            class="w-full px-4 py-3 bg-surface-container-high border border-outline-variant/30 rounded-xl
+                   text-on-surface placeholder:text-on-surface-variant/30 text-sm
+                   focus:outline-none focus:border-[#0070FF]/60 focus:ring-2 focus:ring-[#0070FF]/10
+                   transition-all"
+          />
+        </div>
+
+        <!-- File upload -->
+        <div class="space-y-3">
+          <label class="block text-sm font-semibold text-on-surface">Dateien anhängen</label>
+          <div
+            class="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all"
+            [class.border-[#0070FF]]="dragOver()"
+            [class.bg-[#0070FF]/5]="dragOver()"
+            [class.border-outline-variant/30]="!dragOver()"
+            [class.hover:border-outline-variant]="!dragOver()"
+            (drop)="onDrop($event)"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave()"
+            (click)="fileInput.click()"
+          >
+            <input #fileInput type="file" multiple hidden (change)="onFilesSelected($event)">
+            <span class="material-symbols-outlined text-3xl text-on-surface-variant/30 mb-2 block">attach_file</span>
+            <p class="text-sm text-on-surface-variant/60">
+              Dateien hierher ziehen oder <span class="text-[#0070FF] font-medium">durchsuchen</span>
+            </p>
+            <p class="text-xs text-on-surface-variant/30 mt-1">Screenshots, PDFs, Dokumente etc.</p>
+          </div>
+
+          @if (files().length) {
+            <ul class="space-y-2">
+              @for (file of files(); track file.name + $index) {
+                <li class="flex items-center justify-between px-4 py-2.5 bg-surface-container-high rounded-xl border border-outline-variant/20">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="material-symbols-outlined text-base text-on-surface-variant/50">description</span>
+                    <span class="text-sm text-on-surface truncate">{{ file.name }}</span>
+                  </div>
+                  <div class="flex items-center gap-3 flex-shrink-0">
+                    <span class="text-xs text-on-surface-variant/40">{{ formatFileSize(file.size) }}</span>
+                    <button type="button" (click)="removeFile($index)" class="text-on-surface-variant/30 hover:text-on-surface transition-colors">
+                      <span class="material-symbols-outlined text-base">close</span>
+                    </button>
+                  </div>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-on-surface">
+            Wen können wir für Rückfragen ansprechen? <span class="text-[#0070FF] ml-0.5">*</span>
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="ansprechperson"
+            name="ansprechperson"
+            placeholder="Name oder E-Mail"
+            required
+            class="w-full px-4 py-3 bg-surface-container-high border border-outline-variant/30 rounded-xl
+                   text-on-surface placeholder:text-on-surface-variant/30 text-sm
+                   focus:outline-none focus:border-[#0070FF]/60 focus:ring-2 focus:ring-[#0070FF]/10
+                   transition-all"
+          />
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="loading()"
+          class="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl
+                 bg-[#0070FF] text-white font-semibold text-sm
+                 hover:bg-[#005FDB] active:scale-[0.98]
+                 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        >
+          @if (loading()) {
+            <span class="material-symbols-outlined text-base animate-spin">progress_activity</span>
+            Wird gesendet…
+          } @else {
+            Idee einreichen
+            <span class="material-symbols-outlined text-base">arrow_forward</span>
+          }
+        </button>
+
+      </form>
+    </div>
+  </div>
+</div>

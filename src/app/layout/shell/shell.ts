@@ -30,6 +30,7 @@ export class Shell {
 
   showNotifications = signal(false);
   showBooking = signal(false);
+  showFeedback = signal(false);
 
   toggleNotifications(): void {
     this.showNotifications.update(v => !v);
@@ -57,6 +58,7 @@ export class Shell {
         { label: 'Management', icon: 'tune', route: '/management' },
         { label: 'History', icon: 'history', route: '/conversations' },
         { label: 'CEO Dashboard', icon: 'speed', route: '/ceo-dashboard' },
+        { label: 'KPI Dashboard', icon: 'bar_chart', route: '/kpi-dashboard' },
         { label: 'Reporting Bot', icon: 'summarize', route: '/reporting-bot' },
       ],
     },

@@ -9,6 +9,11 @@ export interface RunInputData {
   keyword?: string;
   industry?: string;
   city?: string;
+  domain?: string;
+  maxPages?: string;
+  brandVoice?: string;
+  primaryTopic?: string;
+  contentType?: string;
 }
 
 export interface RunRecord {
@@ -33,8 +38,11 @@ export type AgentOutput =
   | LeadTableOutput
   | KeywordTableOutput
   | SyncReportOutput
+  | GeoAuditOutput
   | MarkdownOutput
-  | CompanyListOutput;
+  | CompanyListOutput
+  | SocialMediaOutput
+  | ContentStrategyOutput;
 
 export interface EmailOutput {
   type: 'email';
@@ -119,6 +127,72 @@ export interface SyncItem {
   lastSync: string;
 }
 
+export interface GeoAuditOutput {
+  type: 'geo-audit';
+  summary: GeoAuditSummary;
+  botStatus: GeoAuditBotStatus;
+  totals: GeoAuditTotals;
+  distribution: GeoAuditDistribution;
+  topIssues: GeoAuditIssue[];
+  topPages: GeoAuditPage[];
+  worstPages: GeoAuditPage[];
+  errors: GeoAuditError[];
+}
+
+export interface GeoAuditSummary {
+  domain: string;
+  totalFound: number;
+  totalProcessed: number;
+  averageScore: number;
+  bestPage?: GeoAuditPageRef | null;
+  worstPage?: GeoAuditPageRef | null;
+}
+
+export interface GeoAuditPageRef {
+  path: string;
+  score: number;
+  title?: string;
+}
+
+export interface GeoAuditBotStatus {
+  firewallBlocked: boolean;
+  cloudflareDetected?: boolean;
+  cloudflareBlocksAll?: boolean;
+  aiBotStatus?: number | null;
+}
+
+export interface GeoAuditTotals {
+  totalFound: number;
+  totalProcessed: number;
+  averageScore: number;
+}
+
+export interface GeoAuditDistribution {
+  green: number;
+  yellow: number;
+  orange: number;
+  red: number;
+}
+
+export interface GeoAuditIssue {
+  issue: string;
+  count: number;
+  percent: number;
+}
+
+export interface GeoAuditPage {
+  path: string;
+  score: number;
+  title?: string;
+  failedCount: number;
+  failed: string[];
+}
+
+export interface GeoAuditError {
+  pageUrl?: string;
+  errorMsg: string;
+}
+
 export interface MarkdownOutput {
   type: 'markdown';
   content: string;
@@ -140,6 +214,54 @@ export interface CompanyListOutput {
   companies: CompanyRow[];
   industry: string;
   city: string;
+}
+
+export interface SocialMediaOutput {
+  type: 'social-media';
+  topic: string;
+  brandVoice: string;
+  targetAudience: string;
+  twitter: string;
+  linkedin: string;
+  redditTitle: string;
+  redditBody: string;
+  instagramCaption: string;
+}
+
+export interface MonthlySearch {
+  year: number;
+  month: number;
+  searchVolume: number;
+}
+
+export interface KeywordDataRow {
+  keyword: string;
+  searchVolume: number | null;
+  keywordDifficulty: number | null;
+  competition: string | null;
+  competitionIndex: number | null;
+  cpc: number | null;
+  monthlySearches: MonthlySearch[];
+}
+
+export interface ContentStrategyIntentKeyword {
+  keyword: string;
+  intent: string;
+}
+
+export interface ContentStrategyOutput {
+  type: 'content-strategy';
+  primaryTopic: string;
+  targetAudience: string;
+  contentType: string;
+  brief: string;
+  structuredAnalysis: string;
+  primaryKeywords: string[];
+  longTailKeywords: ContentStrategyIntentKeyword[];
+  questionBasedKeywords: string[];
+  relatedTopics: string[];
+  competitorUrls: string[];
+  keywords: KeywordDataRow[];
 }
 
 // ─── Notifications ────────────────────────────────────────────────────────────

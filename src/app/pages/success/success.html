@@ -1,0 +1,27 @@
+<div class="min-h-screen bg-surface text-on-surface font-body flex items-center justify-center px-4">
+  <div class="text-center max-w-md">
+    <div
+      class="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6"
+      [style.background]="config().color + '18'"
+      [style.border]="'1px solid ' + config().color + '30'"
+    >
+      <span
+        class="material-symbols-outlined text-4xl"
+        [style.color]="config().color"
+        style="font-variation-settings:'FILL' 1"
+      >{{ config().icon }}</span>
+    </div>
+
+    <h1 class="text-2xl font-bold text-on-surface font-headline mb-3">{{ config().title }}</h1>
+    <p class="text-on-surface-variant/70 text-sm leading-relaxed mb-8">{{ config().message }}</p>
+
+    <a
+      routerLink="/"
+      class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#0070FF] text-white text-sm font-semibold
+             hover:bg-[#005FDB] active:scale-[0.98] transition-all"
+    >
+      <span class="material-symbols-outlined text-base">home</span>
+      Zurück zur Startseite
+    </a>
+  </div>
+</div>

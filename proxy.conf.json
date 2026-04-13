@@ -1,0 +1,10 @@
+{
+  "/api/n8n": {
+    "target": "https://n8n.eom.de",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/n8n": ""
+    }
+  }
+}

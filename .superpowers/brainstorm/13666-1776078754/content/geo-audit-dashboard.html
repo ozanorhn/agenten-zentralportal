@@ -1,0 +1,117 @@
+<h2>GEO Audit Dashboard</h2>
+<p class="subtitle">Empfohlene erste Ansicht fuer den neuen JSON-first Result-Screen</p>
+
+<div class="section">
+  <div class="mockup">
+    <div class="mockup-header">Result View: Executive First</div>
+    <div class="mockup-body" style="display:flex;flex-direction:column;gap:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div>
+          <div class="label">Domain</div>
+          <div style="font-size:26px;font-weight:800;">eom.de</div>
+          <div style="opacity:.7;font-size:13px;">GEO Full Site Audit · 25 Seiten geprueft</div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <div class="mock-button" style="background:#0f7bff;">Export JSON</div>
+          <div class="mock-button">CSV</div>
+          <div class="mock-button">Neu pruefen</div>
+        </div>
+      </div>
+
+      <div class="cards" style="grid-template-columns:repeat(4,minmax(0,1fr));">
+        <div class="card">
+          <div class="card-body">
+            <div class="label">Durchschnitt</div>
+            <div style="font-size:30px;font-weight:900;">84<span style="font-size:16px;opacity:.6;">/100</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div class="label">Seiten Geprueft</div>
+            <div style="font-size:30px;font-weight:900;">25</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div class="label">Top Score</div>
+            <div style="font-size:30px;font-weight:900;">90</div>
+            <div style="font-size:12px;opacity:.7;">/insights/wie-funktioniert-google-suche...</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div class="label">KI-Crawler Status</div>
+            <div style="font-size:18px;font-weight:800;color:#ff8a5b;">Blockiert</div>
+            <div style="font-size:12px;opacity:.7;">GPTBot 403</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="mockup">
+          <div class="mockup-header">Bot- und Crawl-Status</div>
+          <div class="mockup-body" style="display:flex;flex-direction:column;gap:12px;">
+            <div style="padding:14px;border-radius:14px;background:rgba(255,120,50,.12);border:1px solid rgba(255,120,50,.25);">
+              <div style="font-weight:800;margin-bottom:6px;">KI-Crawler werden blockiert</div>
+              <div style="font-size:13px;opacity:.78;">Browser: OK · GPTBot: 403 · Handlung: Firewall/WAF fuer bekannte Bots pruefen</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div class="placeholder">Seiten gefunden: 254</div>
+              <div class="placeholder">Fehler: 0</div>
+            </div>
+            <div class="placeholder" style="height:120px;">Verteilung 80-100 / 60-79 / 40-59 / 0-39 als einfache Balken</div>
+          </div>
+        </div>
+
+        <div class="mockup">
+          <div class="mockup-header">Top-Probleme</div>
+          <div class="mockup-body" style="display:flex;flex-direction:column;gap:10px;">
+            <div class="placeholder">1. KI-Firewall offen · 25/25 · 100%</div>
+            <div class="placeholder">2. BreadcrumbList · 25/25 · 100%</div>
+            <div class="placeholder">3. llms.txt · 25/25 · 100%</div>
+            <div class="placeholder">4. KI-Regeln in robots.txt · 25/25 · 100%</div>
+            <div class="placeholder">5. Trust-Signale · 18/25 · 72%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="mockup">
+          <div class="mockup-header">Beste Seite</div>
+          <div class="mockup-body">
+            <div style="font-size:28px;font-weight:900;color:#00a86b;">90/100</div>
+            <div style="font-weight:700;margin:8px 0;">/insights/wie-funktioniert-google-suche-39458.html</div>
+            <div style="font-size:13px;opacity:.78;">Nur vier siteweite Probleme verbleiben: KI-Firewall, BreadcrumbList, llms.txt, KI-Regeln in robots.txt</div>
+          </div>
+        </div>
+        <div class="mockup">
+          <div class="mockup-header">Schwaechste Seite</div>
+          <div class="mockup-body">
+            <div style="font-size:28px;font-weight:900;color:#ffb347;">79/100</div>
+            <div style="font-weight:700;margin:8px 0;">/insights/google-local-inventory-ads-2392.html</div>
+            <div style="font-size:13px;opacity:.78;">Fehlend: Alt-Texte, Trust-Signale, FAQ, Breadcrumbs, KI-Regeln</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mockup">
+        <div class="mockup-header">Schwaechste Seiten</div>
+        <div class="mockup-body" style="display:flex;flex-direction:column;gap:10px;">
+          <div class="placeholder">79/100 · /insights/google-local-inventory-ads-2392.html · 8 offene Probleme</div>
+          <div class="placeholder">79/100 · /insights/remarketing-dsgvo-5703.html · 8 offene Probleme</div>
+          <div class="placeholder">79/100 · /insights/in-5-schritten-zum-perfekten-seo-text-5694.html · 9 offene Probleme</div>
+          <div class="placeholder">80/100 · /insights/google-adwords-vs-bing-ads-4150.html · 8 offene Probleme</div>
+        </div>
+      </div>
+
+      <div class="mockup">
+        <div class="mockup-header">Empfehlungen</div>
+        <div class="mockup-body" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
+          <div class="placeholder">1. KI-Bot-Zugriff in Firewall/Cloudflare freigeben</div>
+          <div class="placeholder">2. BreadcrumbList und llms.txt siteweit ausrollen</div>
+          <div class="placeholder">3. Trust-Signale und FAQ auf schwachen Seiten priorisieren</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
