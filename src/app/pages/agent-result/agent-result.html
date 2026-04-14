@@ -645,43 +645,64 @@
                 </div>
 
                 <!-- Top Keyword Stats -->
-                <div class="grid gap-3 sm:grid-cols-3 xl:w-[36rem]">
-                  <div class="rounded-3xl border border-white/10 bg-slate-950/35 p-4 backdrop-blur">
-                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-100/45 mb-2">⬆️ Höchstes Volumen</p>
+                <div class="grid gap-4 sm:grid-cols-3 xl:w-[42rem]">
+                  <!-- Höchstes Volumen -->
+                  <div class="relative rounded-3xl border border-blue-400/20 bg-gradient-to-br from-blue-950/60 to-slate-950/40 p-5 backdrop-blur overflow-hidden group">
+                    <div class="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl"></div>
+                    <div class="flex items-center gap-2 mb-4">
+                      <div class="w-8 h-8 rounded-xl bg-blue-500/15 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-blue-400 text-[18px]" style="font-variation-settings:'FILL' 1;">trending_up</span>
+                      </div>
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-300/60 leading-tight">Höchstes<br>Volumen</p>
+                    </div>
                     @if (contentStrategyTopKeyword(); as topKeyword) {
-                      <p class="text-base font-black text-white leading-tight line-clamp-2">{{ topKeyword.keyword }}</p>
-                      <p class="mt-2 text-sm text-blue-50/70">
-                        <span class="font-black text-white">{{ topKeyword.searchVolume | number }}</span>
-                        <span class="font-light text-[11px]"> Suchanfragen/Mo.</span>
-                      </p>
+                      <p class="text-sm font-black text-white leading-snug line-clamp-2 mb-3">{{ topKeyword.keyword }}</p>
+                      <div class="flex items-baseline gap-1.5">
+                        <span class="text-xl font-black text-white">{{ topKeyword.searchVolume | number }}</span>
+                        <span class="text-[11px] font-light text-blue-200/50">/ Mo.</span>
+                      </div>
                     } @else {
-                      <p class="text-sm text-blue-50/70">–</p>
+                      <p class="text-sm text-blue-50/40">–</p>
                     }
                   </div>
 
-                  <div class="rounded-3xl border border-white/10 bg-slate-950/35 p-4 backdrop-blur">
-                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-100/45 mb-2">✓ Beste Chancen</p>
+                  <!-- Beste Chancen -->
+                  <div class="relative rounded-3xl border border-emerald-400/20 bg-gradient-to-br from-emerald-950/60 to-slate-950/40 p-5 backdrop-blur overflow-hidden group">
+                    <div class="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl"></div>
+                    <div class="flex items-center gap-2 mb-4">
+                      <div class="w-8 h-8 rounded-xl bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-emerald-400 text-[18px]" style="font-variation-settings:'FILL' 1;">verified</span>
+                      </div>
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-300/60 leading-tight">Beste<br>Chancen</p>
+                    </div>
                     @if (contentStrategyLowestDifficultyKeyword(); as lowKeyword) {
-                      <p class="text-base font-black text-white leading-tight line-clamp-2">{{ lowKeyword.keyword }}</p>
-                      <p class="mt-2 text-sm text-blue-50/70">
-                        <span class="font-black text-white">KD {{ lowKeyword.keywordDifficulty }}</span>
-                        <span class="font-light text-[11px]"> (leicht)</span>
-                      </p>
+                      <p class="text-sm font-black text-white leading-snug line-clamp-2 mb-3">{{ lowKeyword.keyword }}</p>
+                      <div class="flex items-baseline gap-1.5">
+                        <span class="text-xl font-black text-white">KD {{ lowKeyword.keywordDifficulty }}</span>
+                        <span class="text-[11px] font-light text-emerald-200/50">leicht</span>
+                      </div>
                     } @else {
-                      <p class="text-sm text-blue-50/70">–</p>
+                      <p class="text-sm text-blue-50/40">–</p>
                     }
                   </div>
 
-                  <div class="rounded-3xl border border-white/10 bg-slate-950/35 p-4 backdrop-blur">
-                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-100/45 mb-2">💰 Höchster CPC</p>
+                  <!-- Höchster CPC -->
+                  <div class="relative rounded-3xl border border-amber-400/20 bg-gradient-to-br from-amber-950/60 to-slate-950/40 p-5 backdrop-blur overflow-hidden group">
+                    <div class="absolute inset-0 bg-amber-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl"></div>
+                    <div class="flex items-center gap-2 mb-4">
+                      <div class="w-8 h-8 rounded-xl bg-amber-500/15 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-amber-400 text-[18px]" style="font-variation-settings:'FILL' 1;">monetization_on</span>
+                      </div>
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-amber-300/60 leading-tight">Höchster<br>CPC</p>
+                    </div>
                     @if (contentStrategyHighestCpcKeyword(); as cpcKeyword) {
-                      <p class="text-base font-black text-white leading-tight line-clamp-2">{{ cpcKeyword.keyword }}</p>
-                      <p class="mt-2 text-sm text-blue-50/70">
-                        <span class="font-black text-white">{{ cpcKeyword.cpc | number:'1.2-2' }} €</span>
-                        <span class="font-light text-[11px]"> pro Klick</span>
-                      </p>
+                      <p class="text-sm font-black text-white leading-snug line-clamp-2 mb-3">{{ cpcKeyword.keyword }}</p>
+                      <div class="flex items-baseline gap-1.5">
+                        <span class="text-xl font-black text-white">{{ cpcKeyword.cpc | number:'1.2-2' }} €</span>
+                        <span class="text-[11px] font-light text-amber-200/50">pro Klick</span>
+                      </div>
                     } @else {
-                      <p class="text-sm text-blue-50/70">–</p>
+                      <p class="text-sm text-blue-50/40">–</p>
                     }
                   </div>
                 </div>

@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 import { RunHistoryService } from '../../services/run-history.service';
 import { AgentOutputService } from '../../services/agent-output.service';
 import { NotificationService } from '../../services/notification.service';
@@ -27,11 +28,12 @@ import {
   RunRecord,
 } from '../../models/interfaces';
 
-const LEAD_RESEARCHER_WEBHOOK = '/api/n8n/webhook/ac9a9c6c-a2f0-4389-9462-06cc82bebe8b';
-const FIRMEN_FINDER_WEBHOOK = '/api/n8n/webhook/3ecd15d2-2606-4ca3-b44e-b4c39208a39d';
-const GEO_SITE_AUDIT_WEBHOOK = '/api/n8n/webhook/site-audit';
-const SOCIAL_MEDIA_WIZARD_WEBHOOK = '/api/n8n/webhook/74ff0667-7ddf-4fdc-9e9e-8a5c1b4c0de1';
-const CONTENT_STRATEGY_WEBHOOK = '/api/n8n/webhook/ac7e989d-6e32-4850-83c4-f10421467fb8';
+const N8N = environment.n8nBase;
+const LEAD_RESEARCHER_WEBHOOK = `${N8N}/webhook/ac9a9c6c-a2f0-4389-9462-06cc82bebe8b`;
+const FIRMEN_FINDER_WEBHOOK = `${N8N}/webhook/3ecd15d2-2606-4ca3-b44e-b4c39208a39d`;
+const GEO_SITE_AUDIT_WEBHOOK = `${N8N}/webhook/site-audit`;
+const SOCIAL_MEDIA_WIZARD_WEBHOOK = `${N8N}/webhook/74ff0667-7ddf-4fdc-9e9e-8a5c1b4c0de1`;
+const CONTENT_STRATEGY_WEBHOOK = `${N8N}/webhook/ac7e989d-6e32-4850-83c4-f10421467fb8`;
 
 type MaxPagesValue = '25' | '50' | '100' | 'all';
 
@@ -365,8 +367,9 @@ export class AgentDetail {
           setTimeout(() => this.completeGeoSiteAudit(response), 400);
         }, remaining);
       },
-      error: () => {
+      error: (err) => {
         clearInterval(interval);
+        console.error('[GeoSiteAudit] Webhook error:', err?.status, err?.message, err);
         this.webhookError.set(true);
         this.progress.set(100);
         this.progressLabel.set('Fehler beim Abrufen der Audit-Daten');
