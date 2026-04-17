@@ -7,6 +7,7 @@ export interface RunInputData {
   toneOfVoice?: string;
   topic?: string;
   keyword?: string;
+  primaryKeyword?: string;
   industry?: string;
   city?: string;
   domain?: string;
@@ -14,6 +15,9 @@ export interface RunInputData {
   brandVoice?: string;
   primaryTopic?: string;
   contentType?: string;
+  wordCount?: number;
+  outline?: string;
+  productImageName?: string;
 }
 
 export interface RunRecord {
@@ -42,7 +46,9 @@ export type AgentOutput =
   | MarkdownOutput
   | CompanyListOutput
   | SocialMediaOutput
-  | ContentStrategyOutput;
+  | ContentStrategyOutput
+  | BlogEditorOutput
+  | ProductTextOutput;
 
 export interface EmailOutput {
   type: 'email';
@@ -262,6 +268,65 @@ export interface ContentStrategyOutput {
   relatedTopics: string[];
   competitorUrls: string[];
   keywords: KeywordDataRow[];
+}
+
+export interface BlogEditorSerpResult {
+  rank: number;
+  url: string;
+  title: string;
+  description: string;
+}
+
+export interface BlogEditorKeyword {
+  keyword: string;
+  search_volume: number | null;
+  cpc: number | null;
+  competition: string | null;
+}
+
+export interface BlogEditorOutput {
+  type: 'blog-editor';
+  topic: string;
+  primaryKeyword: string;
+  audience: string;
+  wordCount: number | null;
+  outline: string;
+  score: number | null;
+  verdict?: string;
+  articleTitle?: string;
+  report: string;
+  article: string;
+  serpResults: BlogEditorSerpResult[];
+  peopleAlsoAsk: string[];
+  keywords: BlogEditorKeyword[];
+}
+
+export interface ProductTextFileReference {
+  fileName: string;
+  mimeType: string;
+  size: number;
+  base64?: string;
+  persisted: boolean;
+}
+
+export type ProductTextResponseMode = 'binary' | 'json' | 'text' | 'multipart' | 'empty';
+export type ProductTextDescriptionSource = 'header' | 'payload' | 'text-body' | 'multipart-field' | 'none';
+export type ProductTextFileSource = 'response-body' | 'payload-base64' | 'multipart-part' | 'none';
+
+export interface ProductTextResponseMeta {
+  mode: ProductTextResponseMode;
+  mimeType: string | null;
+  descriptionSource: ProductTextDescriptionSource;
+  descriptionHeaderName: string | null;
+  fileSource: ProductTextFileSource;
+}
+
+export interface ProductTextOutput {
+  type: 'product-text';
+  description: string;
+  uploadedImageName: string;
+  generatedFile: ProductTextFileReference | null;
+  responseMeta: ProductTextResponseMeta;
 }
 
 // ─── Notifications ────────────────────────────────────────────────────────────

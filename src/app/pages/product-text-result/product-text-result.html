@@ -1,0 +1,159 @@
+<div class="min-h-screen bg-surface text-on-surface font-body">
+  <div
+    class="sticky top-[56px] z-30 flex flex-wrap items-center justify-between gap-3 border-b border-outline-variant/20 bg-surface-container-low/85 px-8 py-4 backdrop-blur-xl"
+  >
+    <div class="flex items-center gap-4">
+      <button
+        (click)="goBack()"
+        class="inline-flex items-center gap-2 text-sm text-on-surface-variant transition-colors hover:text-on-surface"
+      >
+        <span class="material-symbols-outlined text-sm">arrow_back</span>
+        Zurück
+      </button>
+
+      <div class="h-4 w-px bg-outline-variant/30"></div>
+
+      <div class="flex items-center gap-3">
+        <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#0070FF]/15 text-[#0070FF]">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1;">{{ agentMeta.icon }}</span>
+        </div>
+        <div>
+          <p class="text-sm font-bold text-on-surface">{{ agentMeta.name }}</p>
+          <p class="text-[10px] uppercase tracking-[0.2em] text-outline">Ergebnis</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <button
+        (click)="copyDescription()"
+        class="inline-flex items-center gap-2 rounded-xl border border-outline-variant/20 bg-surface-container-high px-4 py-2 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest"
+      >
+        <span class="material-symbols-outlined text-base">content_copy</span>
+        Text kopieren
+      </button>
+      <button
+        (click)="downloadGeneratedFile()"
+        [disabled]="!fileReady()"
+        class="inline-flex items-center gap-2 rounded-xl bg-[#0070FF] px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-[#0060db] disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <span class="material-symbols-outlined text-base">download</span>
+        Bild herunterladen
+      </button>
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-6xl px-8 py-10">
+    @if (output(); as result) {
+      <section
+        class="relative overflow-hidden rounded-[2rem] border border-outline-variant/20 px-8 py-8"
+        style="background:
+          radial-gradient(circle at 12% 18%, rgba(0, 112, 255, 0.22), transparent 34%),
+          radial-gradient(circle at 86% 0%, rgba(34, 197, 94, 0.14), transparent 25%),
+          linear-gradient(135deg, rgba(9, 15, 26, 0.98), rgba(13, 20, 34, 0.94));"
+      >
+        <div class="relative flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between">
+          <div class="max-w-3xl space-y-4">
+            <div class="inline-flex items-center gap-2 rounded-full border border-[#0070FF]/20 bg-[#0070FF]/10 px-4 py-2">
+              <span class="material-symbols-outlined text-[#7DB4FF] text-base" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+              <span class="text-[10px] font-black uppercase tracking-[0.22em] text-[#9EC6FF]">Produkttext</span>
+            </div>
+            <div>
+              <h1 class="text-3xl font-headline font-black tracking-tight text-white md:text-5xl">
+                Produktbeschreibung und Bild
+              </h1>
+              <p class="mt-3 max-w-2xl text-sm leading-relaxed text-blue-50/75 md:text-base">
+                Dein Bild wurde verarbeitet. Hier siehst du den generierten Produkttext und die zurückgelieferte
+                Bildversion in einer aufgeräumten Ansicht.
+              </p>
+            </div>
+          </div>
+
+          <div class="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur xl:w-[20rem]">
+            <p class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-100/45">Upload</p>
+            <p class="mt-3 text-sm font-semibold text-white break-all">{{ result.uploadedImageName }}</p>
+            <p class="mt-1 text-xs text-blue-100/55">{{ descriptionLength() }} Zeichen Beschreibung</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
+        <section class="overflow-hidden rounded-[2rem] border border-outline-variant/20 bg-surface-container">
+          <div class="flex items-center justify-between gap-3 border-b border-outline-variant/10 px-6 py-5">
+            <div>
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Produktbeschreibung</p>
+              <p class="mt-1 text-sm text-on-surface-variant">
+                Der generierte Text wird hier sauber formatiert dargestellt.
+              </p>
+            </div>
+            <button
+              (click)="downloadDescription()"
+              class="inline-flex items-center gap-2 rounded-xl border border-outline-variant/20 bg-surface-container-high px-4 py-2 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest"
+            >
+              <span class="material-symbols-outlined text-base">download</span>
+              Text speichern
+            </button>
+          </div>
+
+          <div class="px-6 py-6">
+            @if (renderedDescription()) {
+              <div class="md-content max-w-none text-on-surface-variant" [innerHTML]="renderedDescription()"></div>
+            } @else {
+              <p class="text-sm text-on-surface-variant">Keine lesbare Beschreibung vorhanden.</p>
+            }
+          </div>
+        </section>
+
+        <aside class="space-y-6">
+          <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
+            <div class="flex items-start gap-4">
+              <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
+                <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">imagesmode</span>
+              </div>
+              <div class="min-w-0">
+                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-outline">Bild</p>
+                <p class="mt-2 text-sm text-on-surface-variant">
+                  Die zurückgelieferte Bildversion wird hier direkt angezeigt.
+                </p>
+              </div>
+            </div>
+
+            @if (generatedPreviewUrl()) {
+              <div class="mt-5 aspect-[3/2] overflow-hidden rounded-2xl border border-outline-variant/20 bg-surface-container-high/20">
+                <img
+                  [src]="generatedPreviewUrl()"
+                  alt="Vom Webhook zurückgeliefertes Bild"
+                  class="h-full w-full object-contain"
+                />
+              </div>
+            } @else {
+              <div class="mt-5 flex aspect-[3/2] items-center justify-center rounded-2xl border border-outline-variant/20 bg-surface-container-high/20 px-6 text-center">
+                <p class="text-sm text-on-surface-variant">Noch kein Bild für die Vorschau verfügbar.</p>
+              </div>
+            }
+
+            <button
+              (click)="downloadGeneratedFile()"
+              [disabled]="!fileReady()"
+              class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0070FF] px-5 py-3 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#0060db] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <span class="material-symbols-outlined text-base">download</span>
+              Bild herunterladen
+            </button>
+          </section>
+        </aside>
+      </div>
+    } @else {
+      <div class="py-24 text-center text-on-surface-variant">
+        <span class="material-symbols-outlined mb-4 block text-5xl opacity-30">hourglass_empty</span>
+        <p>Kein Produkttext-Lauf gefunden. Starte den Agenten erneut mit einem Bild.</p>
+        <button
+          (click)="goBack()"
+          class="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#0070FF] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0060db]"
+        >
+          Zurück zum Agenten
+        </button>
+      </div>
+    }
+  </div>
+</div>

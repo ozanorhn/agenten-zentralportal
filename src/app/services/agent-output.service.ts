@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {
   AgentOutput,
+  BlogEditorOutput,
   CompanyListOutput,
   EmailOutput,
   GeoAuditOutput,
@@ -12,6 +13,7 @@ import {
   SyncReportOutput,
   SocialMediaOutput,
   ContentStrategyOutput,
+  ProductTextOutput,
   RunInputData,
 } from '../models/interfaces';
 
@@ -49,6 +51,16 @@ export class AgentOutputService {
           input.targetAudience || audience,
           input.contentType || 'Insight',
         );
+      case 'blog-redakteur':
+        return this.generateBlogEditorPlaceholder(
+          input.topic || 'Content Marketing für B2B SaaS',
+          input.primaryKeyword || input.keyword || 'content marketing b2b',
+          input.targetAudience || audience,
+          input.wordCount ?? 2500,
+          input.outline || '## Was ist Content Marketing im B2B?\n## Wie unterscheidet sich B2B von B2C?\n## Welche Formate funktionieren?\n## FAQ',
+        );
+      case 'produkttext-agent':
+        return this.generateProductTextPlaceholder(input.productImageName || 'produktbild.jpg');
       default:
         return this.generateColdEmail(audience, url, tone);
     }
@@ -245,6 +257,22 @@ export class AgentOutputService {
     };
   }
 
+  private generateProductTextPlaceholder(uploadedImageName: string): ProductTextOutput {
+    return {
+      type: 'product-text',
+      description: 'Upload ein Produktbild, um hier automatisch die erzeugte Produktbeschreibung aus dem Webhook zu sehen.',
+      uploadedImageName,
+      generatedFile: null,
+      responseMeta: {
+        mode: 'empty',
+        mimeType: null,
+        descriptionSource: 'none',
+        descriptionHeaderName: null,
+        fileSource: 'none',
+      },
+    };
+  }
+
   private generateSocialMediaPlaceholder(topic: string, brandVoice: string, targetAudience: string): SocialMediaOutput {
     return {
       type: 'social-media',
@@ -292,6 +320,87 @@ export class AgentOutputService {
           competitionIndex: 34,
           cpc: 8.51,
           monthlySearches: [],
+        },
+      ],
+    };
+  }
+
+  private generateBlogEditorPlaceholder(
+    topic: string,
+    primaryKeyword: string,
+    audience: string,
+    wordCount: number,
+    outline: string,
+  ): BlogEditorOutput {
+    return {
+      type: 'blog-editor',
+      topic,
+      primaryKeyword,
+      audience,
+      wordCount,
+      outline,
+      score: 78,
+      verdict: 'Mit Korrekturen',
+      articleTitle: `${topic}: Leitfaden für Teams mit messbarem Wachstumsdruck`,
+      report: `## Chefredakteurs-Check
+
+**Score: 78/100**
+**Urteil: Mit Korrekturen**
+
+### Was überzeugt
+
+1. Die Zielgruppe ist klar umrissen und bleibt über den Text hinweg konsistent.
+2. Der Artikel verbindet Strategie mit konkreten Formaten statt nur generische Definitionen zu wiederholen.
+3. Die Struktur eignet sich gut für Suchintention, weil Grundlagen, Vergleich, Formate und FAQ sauber getrennt sind.
+
+### Wo noch Luft ist
+
+1. Einige Abschnitte bleiben noch zu abstrakt und brauchen mehr operative Beispiele.
+2. Der Einstieg kann stärker auf ein reales SaaS-Problem einzahlen.
+3. CTAs und Übergänge zwischen den Hauptkapiteln dürfen prägnanter werden.`,
+      article: `# ${topic}: Der vollständige Leitfaden
+
+${primaryKeyword} hilft Teams nicht nur bei Sichtbarkeit, sondern vor allem dabei, Vertrauen vor dem Erstgespräch aufzubauen.
+
+## Was ist Content Marketing im B2B?
+
+Im B2B geht es darum, relevante Inhalte so aufzubauen, dass sie Kaufprozesse mit mehreren Beteiligten unterstützen.
+
+## Wie unterscheidet sich B2B von B2C?
+
+B2B-Content muss meist fachlicher, belegbarer und stärker auf interne Abstimmung im Buying Center ausgerichtet sein.
+
+## Welche Formate funktionieren?
+
+Blogartikel, Case Studies, Whitepaper, Webinare und E-Mail-Nurturing greifen am besten ineinander, wenn sie entlang der Customer Journey geplant werden.
+
+## FAQ
+
+Gute FAQ-Abschnitte helfen sowohl Lesern als auch Suchsystemen, schnelle Antworten auf Kernfragen zu finden.`,
+      serpResults: [
+        {
+          rank: 1,
+          url: 'https://clicks.digital/knowledge-hub/b2b-content-marketing',
+          title: 'B2B Content Marketing – Erklärung, Strategien, Beispiele',
+          description: 'Mit B2B Marketing durch Content bauen Sie Beziehungen zu potenziellen Kunden auf, noch bevor diese einen Vertrag unterschreiben.',
+        },
+        {
+          rank: 2,
+          url: 'https://www.evergreen.media/ratgeber/b2b-content-marketing/',
+          title: 'B2B-Content-Marketing: Die Anleitung inkl. Beispiele',
+          description: 'Ein praxisnaher Leitfaden mit Definition, Prozess und Beispielen für B2B-Content-Marketing.',
+        },
+      ],
+      peopleAlsoAsk: [
+        'Was ist Content Marketing im B2B?',
+        'Welche Formate funktionieren für SaaS-Unternehmen?',
+      ],
+      keywords: [
+        {
+          keyword: primaryKeyword,
+          search_volume: 170,
+          cpc: 0,
+          competition: 'LOW',
         },
       ],
     };

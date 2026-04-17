@@ -15,6 +15,19 @@
   }
 }
 
+.blog-editor-view {
+  .blog-score-number {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.04em;
+  }
+
+  .glass-panel {
+    box-shadow:
+      0 24px 70px rgba(5, 12, 24, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  }
+}
+
 /* ── Markdown / Sales Briefing Rendering ─────────────────────────── */
 .md-content {
   color: var(--color-on-surface-variant);

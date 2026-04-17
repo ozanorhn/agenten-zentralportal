@@ -8,6 +8,7 @@ import { NotificationService } from '../../services/notification.service';
 import { AGENTS_MAP } from '../../data/agents.data';
 import {
   AgentOutput,
+  BlogEditorOutput,
   CompanyListOutput,
   CompanyRow,
   ContentStrategyOutput,
@@ -34,6 +35,7 @@ const FIRMEN_FINDER_WEBHOOK = `${N8N}/webhook/3ecd15d2-2606-4ca3-b44e-b4c39208a3
 const GEO_SITE_AUDIT_WEBHOOK = `${N8N}/webhook/site-audit`;
 const SOCIAL_MEDIA_WIZARD_WEBHOOK = `${N8N}/webhook/74ff0667-7ddf-4fdc-9e9e-8a5c1b4c0de1`;
 const CONTENT_STRATEGY_WEBHOOK = `${N8N}/webhook/ac7e989d-6e32-4850-83c4-f10421467fb8`;
+const BLOG_REDAKTEUR_WEBHOOK = `${N8N}/webhook/blog-redakteur`;
 
 type MaxPagesValue = '25' | '50' | '100' | 'all';
 
@@ -64,6 +66,7 @@ export class AgentDetail {
   readonly isGeoSiteAudit = this.agentId === 'geo-site-audit';
   readonly isSocialMediaWizard = this.agentId === 'social-media-wizard';
   readonly isContentStrategyBot = this.agentId === 'content-strategy-bot';
+  readonly isBlogRedakteur = this.agentId === 'blog-redakteur';
 
   readonly brandVoice = signal('');
   readonly socialTopic = signal('');
@@ -72,6 +75,12 @@ export class AgentDetail {
   readonly contentStrategyTargetAudience = signal('');
   readonly contentType = signal('');
   readonly competitorUrlsInput = signal('');
+
+  readonly blogTopic = signal('');
+  readonly blogPrimaryKeyword = signal('');
+  readonly blogAudience = signal('');
+  readonly blogWordCount = signal('');
+  readonly blogOutline = signal('');
 
   readonly industry = signal('');
   readonly city = signal('');
@@ -141,6 +150,15 @@ export class AgentDetail {
     'Geo Site Audit fertig ✓',
   ];
 
+  private readonly PROGRESS_LABELS_BLOG = [
+    'Initialisiere Redaktion…',
+    'Pruefe Briefing und Outline…',
+    'Analysiere Keywords und SERP…',
+    'Erstelle Artikelentwurf…',
+    'Baue Redaktions-Check auf…',
+    'Blog-Paket fertig ✓',
+  ];
+
   submitWorkflow(): void {
     if (this.isSubmitting()) return;
     this.isSubmitting.set(true);
@@ -157,6 +175,8 @@ export class AgentDetail {
       this.runSocialMediaWizardWorkflow();
     } else if (this.isContentStrategyBot) {
       this.runContentStrategyWorkflow();
+    } else if (this.isBlogRedakteur) {
+      this.runBlogRedakteurWorkflow();
     } else {
       this.runGenericWorkflow();
     }
@@ -1073,6 +1093,237 @@ export class AgentDetail {
     this.saveAndNavigate(output, `Content-Strategie: ${primaryTopic}`, input);
   }
 
+  private runBlogRedakteurWorkflow(): void {
+    const topic = this.blogTopic().trim();
+    const primaryKeyword = this.blogPrimaryKeyword().trim();
+    const audience = this.blogAudience().trim();
+    const outline = this.blogOutline().trim();
+    const wordCount = this.toNumber(this.blogWordCount().trim());
+
+    if (!topic || !primaryKeyword || !audience || !outline || wordCount === null || wordCount <= 0) {
+      alert('Bitte fülle Thema, Primary Keyword, Zielgruppe, Wortanzahl und Gliederung aus.');
+      this.isSubmitting.set(false);
+      return;
+    }
+
+    const labels = this.PROGRESS_LABELS_BLOG;
+    this.progressLabel.set(labels[0]);
+
+    const startTime = Date.now();
+    const minDuration = 4200;
+
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const pct = Math.min(Math.round((elapsed / minDuration) * 80), 80);
+      this.progress.set(pct);
+      if (pct >= 60) this.progressLabel.set(labels[4]);
+      else if (pct >= 40) this.progressLabel.set(labels[3]);
+      else if (pct >= 20) this.progressLabel.set(labels[2]);
+      else if (pct >= 5) this.progressLabel.set(labels[1]);
+    }, 80);
+
+    const body = {
+      topic,
+      primaryKeyword,
+      audience,
+      wordCount,
+      outline,
+      statistics: [],
+    };
+
+    this.http.post(BLOG_REDAKTEUR_WEBHOOK, body, { responseType: 'text' }).subscribe({
+      next: (response: string) => {
+        clearInterval(interval);
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, minDuration - elapsed);
+
+        setTimeout(() => {
+          this.progress.set(100);
+          this.progressLabel.set(labels[5]);
+          setTimeout(() => this.completeBlogRedakteur(response), 400);
+        }, remaining);
+      },
+      error: () => {
+        clearInterval(interval);
+        this.webhookError.set(true);
+        this.progress.set(100);
+        this.progressLabel.set('Fehler beim Erstellen des Blog-Pakets');
+        setTimeout(() => this.isSubmitting.set(false), 800);
+      },
+    });
+  }
+
+  private completeBlogRedakteur(rawResponse: string): void {
+    const output = this.extractBlogRedakteurResponse(rawResponse);
+    if (!output) {
+      this.webhookError.set(true);
+      this.progressLabel.set('Leere oder ungueltige Redaktions-Antwort');
+      setTimeout(() => this.isSubmitting.set(false), 800);
+      return;
+    }
+
+    const input: RunInputData = {
+      topic: output.topic,
+      primaryKeyword: output.primaryKeyword,
+      targetAudience: output.audience,
+      wordCount: output.wordCount ?? undefined,
+      outline: output.outline,
+    };
+
+    const summary = output.articleTitle
+      ? `Blog-Artikel: ${output.articleTitle}`
+      : `Blog-Artikel: ${output.topic}`;
+
+    this.saveAndNavigate(output, summary, input);
+  }
+
+  private extractBlogRedakteurResponse(raw: string): BlogEditorOutput | null {
+    const trimmed = raw.trim();
+    const parsed = this.tryParseJson(trimmed);
+    const candidate = Array.isArray(parsed) ? parsed[0] : parsed;
+
+    return this.normalizeBlogRedakteurPayload(candidate);
+  }
+
+  private normalizeBlogRedakteurPayload(value: unknown): BlogEditorOutput | null {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return null;
+    }
+
+    const record = value as Record<string, unknown>;
+    const topic = this.toNonEmptyString(record['topic']) ?? this.blogTopic().trim();
+    const primaryKeyword = this.toNonEmptyString(record['primaryKeyword'])
+      ?? this.toNonEmptyString(record['primary_keyword'])
+      ?? this.blogPrimaryKeyword().trim();
+    const audience = this.toNonEmptyString(record['audience']) ?? this.blogAudience().trim();
+    const report = this.toNonEmptyString(record['report']) ?? '';
+    const article = this.toNonEmptyString(record['article']) ?? '';
+    const outline = this.blogOutline().trim();
+    const wordCount = this.toNumber(record['wordCount']) ?? this.toNumber(this.blogWordCount().trim());
+    const score = this.toNumber(record['score']) ?? this.extractBlogScore(report);
+    const verdict = this.extractBlogVerdict(report);
+    const articleTitle = this.extractBlogArticleTitle(article);
+
+    if (!topic || !primaryKeyword || !audience) {
+      return null;
+    }
+
+    return {
+      type: 'blog-editor',
+      topic,
+      primaryKeyword,
+      audience,
+      wordCount,
+      outline,
+      score,
+      verdict,
+      articleTitle,
+      report,
+      article,
+      serpResults: this.normalizeBlogSerpResults(record['serpResults']),
+      peopleAlsoAsk: this.normalizePeopleAlsoAsk(record['peopleAlsoAsk']),
+      keywords: this.normalizeBlogKeywords(record['keywords']),
+    };
+  }
+
+  private normalizeBlogSerpResults(value: unknown): BlogEditorOutput['serpResults'] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value
+      .map((item) => {
+        if (!item || typeof item !== 'object' || Array.isArray(item)) {
+          return null;
+        }
+
+        const record = item as Record<string, unknown>;
+        const rank = this.toNumber(record['rank']);
+        const url = this.toNonEmptyString(record['url']);
+        const title = this.toNonEmptyString(record['title']);
+        const description = this.toNonEmptyString(record['description']) ?? '';
+
+        if (rank === null || !url || !title) {
+          return null;
+        }
+
+        return {
+          rank,
+          url,
+          title,
+          description,
+        };
+      })
+      .filter((item): item is BlogEditorOutput['serpResults'][number] => item !== null);
+  }
+
+  private normalizeBlogKeywords(value: unknown): BlogEditorOutput['keywords'] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value
+      .map((item) => {
+        if (!item || typeof item !== 'object' || Array.isArray(item)) {
+          return null;
+        }
+
+        const record = item as Record<string, unknown>;
+        const keyword = this.toNonEmptyString(record['keyword']);
+
+        if (!keyword) {
+          return null;
+        }
+
+        return {
+          keyword,
+          search_volume: this.toNumber(record['search_volume']),
+          cpc: this.toNumber(record['cpc']),
+          competition: this.toOptionalString(record['competition']) ?? null,
+        };
+      })
+      .filter((item): item is BlogEditorOutput['keywords'][number] => item !== null);
+  }
+
+  private normalizePeopleAlsoAsk(value: unknown): string[] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value
+      .map((item) => {
+        if (typeof item === 'string') {
+          return item.trim();
+        }
+
+        if (!item || typeof item !== 'object' || Array.isArray(item)) {
+          return '';
+        }
+
+        const record = item as Record<string, unknown>;
+        return this.toNonEmptyString(record['question'])
+          ?? this.toNonEmptyString(record['title'])
+          ?? this.toNonEmptyString(record['value'])
+          ?? '';
+      })
+      .filter((item) => !!item);
+  }
+
+  private extractBlogScore(report: string): number | null {
+    const match = report.match(/score:\s*(\d+)\s*\/\s*100/i);
+    return match ? Number(match[1]) : null;
+  }
+
+  private extractBlogVerdict(report: string): string | undefined {
+    const match = report.match(/urteil:\s*([^\n*]+)/i);
+    return match?.[1]?.trim() || undefined;
+  }
+
+  private extractBlogArticleTitle(article: string): string | undefined {
+    const match = article.match(/^#\s+(.+)$/m);
+    return match?.[1]?.trim() || undefined;
+  }
+
   private runGenericWorkflow(): void {
     const labels = this.PROGRESS_LABELS;
     this.progressLabel.set(labels[0]);
@@ -1120,7 +1371,10 @@ export class AgentDetail {
       case 'geo-audit':          summary = `Geo Audit: ${this.toDomainLabel(output.summary.domain)}`; break;
       case 'markdown':           summary = output.companyName ?? 'Bericht'; break;
       case 'company-list':       summary = `${output.companies.length} Unternehmen gefunden`; break;
+      case 'blog-editor':        summary = output.articleTitle ?? `Blog-Artikel: ${output.topic}`; break;
       case 'content-strategy':   summary = `Content-Strategie: ${output.primaryTopic}`; break;
+      case 'social-media':       summary = `Social Media: ${output.topic}`; break;
+      case 'product-text':       summary = output.generatedFile?.fileName ?? 'Produkttext generiert'; break;
     }
 
     this.saveAndNavigate(output, summary, input);

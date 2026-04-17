@@ -1,0 +1,317 @@
+<div class="min-h-screen bg-surface text-on-surface font-body">
+  <div class="sticky top-[56px] z-30 border-b border-outline-variant/20 bg-surface-container-low/85 backdrop-blur-xl">
+    <div class="mx-auto flex max-w-[900px] flex-wrap items-center justify-between gap-3 px-4 py-4 md:px-6">
+      <div class="flex items-center gap-4">
+        <button
+          (click)="goBack()"
+          class="inline-flex items-center gap-2 text-sm text-on-surface-variant transition-colors hover:text-on-surface"
+        >
+          <span class="material-symbols-outlined text-sm">arrow_back</span>
+          Zurück
+        </button>
+
+        <div class="h-4 w-px bg-outline-variant/30"></div>
+
+        <div class="flex items-center gap-3">
+          <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#0070FF]/15 text-[#0070FF]">
+            <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1;">{{ agentMeta.icon }}</span>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-on-surface">{{ agentMeta.name }}</p>
+            <p class="text-[10px] uppercase tracking-[0.2em] text-outline">Report</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-[900px] px-4 py-6 md:px-6">
+    @if (output(); as analysis) {
+      <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 class="text-xl font-medium text-on-surface">{{ analysis.input?.url?.replace('https://', '') || 'Report' }}</h1>
+            <p class="mt-1 text-sm text-on-surface-variant">
+              {{ analysis.input?.brand || '–' }} · {{ analysis.input?.industry || '–' }} · {{ analysis.input?.location || '–' }} · analysiert {{ formatDate(analysis.analysedAt) }}
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-5 grid gap-3 md:grid-cols-2">
+          @for (box of scoreBoxes(); track box.label) {
+            <div class="rounded-2xl bg-surface-container-high/40 px-4 py-4 text-center">
+              <p class="mb-2 text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ box.label }}</p>
+              <p class="text-3xl font-medium" [class]="scoreNumberClass(box)">
+                {{ formatValue(box.value) }}<span class="text-sm text-outline">/100</span>
+              </p>
+              <div class="mt-3 h-1.5 rounded-full bg-outline-variant/30">
+                <div class="h-1.5 rounded-full" [class]="scoreBarClass(box)" [style.width]="scoreBarWidth(box.value, box.max)"></div>
+              </div>
+              @if (box.hint) {
+                <p class="mt-2 text-xs text-on-surface-variant">{{ box.hint }}</p>
+              }
+            </div>
+          }
+        </div>
+      </section>
+
+      <section class="mt-4 rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 class="text-base font-medium text-on-surface">GEO Dimensionen</h2>
+            <p class="mt-1 text-sm text-on-surface-variant">
+              Faktenbasierte Bewertung der wichtigsten GEO-Signale je Dimension.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-4 grid gap-3 md:grid-cols-3">
+          @for (dimension of dimensionCards(); track dimension.key) {
+            <article class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 px-4 py-4">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex min-w-0 items-start gap-3">
+                  <span class="material-symbols-outlined text-lg leading-none text-on-surface-variant">{{ dimension.icon }}</span>
+                  <div class="min-w-0">
+                    <p class="truncate text-sm font-medium text-on-surface">{{ dimension.label }}</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-base font-semibold" [class]="metricTextClass(dimension.score)">{{ formatValue(dimension.score) }}</p>
+                  <p class="text-[11px] text-on-surface-variant">{{ dimension.labelText }}</p>
+                </div>
+              </div>
+
+              <div class="mt-3 flex items-center gap-3">
+                <div class="h-1.5 flex-1 rounded-full bg-outline-variant/30">
+                  <div class="h-1.5 rounded-full" [class]="metricBarClass(dimension.score)" [style.width]="scoreBarWidth(dimension.score, 100)"></div>
+                </div>
+                <div class="min-w-[52px] text-right text-[11px] text-on-surface-variant">{{ formatScore(dimension.score, 100) }}</div>
+              </div>
+
+              <div class="mt-3 space-y-1.5">
+                @for (fact of dimension.facts; track fact) {
+                  <div class="flex items-start gap-2 text-[12px] leading-4 text-on-surface-variant">
+                    <span class="material-symbols-outlined mt-[-1px] text-sm leading-none" [class]="factClass(fact)">{{ factIcon(fact) }}</span>
+                    <span>{{ fact }}</span>
+                  </div>
+                } @empty {
+                  <p class="text-[12px] leading-4 text-on-surface-variant">Keine Fakten vom Webhook erhalten.</p>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+
+      <div class="mt-4 flex gap-1 rounded-2xl bg-surface-container-high/30 p-1">
+        @for (tab of tabs; track tab.key) {
+          <button
+            type="button"
+            (click)="setActiveTab(tab.key)"
+            class="flex-1 rounded-xl px-3 py-2 text-sm transition-all"
+            [class]="navClass(tab.key)"
+          >
+            {{ tab.label }}
+          </button>
+        }
+      </div>
+
+      @if (activeTab() !== 'geo') {
+        @if (currentReport(); as report) {
+          <section class="mt-4 space-y-3">
+            <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+              <h2 class="text-base font-medium text-on-surface">{{ currentTabLabel() }}</h2>
+              <div class="mt-4 space-y-2">
+                @for (item of currentStatuses(); track item.text) {
+                  <div class="flex items-start gap-3 rounded-2xl border px-4 py-3" [class]="statusClass(item.tone)">
+                    <span class="inline-flex h-6 w-6 items-center justify-center rounded-full" [class]="statusIconClass(item.tone)">
+                      <span class="material-symbols-outlined text-sm">{{ statusSymbol(item.tone) }}</span>
+                    </span>
+                    <p class="text-sm text-on-surface">{{ item.text }}</p>
+                  </div>
+                } @empty {
+                  <p class="text-sm text-on-surface-variant">Keine Status-Einträge im Report vorhanden.</p>
+                }
+              </div>
+            </div>
+
+            <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+              <h3 class="text-sm font-medium text-on-surface">Findings</h3>
+              <div class="mt-4 space-y-2">
+                @for (finding of currentFindings(); track finding) {
+                  <div class="flex gap-3 rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3 text-sm text-on-surface-variant">
+                    <span class="text-outline">•</span>
+                    <span>{{ finding }}</span>
+                  </div>
+                } @empty {
+                  <p class="text-sm text-on-surface-variant">Keine Findings im Report vorhanden.</p>
+                }
+              </div>
+            </div>
+
+            <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+              <h3 class="text-sm font-medium text-on-surface">Quick Wins</h3>
+              <div class="mt-4 space-y-3">
+                @for (quickWin of currentQuickWins(); track quickWin.titel || $index) {
+                  <div class="rounded-2xl bg-surface-container-high/40 px-4 py-4">
+                    <div class="flex items-center justify-between gap-3">
+                      <p class="text-sm font-medium text-on-surface">{{ quickWin.titel }}</p>
+                      <span class="rounded-full px-3 py-1 text-xs" [class]="effortClass(quickWin.aufwand)">Aufwand: {{ quickWin.aufwand || '–' }}</span>
+                    </div>
+                    @if (quickWin.loesung?.length) {
+                      <div class="mt-3 space-y-2">
+                        @for (step of quickWin.loesung ?? []; track step) {
+                          <div class="flex gap-3 text-sm text-on-surface-variant">
+                            <span class="text-outline">→</span>
+                            <span>{{ step }}</span>
+                          </div>
+                        }
+                      </div>
+                    }
+                    @if (quickWin.beispiel) {
+                      <pre class="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-xl border border-outline-variant/20 bg-surface-container-lowest/60 px-3 py-3 text-xs text-on-surface-variant">{{ quickWin.beispiel }}</pre>
+                    }
+                    @if (quickWin.scoreImpact) {
+                      <p class="mt-3 text-sm font-medium text-emerald-300">{{ quickWin.scoreImpact }}</p>
+                    }
+                  </div>
+                } @empty {
+                  <p class="text-sm text-on-surface-variant">Keine Quick Wins im Report vorhanden.</p>
+                }
+              </div>
+            </div>
+
+            @if (activeTab() === 'technik') {
+              <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+                <h3 class="text-sm font-medium text-on-surface">Bot Accessibility</h3>
+                <div class="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  @for (bot of techniqueBotCards(); track bot.name + bot.provider) {
+                    <div class="rounded-2xl border px-4 py-3" [class]="botCardClass(bot)">
+                      <p class="text-sm font-medium text-on-surface">{{ bot.name }}</p>
+                      <p class="mt-1 text-xs text-on-surface-variant">{{ bot.provider }} · {{ bot.statusCode ?? '–' }}</p>
+                    </div>
+                  }
+                </div>
+
+                @if (analysis.botAccessibilityCheck?.assessment?.recommendation) {
+                  <div class="mt-4 rounded-2xl bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                    {{ analysis.botAccessibilityCheck?.assessment?.recommendation }}
+                  </div>
+                }
+
+                @if (blockedBots().length) {
+                  <div class="mt-3 text-xs text-on-surface-variant">
+                    Blockiert: {{ blockedBots().join(', ') }}
+                  </div>
+                }
+              </div>
+            }
+          </section>
+        }
+      }
+
+      @if (activeTab() === 'geo') {
+        <section class="mt-4 space-y-3">
+          <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+            <h2 class="text-base font-medium text-on-surface">AI</h2>
+            <div class="mt-4 space-y-5">
+              @for (entry of geoDimensionEntries(); track entry[0]) {
+                <div>
+                  <p class="mb-2 text-xs font-medium uppercase tracking-[0.05em] text-on-surface-variant">{{ entry[0] }}</p>
+                  <div class="space-y-2">
+                    @for (item of entry[1]; track item) {
+                      <div class="flex gap-3 rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3 text-sm text-on-surface-variant">
+                        <span class="text-outline">•</span>
+                        <span>{{ item }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              } @empty {
+                <p class="text-sm text-on-surface-variant">Keine GEO-Dimension-Analyse im Report vorhanden.</p>
+              }
+            </div>
+          </div>
+
+          @if (geoAiMode().length) {
+            <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+              <h3 class="text-sm font-medium text-on-surface">AI Mode</h3>
+              <div class="mt-4 space-y-2">
+                @for (item of geoAiMode(); track item) {
+                  <div class="flex gap-3 rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3 text-sm text-on-surface-variant">
+                    <span class="text-outline">•</span>
+                    <span>{{ item }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+            <h3 class="text-sm font-medium text-on-surface">AI Platforms</h3>
+            <div class="mt-4 divide-y divide-outline-variant/15">
+              @for (platform of aiPlatforms(); track platform.name) {
+                <div class="py-3">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0 flex-1">
+                      <p class="text-sm font-medium text-on-surface">{{ platform.name }}</p>
+                      <p class="mt-1 text-xs text-on-surface-variant">{{ platform.limitingFactor || '–' }}</p>
+                    </div>
+                    <div class="min-w-[58px] text-right text-sm font-medium" [class]="metricTextClass(platform.score)">
+                      {{ formatScore(platform.score, 100) }}
+                    </div>
+                  </div>
+                  <div class="mt-2 h-1.5 rounded-full bg-outline-variant/30">
+                    <div class="h-1.5 rounded-full" [class]="metricBarClass(platform.score)" [style.width]="scoreBarWidth(platform.score, 100)"></div>
+                  </div>
+                </div>
+              } @empty {
+                <p class="py-3 text-sm text-on-surface-variant">Keine AI-Plattform-Scores vorhanden.</p>
+              }
+            </div>
+          </div>
+
+          <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+            <h3 class="text-sm font-medium text-on-surface">Strategische Maßnahmen</h3>
+            <div class="mt-4 space-y-3">
+              @for (action of strategicActions(); track action.titel || $index) {
+                <div class="rounded-2xl bg-surface-container-high/40 px-4 py-4">
+                  <div class="flex items-center justify-between gap-3">
+                    <p class="text-sm font-medium text-on-surface">{{ action.titel }}</p>
+                    <span class="rounded-full bg-surface-container-lowest/70 px-3 py-1 text-xs text-on-surface-variant">{{ action.zeithorizont || '–' }}</span>
+                  </div>
+                  @if (action.warum) {
+                    <p class="mt-3 text-sm text-on-surface-variant">{{ action.warum }}</p>
+                  }
+                  @if (action.wie?.length) {
+                    <div class="mt-3 space-y-2">
+                      @for (step of action.wie ?? []; track step) {
+                        <div class="flex gap-3 text-sm text-on-surface-variant">
+                          <span class="text-outline">→</span>
+                          <span>{{ step }}</span>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              } @empty {
+                <p class="text-sm text-on-surface-variant">Keine strategischen Maßnahmen im Report vorhanden.</p>
+              }
+            </div>
+          </div>
+        </section>
+      }
+    } @else {
+      <div class="py-24 text-center text-on-surface-variant">
+        <span class="material-symbols-outlined mb-4 block text-5xl opacity-30">hourglass_empty</span>
+        <p>Kein SEO/GEO-Report gefunden. Starte die Analyse erneut.</p>
+        <button
+          (click)="goBack()"
+          class="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#0070FF] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0060db]"
+        >
+          Zurück zum Formular
+        </button>
+      </div>
+    }
+  </div>
+</div>

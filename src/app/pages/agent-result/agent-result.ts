@@ -7,6 +7,7 @@ import { RunHistoryService } from '../../services/run-history.service';
 import { AgentOutputService } from '../../services/agent-output.service';
 import { ToastService } from '../../services/toast.service';
 import {
+  BlogEditorOutput,
   RunRecord,
   EmailOutput,
   GeoAuditBotStatus,
@@ -22,6 +23,7 @@ import {
   SocialMediaOutput,
   ContentStrategyOutput,
   KeywordDataRow,
+  ProductTextOutput,
 } from '../../models/interfaces';
 import { AGENTS_MAP } from '../../data/agents.data';
 
@@ -106,6 +108,12 @@ export class AgentResult {
   readonly contentStrategyOutput = computed(() =>
     this.output()?.type === 'content-strategy' ? this.output() as ContentStrategyOutput : null
   );
+  readonly blogEditorOutput = computed(() =>
+    this.output()?.type === 'blog-editor' ? this.output() as BlogEditorOutput : null
+  );
+  readonly productTextOutput = computed(() =>
+    this.output()?.type === 'product-text' ? this.output() as ProductTextOutput : null
+  );
   readonly renderedContentStrategyBrief = computed((): SafeHtml | null => {
     const brief = this.contentStrategyOutput()?.brief;
     if (!brief) return null;
@@ -179,6 +187,27 @@ export class AgentResult {
     const html = typeof result === 'string' ? result : '';
     return this.sanitizer.bypassSecurityTrustHtml(html);
   });
+  readonly renderedBlogReport = computed((): SafeHtml | null => {
+    const report = this.blogEditorOutput()?.report;
+    if (!report) return null;
+    const result = marked.parse(report);
+    const html = typeof result === 'string' ? result : '';
+    return this.sanitizer.bypassSecurityTrustHtml(html);
+  });
+  readonly renderedBlogArticle = computed((): SafeHtml | null => {
+    const article = this.blogEditorOutput()?.article;
+    if (!article) return null;
+    const result = marked.parse(article);
+    const html = typeof result === 'string' ? result : '';
+    return this.sanitizer.bypassSecurityTrustHtml(html);
+  });
+  readonly renderedBlogOutline = computed((): SafeHtml | null => {
+    const outline = this.blogEditorOutput()?.outline;
+    if (!outline) return null;
+    const result = marked.parse(outline);
+    const html = typeof result === 'string' ? result : '';
+    return this.sanitizer.bypassSecurityTrustHtml(html);
+  });
 
   readonly markdownTitle = computed(() =>
     this.isGeoSiteAudit ? 'GEO Site Audit' : 'Sales Briefing'
@@ -221,6 +250,8 @@ export class AgentResult {
       case 'company-list': return `${output.companies.length} Unternehmen in ${output.city}`;
       case 'social-media': return `Social Media: ${output.topic}`;
       case 'content-strategy': return `Content-Strategie: ${output.primaryTopic}`;
+      case 'blog-editor': return output.articleTitle ?? `Blog-Artikel: ${output.topic}`;
+      case 'product-text': return output.generatedFile?.fileName ?? 'Produkttext';
     }
   }
 
@@ -382,6 +413,34 @@ export class AgentResult {
     }
   }
 
+  getBlogScoreBadgeClass(score: number | null): string {
+    if (score === null) return 'bg-surface-container-high text-on-surface-variant border-outline-variant/30';
+    if (score >= 85) return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+    if (score >= 70) return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+    return 'bg-red-500/15 text-red-300 border-red-500/30';
+  }
+
+  getBlogVerdictBadgeClass(verdict?: string): string {
+    const normalized = verdict?.toLowerCase() ?? '';
+    if (normalized.includes('freigegeben') || normalized.includes('stark')) {
+      return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+    }
+
+    if (normalized.includes('korrektur') || normalized.includes('ueberarbeiten')) {
+      return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+    }
+
+    if (normalized.includes('kritisch') || normalized.includes('ablehnen')) {
+      return 'bg-red-500/15 text-red-300 border-red-500/30';
+    }
+
+    return 'bg-[#0070FF]/15 text-[#7DB4FF] border-[#0070FF]/30';
+  }
+
+  formatSerpHost(url: string): string {
+    return this.toDisplayUrl(url);
+  }
+
   private buildTextVersion(): string {
     const out = this.output();
     if (!out) return '';
@@ -488,6 +547,43 @@ export class AgentResult {
           '',
           '=== Brief ===',
           out.brief,
+        );
+        break;
+      case 'blog-editor':
+        lines.push(
+          `Thema: ${out.topic}`,
+          `Primary Keyword: ${out.primaryKeyword}`,
+          `Zielgruppe: ${out.audience}`,
+          `Wortanzahl: ${out.wordCount ?? '—'}`,
+          ...(out.score !== null ? [`Score: ${out.score}/100`] : []),
+          ...(out.verdict ? [`Urteil: ${out.verdict}`] : []),
+          '',
+          '=== Outline ===',
+          out.outline,
+          '',
+          '=== Chefredakteurs-Check ===',
+          out.report,
+          '',
+          '=== Artikel ===',
+          out.article,
+          '',
+          ...(out.keywords.length
+            ? ['=== Keywords ===', ...out.keywords.map((keyword) => `${keyword.keyword} | SV: ${keyword.search_volume ?? '—'} | CPC: ${keyword.cpc ?? '—'} | Wettbewerb: ${keyword.competition ?? '—'}`), '']
+            : []),
+          ...(out.serpResults.length
+            ? ['=== SERP ===', ...out.serpResults.map((result) => `${result.rank}. ${result.title} | ${result.url}`), '']
+            : []),
+          ...(out.peopleAlsoAsk.length
+            ? ['=== People Also Ask ===', ...out.peopleAlsoAsk]
+            : []),
+        );
+        break;
+      case 'product-text':
+        lines.push(
+          `Upload: ${out.uploadedImageName}`,
+          `Datei: ${out.generatedFile?.fileName ?? 'Keine Datei erhalten'}`,
+          '',
+          out.description,
         );
         break;
     }

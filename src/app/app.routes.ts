@@ -25,6 +25,26 @@ export const routes: Routes = [
           import('./pages/dashboard/dashboard').then((m) => m.Dashboard),
       },
       {
+        path: 'agents/produkttext-agent/result',
+        loadComponent: () =>
+          import('./pages/product-text-result/product-text-result').then((m) => m.ProductTextResultComponent),
+      },
+      {
+        path: 'agents/produkttext-agent',
+        loadComponent: () =>
+          import('./pages/product-text-agent/product-text-agent').then((m) => m.ProductTextAgentComponent),
+      },
+      {
+        path: 'agents/seo-geo-analyse-assistent',
+        loadComponent: () =>
+          import('./pages/seo-geo-assistant/seo-geo-assistant').then((m) => m.SeoGeoAssistantComponent),
+      },
+      {
+        path: 'agents/seo-geo-analyse-assistent/result',
+        loadComponent: () =>
+          import('./pages/seo-geo-assistant/seo-geo-assistant-result').then((m) => m.SeoGeoAssistantResultComponent),
+      },
+      {
         path: 'agents/:id',
         loadComponent: () =>
           import('./pages/agent-detail/agent-detail').then((m) => m.AgentDetail),

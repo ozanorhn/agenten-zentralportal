@@ -79,6 +79,26 @@ export class Dashboard implements OnInit, OnDestroy {
       category: 'Content',
     },
     {
+      id: 'blog-redakteur',
+      name: 'Blog-Redakteur',
+      description:
+        'Erstellt vollständige Blogpakete mit Briefing, Artikel, Chefredakteurs-Check, Keywords und SERP-Auswertung.',
+      icon: 'edit_note',
+      category: 'Content',
+      badgeLabel: 'NEU',
+      badgeVariant: 'primary',
+    },
+    {
+      id: 'produkttext-agent',
+      name: 'Produkttext-Agent',
+      description:
+        'Aus einem einzigen Produktbild entstehen automatisch ein passender Produkttext und die vom Webhook zurückgelieferte Datei.',
+      icon: 'imagesmode',
+      category: 'Content',
+      badgeLabel: 'LIVE',
+      badgeVariant: 'primary',
+    },
+    {
       id: 'lead-researcher',
       name: 'Lead-Researcher',
       description:
@@ -100,6 +120,16 @@ export class Dashboard implements OnInit, OnDestroy {
       description:
         'Crawlt deine Sitemap und erstellt einen GEO-Audit mit Rankings, KI-Signalen und den wichtigsten siteweiten Baustellen.',
       icon: 'travel_explore',
+      category: 'SEO',
+      badgeLabel: 'LIVE',
+      badgeVariant: 'primary',
+    },
+    {
+      id: 'seo-geo-analyse-assistent',
+      name: 'SEO/GEO Analyse Assistent',
+      description:
+        'Nimmt URL, Marke, Branche und Standort als Formular entgegen, sendet den GEO-Webhook und zeigt die strukturierte Analyse direkt auf der Seite.',
+      icon: 'forum',
       category: 'SEO',
       badgeLabel: 'LIVE',
       badgeVariant: 'primary',

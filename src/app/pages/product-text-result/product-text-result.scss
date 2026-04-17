@@ -1,0 +1,38 @@
+:host {
+  display: block;
+}
+
+.md-content {
+  color: rgb(var(--color-on-surface));
+  line-height: 1.75;
+}
+
+.md-content > * + * {
+  margin-top: 1rem;
+}
+
+.md-content h1,
+.md-content h2,
+.md-content h3 {
+  color: rgb(var(--color-on-surface));
+  font-family: var(--font-headline, 'Space Grotesk', sans-serif);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.md-content p,
+.md-content li {
+  color: rgb(var(--color-on-surface-variant));
+}
+
+.md-content ul,
+.md-content ol {
+  padding-left: 1.25rem;
+}
+
+.md-content code {
+  border-radius: 0.5rem;
+  background: rgba(0, 112, 255, 0.12);
+  padding: 0.15rem 0.4rem;
+  color: rgb(var(--color-on-surface));
+}
