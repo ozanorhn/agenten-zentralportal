@@ -1,5 +1,7 @@
 export const SEO_GEO_REPORT_SESSION_KEY = 'seo-geo-assistant:reports';
 
+export type GeoAnalysisJobState = 'running' | 'done' | 'failed';
+
 export interface GeoWebhookInput {
   url?: string;
   brand?: string;
@@ -41,12 +43,15 @@ export interface ScoreSummary {
   label?: string;
   median?: number;
   improvementPotential?: number;
+  diffToMedian?: number;
 }
 
 export interface DimensionScore {
   key?: string;
   label?: string;
   score?: number;
+  indicator?: string;
+  status?: string;
   label_text?: string;
   facts?: string[];
 }
@@ -54,6 +59,7 @@ export interface DimensionScore {
 export interface AiPlatformScore {
   name?: string;
   score?: number;
+  indicator?: string;
   limitingFactor?: string;
 }
 
@@ -101,6 +107,7 @@ export interface BotAccessibilityCheck {
     };
   };
   assessment?: BotAssessment;
+  criticalBlocking?: string[];
 }
 
 export interface QuickWin {
@@ -132,16 +139,36 @@ export interface GeoReportSection {
   strategicActions?: StrategicAction[];
 }
 
+export interface GeoSchemaAnalysis {
+  present?: string[];
+  missing?: string[];
+  h2QuestionsFound?: string[];
+  deployInstructions?: string;
+}
+
+export interface GeoArtifacts {
+  organizationSchema?: string;
+  faqPageSchema?: string;
+  breadcrumbSchema?: string;
+  websiteSchema?: string;
+  llmsTxt?: string;
+  schemaAnalysis?: GeoSchemaAnalysis;
+}
+
 export interface GeoReport {
   executiveSummary?: string[];
   onpage?: ReportCategory;
   technik?: ReportCategory;
   offpage?: ReportCategory;
   geo?: GeoReportSection;
+  artifacts?: GeoArtifacts;
 }
 
 export interface GeoWebhookResult {
   analysedAt?: string;
+  visuals?: {
+    radarChart?: string;
+  };
   input?: GeoWebhookInput;
   seoAnalysis?: SeoAnalysis;
   score?: ScoreSummary;
@@ -153,11 +180,14 @@ export interface GeoWebhookResult {
     hasLlmsTxt?: boolean;
     isSSR?: boolean;
     hasCanonical?: boolean;
+    https?: boolean;
   };
   content?: {
     wordCount?: number;
+    avgParagraphWords?: number;
     h2QuestionCount?: number;
     hasVisibleAuthor?: boolean;
+    semanticDensity?: number;
   };
   authority?: {
     hasWikidata?: boolean;
@@ -166,14 +196,58 @@ export interface GeoWebhookResult {
     domainRating?: number;
     refDomains?: number;
     socialPlatforms?: string[];
+    validatedSocialLinks?: number;
   };
   report?: GeoReport;
+}
+
+export interface GeoAnalysisStartResponse {
+  jobId?: string;
+  status?: GeoAnalysisJobState;
+  progress?: number;
+  step?: string;
+}
+
+export interface GeoAnalysisJobError {
+  message?: string;
+  [key: string]: unknown;
+}
+
+export interface GeoAnalysisJobStatusResponse {
+  jobId?: string;
+  status?: GeoAnalysisJobState;
+  progress?: number;
+  step?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  input?: GeoWebhookInput | null;
+  result?: unknown;
+  error?: GeoAnalysisJobError | string | null;
 }
 
 export interface StoredSeoGeoReport {
   id: string;
   createdAt: number;
   payload: GeoWebhookResult;
+}
+
+export function extractGeoWebhookResult(data: unknown): GeoWebhookResult | null {
+  let parsed = data;
+
+  if (typeof parsed === 'string') {
+    try {
+      parsed = JSON.parse(parsed);
+    } catch {
+      return null;
+    }
+  }
+
+  const payload = Array.isArray(parsed) ? (parsed[0] ?? null) : parsed;
+  if (!payload || typeof payload !== 'object') {
+    return null;
+  }
+
+  return payload as GeoWebhookResult;
 }
 
 export function loadSeoGeoReports(): StoredSeoGeoReport[] {

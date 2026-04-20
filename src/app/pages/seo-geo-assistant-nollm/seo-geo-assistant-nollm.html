@@ -5,10 +5,10 @@
         SEO
       </span>
       <h1 class="mb-5 text-4xl font-black leading-none tracking-tighter text-on-surface font-headline md:text-6xl">
-        SEO/GEO Analyse <span class="text-[#0070FF]">Assistent</span>
+        SEO/GEO Analyse <span class="text-[#0070FF]">Assistent NoLLM</span>
       </h1>
       <p class="max-w-3xl text-lg font-light leading-relaxed text-on-surface-variant md:text-xl">
-        Felder ausfüllen, Analyse starten und den Live-Status danach direkt auf der eigenen Ergebnisseite verfolgen.
+        Felder ausfüllen, den NoLLM-Webhook direkt anstoßen und den fertigen Report danach auf einer eigenen Ergebnisseite ansehen.
       </p>
     </div>
 
@@ -95,12 +95,6 @@
             </div>
           }
 
-          @if (isSubmitting() && showLongWaitNotice()) {
-            <div class="rounded-2xl border border-[#0070FF]/20 bg-[#0070FF]/10 px-5 py-4 text-sm text-[#0A4FB7]">
-              Die Analyse wird gerade vorbereitet. Sobald die Job-ID da ist, springt die Seite automatisch in den Live-Status.
-            </div>
-          }
-
           <div class="flex flex-wrap gap-3">
             <button
               type="button"
@@ -110,7 +104,7 @@
             >
               @if (isSubmitting()) {
                 <span class="material-symbols-outlined animate-spin text-base">progress_activity</span>
-                Analyse startet...
+                Analyse läuft...
               } @else {
                 Report erstellen
                 <span class="material-symbols-outlined text-base">east</span>
@@ -136,9 +130,9 @@
             </div>
             <div>
               <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Webhook</p>
-              <p class="mt-2 text-lg font-black text-on-surface font-headline">Start-Endpunkt</p>
+              <p class="mt-2 text-lg font-black text-on-surface font-headline">Endpunkt</p>
               <p class="mt-3 break-all text-sm leading-relaxed text-on-surface-variant">
-                {{ environment.geoAnalysisStartWebhookUrl }}
+                {{ environment.geoAnalysisNoLlmWebhookUrl }}
               </p>
             </div>
           </div>
@@ -146,8 +140,8 @@
           <div class="mt-6 space-y-4">
             @for (step of [
               'Formular absenden',
-              'Sofort zur eigenen Status-Seite springen',
-              'Status pollen und Ergebnis automatisch laden'
+              'JSON vom Webhook empfangen',
+              'Automatisch zur eigenen Report-Seite springen'
             ]; track step) {
               <div class="flex gap-3">
                 <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#0070FF]/10 text-[11px] font-black text-[#0070FF]">
@@ -181,6 +175,33 @@
             <span class="material-symbols-outlined text-base">arrow_back</span>
             Zurück zum Marketplace
           </a>
+        </section>
+
+        <section class="glass-panel kinetic-border rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
+          <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Legende</p>
+          <div class="mt-4 space-y-3">
+            <div class="flex items-start gap-3 rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-3">
+              <span class="mt-0.5 text-base font-black text-[#22c55e]">✓</span>
+              <div>
+                <p class="text-sm font-semibold text-on-surface">Gut / vorhanden</p>
+                <p class="text-xs text-on-surface-variant">z. B. H1 korrekt ✓, llms.txt vorhanden ✓</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-3">
+              <span class="mt-0.5 text-base font-black text-[#f59e0b]">!</span>
+              <div>
+                <p class="text-sm font-semibold text-on-surface">Ausreichend / ausbaufähig</p>
+                <p class="text-xs text-on-surface-variant">z. B. 1.200 Wörter – ausbaufähig ⓘ, DR 35 ⓘ</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-3">
+              <span class="mt-0.5 text-base font-black text-[#ef4444]">✗</span>
+              <div>
+                <p class="text-sm font-semibold text-on-surface">Fehlt / kritisch</p>
+                <p class="text-xs text-on-surface-variant">z. B. H1 fehlt ✗, llms.txt fehlt ✗, DR 0 ✗</p>
+              </div>
+            </div>
+          </div>
         </section>
       </aside>
     </div>

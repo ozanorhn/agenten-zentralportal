@@ -1339,7 +1339,7 @@ export class AgentDetail {
       case 'blog-editor':        summary = output.articleTitle ?? `Blog-Artikel: ${output.topic}`; break;
       case 'content-strategy':   summary = `Content-Strategie: ${output.primaryTopic}`; break;
       case 'social-media':       summary = `Social Media: ${output.topic}`; break;
-      case 'product-text':       summary = output.generatedFile?.fileName ?? 'Produkttext generiert'; break;
+      case 'product-text':       summary = output.structuredResult?.seo?.title ?? output.structuredResult?.seo?.h1 ?? output.generatedFile?.fileName ?? 'Produkttext generiert'; break;
     }
 
     this.saveAndNavigate(output, summary, input);

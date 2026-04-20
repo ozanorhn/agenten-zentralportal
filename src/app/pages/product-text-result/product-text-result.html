@@ -43,7 +43,7 @@
     </div>
   </div>
 
-  <div class="mx-auto max-w-6xl px-8 py-10">
+  <div class="mx-auto max-w-7xl px-8 py-10">
     @if (output(); as result) {
       <section
         class="relative overflow-hidden rounded-[2rem] border border-outline-variant/20 px-8 py-8"
@@ -52,107 +52,1257 @@
           radial-gradient(circle at 86% 0%, rgba(34, 197, 94, 0.14), transparent 25%),
           linear-gradient(135deg, rgba(9, 15, 26, 0.98), rgba(13, 20, 34, 0.94));"
       >
-        <div class="relative flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between">
-          <div class="max-w-3xl space-y-4">
+        <div class="relative grid gap-8 xl:grid-cols-[minmax(0,1.3fr)_minmax(300px,0.7fr)]">
+          <div class="space-y-4">
             <div class="inline-flex items-center gap-2 rounded-full border border-[#0070FF]/20 bg-[#0070FF]/10 px-4 py-2">
-              <span class="material-symbols-outlined text-[#7DB4FF] text-base" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
-              <span class="text-[10px] font-black uppercase tracking-[0.22em] text-[#9EC6FF]">Produkttext</span>
+              <span class="material-symbols-outlined text-[#7DB4FF] text-base" style="font-variation-settings:'FILL' 1;">query_stats</span>
+              <span class="text-[10px] font-black uppercase tracking-[0.22em] text-[#9EC6FF]">SEO-Ergebnis</span>
             </div>
+
             <div>
               <h1 class="text-3xl font-headline font-black tracking-tight text-white md:text-5xl">
-                Produktbeschreibung
+                {{ heroTitle() }}
               </h1>
-              <p class="mt-3 max-w-2xl text-sm leading-relaxed text-blue-50/75 md:text-base">
-                Hier siehst du den generierten Produkttext. Falls der Webhook zusaetzlich eine Datei zurueckliefert,
-                kannst du sie direkt aus dieser Ansicht herunterladen.
-              </p>
+              @if (heroSubtitle()) {
+                <p class="mt-3 max-w-3xl text-sm leading-relaxed text-blue-50/75 md:text-base">
+                  {{ heroSubtitle() }}
+                </p>
+              }
             </div>
           </div>
 
-          <div class="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur xl:w-[20rem]">
-            <p class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-100/45">Eingabe</p>
-            <p class="mt-3 text-sm font-semibold text-white break-all">{{ result.inputReference }}</p>
-            <p class="mt-1 text-xs text-blue-100/55">{{ descriptionLength() }} Zeichen Produkttext</p>
+          <div class="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur">
+            <p class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-100/45">Überblick</p>
+            <div class="mt-4 space-y-4">
+              <div>
+                <p class="text-xs uppercase tracking-[0.18em] text-blue-100/45">Eingabe</p>
+                <p class="mt-2 break-all text-sm font-semibold text-white">{{ result.inputReference }}</p>
+              </div>
+
+              <div class="grid gap-3 sm:grid-cols-2">
+                <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <p class="text-[10px] uppercase tracking-[0.18em] text-blue-100/45">Status</p>
+                  <p class="mt-2 text-sm font-semibold text-white">
+                    @if (structuredResult()?.success === true) {
+                      Erfolgreich
+                    } @else if (structuredResult()?.success === false) {
+                      Fehler
+                    } @else {
+                      Unbekannt
+                    }
+                  </p>
+                </div>
+
+                <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <p class="text-[10px] uppercase tracking-[0.18em] text-blue-100/45">Tokens</p>
+                  <p class="mt-2 text-sm font-semibold text-white">{{ formattedTokensUsed() }}</p>
+                </div>
+
+                <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <p class="text-[10px] uppercase tracking-[0.18em] text-blue-100/45">Modell</p>
+                  <p class="mt-2 text-sm font-semibold text-white break-all">{{ structuredResult()?.model || '–' }}</p>
+                </div>
+
+                <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <p class="text-[10px] uppercase tracking-[0.18em] text-blue-100/45">Generiert</p>
+                  <p class="mt-2 text-sm font-semibold text-white">{{ formattedGeneratedAt() }}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <div class="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
-        <section class="overflow-hidden rounded-[2rem] border border-outline-variant/20 bg-surface-container">
-          <div class="flex items-center justify-between gap-3 border-b border-outline-variant/10 px-6 py-5">
-            <div>
-              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Produktbeschreibung</p>
-              <p class="mt-1 text-sm text-on-surface-variant">
-                Der generierte Text aus dem neuen Produkttext-Webhook wird hier sauber formatiert dargestellt.
-              </p>
-            </div>
-            <button
-              (click)="downloadDescription()"
-              class="inline-flex items-center gap-2 rounded-xl border border-outline-variant/20 bg-surface-container-high px-4 py-2 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest"
-            >
-              <span class="material-symbols-outlined text-base">download</span>
-              Text speichern
-            </button>
-          </div>
+      @if (hasStructuredResult()) {
+        <div class="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
+          <div class="space-y-6">
+            @if (seo(); as seoResult) {
+              <section class="overflow-hidden rounded-[2rem] border border-outline-variant/20 bg-surface-container">
+                <div class="border-b border-outline-variant/10 px-6 py-5">
+                  <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">SEO-Grunddaten</p>
+                  <p class="mt-1 text-sm text-on-surface-variant">
+                    Titel, Meta-Daten, Headline und Keyword-Cluster aus dem Webhook.
+                  </p>
+                </div>
 
-          <div class="px-6 py-6">
-            @if (renderedDescription()) {
-              <div class="md-content max-w-none text-on-surface-variant" [innerHTML]="renderedDescription()"></div>
-            } @else {
-              <p class="text-sm text-on-surface-variant">Keine lesbare Beschreibung vorhanden.</p>
+                <div class="space-y-6 px-6 py-6">
+                  <div class="grid gap-4 md:grid-cols-3">
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4 md:col-span-3">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">SEO-Titel</p>
+                      <p class="mt-2 text-base font-semibold text-on-surface">{{ seoResult.title || '–' }}</p>
+                    </div>
+
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4 md:col-span-3">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Meta-Beschreibung</p>
+                      <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">{{ seoResult.metaDescription || '–' }}</p>
+                    </div>
+
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4 md:col-span-3">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">H1</p>
+                      <p class="mt-2 text-base font-semibold text-on-surface">{{ seoResult.h1 || '–' }}</p>
+                    </div>
+                  </div>
+
+                  <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Fokus-Keyword</p>
+                      <p class="mt-2 text-sm font-semibold text-on-surface">{{ seoResult.focusKeyword || '–' }}</p>
+                    </div>
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Slug</p>
+                      <p class="mt-2 break-all text-sm font-semibold text-on-surface">{{ seoResult.slug || '–' }}</p>
+                    </div>
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Canonical URL</p>
+                      <p class="mt-2 break-all text-sm font-semibold text-on-surface">{{ seoResult.canonicalUrl || '–' }}</p>
+                    </div>
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Robots</p>
+                      <p class="mt-2 text-sm font-semibold text-on-surface">{{ seoResult.robots || '–' }}</p>
+                    </div>
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Lesbarkeit</p>
+                      <p class="mt-2 text-sm font-semibold text-on-surface">{{ seoResult.readabilityLevel || '–' }}</p>
+                    </div>
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Keyword-Dichte</p>
+                      <p class="mt-2 text-sm font-semibold text-on-surface">{{ seoResult.keywordDensityTarget || '–' }}</p>
+                    </div>
+                  </div>
+
+                  <div class="grid gap-4 lg:grid-cols-3">
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Sekundäre Keywords</p>
+                      <div class="mt-3 flex flex-wrap gap-2">
+                        @for (keyword of seoResult.secondaryKeywords; track keyword) {
+                          <span class="rounded-full bg-[#0070FF]/10 px-3 py-1 text-xs font-semibold text-[#0070FF]">{{ keyword }}</span>
+                        }
+                        @if (!seoResult.secondaryKeywords.length) {
+                          <span class="text-sm text-on-surface-variant">Keine Daten</span>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">LSI-Keywords</p>
+                      <div class="mt-3 flex flex-wrap gap-2">
+                        @for (keyword of seoResult.lsiKeywords; track keyword) {
+                          <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">{{ keyword }}</span>
+                        }
+                        @if (!seoResult.lsiKeywords.length) {
+                          <span class="text-sm text-on-surface-variant">Keine Daten</span>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Long-Tail-Keywords</p>
+                      <div class="mt-3 flex flex-wrap gap-2">
+                        @for (keyword of seoResult.longTailKeywords; track keyword) {
+                          <span class="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-300">{{ keyword }}</span>
+                        }
+                        @if (!seoResult.longTailKeywords.length) {
+                          <span class="text-sm text-on-surface-variant">Keine Daten</span>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            }
+
+            @if (contentData(); as contentResult) {
+              <section class="overflow-hidden rounded-[2rem] border border-outline-variant/20 bg-surface-container">
+                <div class="border-b border-outline-variant/10 px-6 py-5">
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Content</p>
+                      <p class="mt-1 text-sm text-on-surface-variant">
+                        Einleitung, Produktbeschreibung, Gliederung und Conversion-Bausteine.
+                      </p>
+                    </div>
+
+                    <button
+                      (click)="downloadDescription()"
+                      class="inline-flex items-center gap-2 rounded-xl border border-outline-variant/20 bg-surface-container-high px-4 py-2 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest"
+                    >
+                      <span class="material-symbols-outlined text-base">download</span>
+                      Text speichern
+                    </button>
+                  </div>
+                </div>
+
+                <div class="space-y-6 px-6 py-6">
+                  @if (contentResult.intro) {
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Intro</p>
+                      <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">{{ contentResult.intro }}</p>
+                    </div>
+                  }
+
+                  <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-5">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Produktbeschreibung</p>
+                    <div class="md-content mt-4 max-w-none text-on-surface-variant" [innerHTML]="renderedPrimaryText()"></div>
+                  </div>
+
+                  @if (contentResult.contentOutline.length) {
+                    <div class="space-y-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Inhaltsgliederung</p>
+                      <div class="grid gap-4 lg:grid-cols-2">
+                        @for (section of contentResult.contentOutline; track section.h2) {
+                          <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                            <div class="flex items-start justify-between gap-3">
+                              <p class="text-sm font-semibold text-on-surface">{{ section.h2 }}</p>
+                              @if (section.keyFocus) {
+                                <span class="rounded-full bg-[#0070FF]/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#0070FF]">
+                                  {{ section.keyFocus }}
+                                </span>
+                              }
+                            </div>
+
+                            @if (section.h3s.length) {
+                              <div class="mt-4 flex flex-wrap gap-2">
+                                @for (subheading of section.h3s; track subheading) {
+                                  <span class="rounded-full border border-outline-variant/20 px-3 py-1 text-xs text-on-surface-variant">{{ subheading }}</span>
+                                }
+                              </div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  <div class="grid gap-4 lg:grid-cols-2">
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Merkmale</p>
+                      <div class="mt-3 space-y-2">
+                        @for (feature of contentResult.features; track feature) {
+                          <div class="flex gap-3">
+                            <span class="mt-1 h-2 w-2 rounded-full bg-[#0070FF]"></span>
+                            <p class="text-sm text-on-surface-variant">{{ feature }}</p>
+                          </div>
+                        }
+                        @if (!contentResult.features.length) {
+                          <p class="text-sm text-on-surface-variant">Keine Merkmale vorhanden.</p>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Vorteile</p>
+                      <div class="mt-3 space-y-2">
+                        @for (benefit of contentResult.benefits; track benefit) {
+                          <div class="flex gap-3">
+                            <span class="mt-1 h-2 w-2 rounded-full bg-emerald-400"></span>
+                            <p class="text-sm text-on-surface-variant">{{ benefit }}</p>
+                          </div>
+                        }
+                        @if (!contentResult.benefits.length) {
+                          <p class="text-sm text-on-surface-variant">Keine Vorteile vorhanden.</p>
+                        }
+                      </div>
+                    </div>
+                  </div>
+
+                  @if (specificationEntries().length) {
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Technische Merkmale</p>
+                      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                        @for (spec of specificationEntries(); track spec.key) {
+                          <div class="rounded-xl border border-outline-variant/20 px-4 py-3">
+                            <p class="text-[10px] font-black uppercase tracking-[0.16em] text-outline">{{ spec.key }}</p>
+                            <p class="mt-2 text-sm text-on-surface">{{ spec.value }}</p>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  @if (contentResult.callToAction || contentResult.socialProofHook) {
+                    <div class="grid gap-4 lg:grid-cols-2">
+                      @if (contentResult.callToAction) {
+                        <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Handlungsaufforderung</p>
+                          <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">{{ contentResult.callToAction }}</p>
+                        </div>
+                      }
+
+                      @if (contentResult.socialProofHook) {
+                        <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Social Proof Hook</p>
+                          <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">{{ contentResult.socialProofHook }}</p>
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  @if (contentResult.imageAltTexts.length) {
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Alt-Texte für Bilder</p>
+                      <div class="mt-3 flex flex-wrap gap-2">
+                        @for (altText of contentResult.imageAltTexts; track altText) {
+                          <span class="rounded-full bg-fuchsia-500/10 px-3 py-1 text-xs font-semibold text-fuchsia-300">{{ altText }}</span>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </section>
+            }
+
+            @if (dataflowSeo(); as dataflow) {
+              <section class="overflow-hidden rounded-[2rem] border border-outline-variant/20 bg-surface-container">
+                <div class="border-b border-outline-variant/10 px-6 py-5">
+                  <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">SEO-Strategie</p>
+                  <p class="mt-1 text-sm text-on-surface-variant">
+                    Suchintention, Keyword-Strategie und interne SEO-Empfehlungen.
+                  </p>
+                </div>
+
+                <div class="space-y-6 px-6 py-6">
+                  <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Primäre Suchintention</p>
+                      <p class="mt-2 text-sm font-semibold text-on-surface">{{ dataflow.primaryIntent || '–' }}</p>
+                    </div>
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Content-Score</p>
+                      <p class="mt-2 text-sm font-semibold text-on-surface">{{ dataflow.contentScore || '–' }}</p>
+                    </div>
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Keyword-Strategie</p>
+                      <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">{{ dataflow.keywordStrategy || '–' }}</p>
+                    </div>
+                  </div>
+
+                  <div class="grid gap-4 lg:grid-cols-3">
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">E-E-A-T-Signale</p>
+                      <div class="mt-3 flex flex-wrap gap-2">
+                        @for (item of dataflow.eeatSignals; track item) {
+                          <span class="rounded-full bg-[#0070FF]/10 px-3 py-1 text-xs font-semibold text-[#0070FF]">{{ item }}</span>
+                        }
+                        @if (!dataflow.eeatSignals.length) {
+                          <span class="text-sm text-on-surface-variant">Keine Daten</span>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Differenzierer</p>
+                      <div class="mt-3 flex flex-wrap gap-2">
+                        @for (item of dataflow.competitorDifferentiators; track item) {
+                          <span class="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-300">{{ item }}</span>
+                        }
+                        @if (!dataflow.competitorDifferentiators.length) {
+                          <span class="text-sm text-on-surface-variant">Keine Daten</span>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Themencluster</p>
+                      <div class="mt-3 flex flex-wrap gap-2">
+                        @for (item of dataflow.topicalClusters; track item) {
+                          <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">{{ item }}</span>
+                        }
+                        @if (!dataflow.topicalClusters.length) {
+                          <span class="text-sm text-on-surface-variant">Keine Daten</span>
+                        }
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Interne Verlinkung</p>
+                    <div class="mt-4 space-y-3">
+                      @for (item of dataflow.internalLinkOpportunities; track item.anchorText + '-' + item.targetTopic) {
+                        <div class="rounded-xl border border-outline-variant/20 px-4 py-3">
+                          <p class="text-sm font-semibold text-on-surface">{{ item.anchorText }}</p>
+                          <p class="mt-1 text-xs uppercase tracking-[0.16em] text-on-surface-variant/60">{{ item.targetTopic }}</p>
+                        </div>
+                      }
+                      @if (!dataflow.internalLinkOpportunities.length) {
+                        <p class="text-sm text-on-surface-variant">Keine internen Link-Empfehlungen vorhanden.</p>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </section>
+            }
+
+            @if (faqItems().length) {
+              <section class="overflow-hidden rounded-[2rem] border border-outline-variant/20 bg-surface-container">
+                <div class="border-b border-outline-variant/10 px-6 py-5">
+                  <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">FAQ-Schema</p>
+                  <p class="mt-1 text-sm text-on-surface-variant">
+                    Direkt aus den strukturierten FAQ-Daten übernommen.
+                  </p>
+                </div>
+
+                <div class="space-y-4 px-6 py-6">
+                  @for (item of faqItems(); track item.question) {
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                      <p class="text-sm font-semibold text-on-surface">{{ item.question }}</p>
+                      <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">{{ item.answer }}</p>
+                    </div>
+                  }
+                </div>
+              </section>
             }
           </div>
-        </section>
 
-        <aside class="space-y-6">
-          <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
-            <div class="flex items-start gap-4">
-              <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
-                <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">imagesmode</span>
+          <aside class="space-y-6">
+            @if (tags(); as tagResult) {
+              <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
+                <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Tags & Struktur</p>
+                <div class="mt-5 space-y-5">
+                  <div>
+                    <p class="text-xs font-semibold text-on-surface">Produkt-Tags</p>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                      @for (tag of tagResult.productTags; track tag) {
+                        <span class="rounded-full bg-[#0070FF]/10 px-3 py-1 text-xs font-semibold text-[#0070FF]">{{ tag }}</span>
+                      }
+                      @if (!tagResult.productTags.length) {
+                        <span class="text-sm text-on-surface-variant">Keine Daten</span>
+                      }
+                    </div>
+                  </div>
+
+                  <div>
+                    <p class="text-xs font-semibold text-on-surface">Kategorienpfad</p>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                      @for (item of tagResult.categoryPath; track item) {
+                        <span class="rounded-full border border-outline-variant/20 px-3 py-1 text-xs text-on-surface-variant">{{ item }}</span>
+                      }
+                      @if (!tagResult.categoryPath.length) {
+                        <span class="text-sm text-on-surface-variant">Keine Daten</span>
+                      }
+                    </div>
+                  </div>
+
+                  <div>
+                    <p class="text-xs font-semibold text-on-surface">Breadcrumb</p>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                      @for (item of tagResult.breadcrumb; track item) {
+                        <span class="rounded-full border border-outline-variant/20 px-3 py-1 text-xs text-on-surface-variant">{{ item }}</span>
+                      }
+                      @if (!tagResult.breadcrumb.length) {
+                        <span class="text-sm text-on-surface-variant">Keine Daten</span>
+                      }
+                    </div>
+                  </div>
+
+                  <div>
+                    <p class="text-xs font-semibold text-on-surface">CMS-Tags</p>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                      @for (tag of tagResult.cmsTags; track tag) {
+                        <span class="rounded-full bg-fuchsia-500/10 px-3 py-1 text-xs font-semibold text-fuchsia-300">{{ tag }}</span>
+                      }
+                      @if (!tagResult.cmsTags.length) {
+                        <span class="text-sm text-on-surface-variant">Keine Daten</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </section>
+            }
+
+            @if (openGraphEntries().length || twitterCardEntries().length) {
+              <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
+                <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Social-Metadaten</p>
+                <div class="mt-5 space-y-5">
+                  @if (openGraphEntries().length) {
+                    <div>
+                      <p class="text-xs font-semibold text-on-surface">Open Graph</p>
+                      <div class="mt-3 space-y-2">
+                        @for (item of openGraphEntries(); track item.key) {
+                          <div class="rounded-xl border border-outline-variant/20 px-4 py-3">
+                            <p class="text-[10px] font-black uppercase tracking-[0.16em] text-outline">{{ item.key }}</p>
+                            <p class="mt-2 text-sm text-on-surface-variant">{{ item.value }}</p>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  @if (twitterCardEntries().length) {
+                    <div>
+                      <p class="text-xs font-semibold text-on-surface">Twitter Card</p>
+                      <div class="mt-3 space-y-2">
+                        @for (item of twitterCardEntries(); track item.key) {
+                          <div class="rounded-xl border border-outline-variant/20 px-4 py-3">
+                            <p class="text-[10px] font-black uppercase tracking-[0.16em] text-outline">{{ item.key }}</p>
+                            <p class="mt-2 text-sm text-on-surface-variant">{{ item.value }}</p>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </section>
+            }
+
+            @if (schemaProductJson() || schemaBreadcrumbJson() || schemaFaqJson()) {
+              <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
+                <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Schema JSON</p>
+                <div class="mt-5 space-y-4">
+                  @if (schemaProductJson()) {
+                    <div>
+                      <p class="mb-2 text-xs font-semibold text-on-surface">Produkt</p>
+                      <pre class="seo-code-block">{{ schemaProductJson() }}</pre>
+                    </div>
+                  }
+
+                  @if (schemaBreadcrumbJson()) {
+                    <div>
+                      <p class="mb-2 text-xs font-semibold text-on-surface">Breadcrumb</p>
+                      <pre class="seo-code-block">{{ schemaBreadcrumbJson() }}</pre>
+                    </div>
+                  }
+
+                  @if (schemaFaqJson()) {
+                    <div>
+                      <p class="mb-2 text-xs font-semibold text-on-surface">FAQ-Seite</p>
+                      <pre class="seo-code-block">{{ schemaFaqJson() }}</pre>
+                    </div>
+                  }
+                </div>
+              </section>
+            }
+
+            @if (hasPlatformData()) {
+              <section class="overflow-hidden rounded-[2rem] border border-outline-variant/20 bg-surface-container">
+                <div class="border-b border-outline-variant/10 px-6 py-5">
+                  <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Plattform-Daten</p>
+                  <p class="mt-1 text-sm text-on-surface-variant">
+                    Produktdaten für verschiedene e-Commerce-Plattformen.
+                  </p>
+                </div>
+
+                <div class="space-y-6 px-6 py-6">
+                  @if (availablePlatforms().length > 0) {
+                    <div class="flex flex-wrap gap-2 border-b border-outline-variant/10 pb-6">
+                      @for (platform of availablePlatforms(); track platform) {
+                        <button
+                          (click)="selectedPlatform.set(platform)"
+                          class="rounded-xl px-4 py-2 text-sm font-semibold transition-all"
+                          [class.bg-[#0070FF] text-white]="effectivePlatform() === platform"
+                          [class.bg-surface-container-high text-on-surface]="effectivePlatform() !== platform"
+                        >
+                          {{ platform | uppercase }}
+                        </button>
+                      }
+                    </div>
+
+                    <div class="space-y-4">
+                      @if (platformResult(); as result) {
+                        @if (effectivePlatform() === 'amazon' && result.amazon) {
+                          <div class="space-y-4">
+                            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Produktname</p>
+                              <p class="mt-2 text-sm font-semibold text-on-surface">{{ result.amazon.item_name }}</p>
+                            </div>
+
+                            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Produktbeschreibung</p>
+                              <div class="md-content mt-2 text-sm text-on-surface-variant" [innerHTML]="result.amazon.item_description"></div>
+                            </div>
+
+                            <div class="space-y-3">
+                              @for (i of [1, 2, 3, 4, 5]; track i) {
+                                @if (result.amazon['bullet_point' + i]) {
+                                  <div class="flex gap-3 rounded-xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                                    <span class="mt-1 flex-shrink-0 text-[#0070FF]">•</span>
+                                    <p class="text-sm text-on-surface-variant">{{ result.amazon['bullet_point' + i] }}</p>
+                                  </div>
+                                }
+                              }
+                            </div>
+
+                            <div class="grid gap-4 sm:grid-cols-2">
+                              <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">SKU</p>
+                                <p class="mt-2 text-sm text-on-surface">{{ result.amazon.item_sku || '–' }}</p>
+                              </div>
+                              <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Produkttyp</p>
+                                <p class="mt-2 text-sm text-on-surface">{{ result.amazon.product_type }}</p>
+                              </div>
+                            </div>
+
+                            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Keywords</p>
+                              <div class="mt-3 flex flex-wrap gap-2">
+                                @for (keyword of result.amazon.generic_keywords.split(','); track keyword) {
+                                  <span class="rounded-full bg-[#0070FF]/10 px-3 py-1 text-xs font-semibold text-[#0070FF]">{{ keyword.trim() }}</span>
+                                }
+                              </div>
+                            </div>
+                          </div>
+                        }
+
+                        @if (effectivePlatform() === 'shopify' && result.shopify) {
+                          <div class="space-y-4">
+                            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Titel</p>
+                              <p class="mt-2 text-sm font-semibold text-on-surface">{{ result.shopify.Title }}</p>
+                            </div>
+
+                            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Beschreibung</p>
+                              <div class="md-content mt-2 text-sm text-on-surface-variant" [innerHTML]="result.shopify['Body (HTML)']"></div>
+                            </div>
+
+                            <div class="grid gap-4 sm:grid-cols-2">
+                              <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Handle</p>
+                                <p class="mt-2 break-all text-sm text-on-surface">{{ result.shopify.Handle }}</p>
+                              </div>
+                              <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Kategorie</p>
+                                <p class="mt-2 text-sm text-on-surface">{{ result.shopify.Type }}</p>
+                              </div>
+                            </div>
+
+                            <div class="grid gap-4 sm:grid-cols-2">
+                              <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">SEO Titel</p>
+                                <p class="mt-2 text-sm font-semibold text-on-surface">{{ result.shopify['SEO Title'] }}</p>
+                              </div>
+                              <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Veröffentlicht</p>
+                                <p class="mt-2 text-sm text-on-surface">{{ result.shopify.Published }}</p>
+                              </div>
+                            </div>
+
+                            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">SEO-Beschreibung</p>
+                              <p class="mt-2 text-sm text-on-surface-variant">{{ result.shopify['SEO Description'] }}</p>
+                            </div>
+                          </div>
+                        }
+
+                        @if (effectivePlatform() === 'ebay' && result.ebay) {
+                          <div class="space-y-4">
+                            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Titel</p>
+                              <p class="mt-2 text-sm font-semibold text-on-surface">{{ result.ebay.Title }}</p>
+                            </div>
+
+                            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Beschreibung</p>
+                              <div class="md-content mt-2 text-sm text-on-surface-variant" [innerHTML]="result.ebay.Description"></div>
+                            </div>
+
+                            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Zustand</p>
+                              <p class="mt-2 text-sm text-on-surface">{{ result.ebay.ConditionDescription }}</p>
+                            </div>
+
+                            <div class="grid gap-4 sm:grid-cols-2">
+                              @for (entry of [
+                                { label: 'Marke', key: 'Marke' },
+                                { label: 'Material', key: 'Material' },
+                                { label: 'Farbe', key: 'Farbe' },
+                                { label: 'Größe', key: 'Groesse' }
+                              ]; track entry.key) {
+                                @if (result.ebay.ItemSpecifics[entry.key]) {
+                                  <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">{{ entry.label }}</p>
+                                    <p class="mt-2 text-sm text-on-surface">{{ result.ebay.ItemSpecifics[entry.key] }}</p>
+                                  </div>
+                                }
+                              }
+                            </div>
+                          </div>
+                        }
+
+                        @if (effectivePlatform() === 'shopware' && result.shopware) {
+                          <div class="space-y-4">
+                            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Name</p>
+                              <p class="mt-2 text-sm font-semibold text-on-surface">{{ result.shopware.name }}</p>
+                            </div>
+
+                            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Beschreibung</p>
+                              <div class="md-content mt-2 text-sm text-on-surface-variant" [innerHTML]="result.shopware.description"></div>
+                            </div>
+
+                            <div class="grid gap-4 sm:grid-cols-2">
+                              <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Meta-Titel</p>
+                                <p class="mt-2 text-sm font-semibold text-on-surface">{{ result.shopware.metaTitle }}</p>
+                              </div>
+                              <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Meta-Beschreibung</p>
+                                <p class="mt-2 text-sm text-on-surface-variant">{{ result.shopware.metaDescription }}</p>
+                              </div>
+                            </div>
+
+                            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Keywords</p>
+                              <p class="mt-2 text-sm text-on-surface-variant">{{ result.shopware.keywords }}</p>
+                            </div>
+                          </div>
+                        }
+
+                        @if (effectivePlatform() === 'woocommerce' && result.woocommerce) {
+                          <div class="space-y-4">
+                            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Titel</p>
+                              <p class="mt-2 text-sm font-semibold text-on-surface">{{ result.woocommerce.post_title }}</p>
+                            </div>
+
+                            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Inhalt</p>
+                              <div class="md-content mt-2 text-sm text-on-surface-variant" [innerHTML]="result.woocommerce.post_content"></div>
+                            </div>
+
+                            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Auszug</p>
+                              <p class="mt-2 text-sm text-on-surface-variant">{{ result.woocommerce.post_excerpt }}</p>
+                            </div>
+
+                            <div class="grid gap-4 sm:grid-cols-2">
+                              <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Yoast-Titel</p>
+                                <p class="mt-2 text-sm font-semibold text-on-surface">{{ result.woocommerce._yoast_wpseo_title }}</p>
+                              </div>
+                              <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Yoast-Meta</p>
+                                <p class="mt-2 text-sm text-on-surface-variant">{{ result.woocommerce._yoast_wpseo_metadesc }}</p>
+                              </div>
+                            </div>
+
+                            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Kategorien</p>
+                              <p class="mt-2 text-sm text-on-surface-variant">{{ result.woocommerce.categories }}</p>
+                            </div>
+                          </div>
+                        }
+                      }
+
+                      <div class="flex flex-wrap gap-3 border-t border-outline-variant/10 pt-6">
+                        @if (effectivePlatform()) {
+                          <button
+                            (click)="downloadPlatformData(effectivePlatform()!)"
+                            class="inline-flex items-center gap-2 rounded-xl bg-[#0070FF] px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-[#0060db]"
+                          >
+                            <span class="material-symbols-outlined text-base">download</span>
+                            JSON herunterladen
+                          </button>
+
+                          <button
+                            (click)="downloadPlatformDataAsCSV(effectivePlatform()!)"
+                            class="inline-flex items-center gap-2 rounded-xl border border-outline-variant/20 bg-surface-container-high px-4 py-2 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest"
+                          >
+                            <span class="material-symbols-outlined text-base">table_chart</span>
+                            CSV herunterladen
+                          </button>
+                        }
+
+                        @if (availablePlatforms().length > 1) {
+                          <button
+                            (click)="downloadAllPlatformData()"
+                            class="inline-flex items-center gap-2 rounded-xl border border-outline-variant/20 bg-surface-container-high px-4 py-2 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest"
+                          >
+                            <span class="material-symbols-outlined text-base">cloud_download</span>
+                            Alle herunterladen
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </section>
+            }
+
+            <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
+              <div class="flex items-start gap-4">
+                <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
+                  <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">imagesmode</span>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-[10px] font-black uppercase tracking-[0.2em] text-outline">Datei</p>
+                  <p class="mt-2 text-sm text-on-surface-variant">
+                    Falls der Webhook zusaetzlich eine Datei liefert, findest du sie hier als Vorschau oder Download.
+                  </p>
+                </div>
               </div>
-              <div class="min-w-0">
-                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-outline">Datei</p>
-                <p class="mt-2 text-sm text-on-surface-variant">
-                  Wenn der Webhook eine Datei zurueckgibt, findest du sie hier als Vorschau oder Download.
-                </p>
+
+              @if (generatedPreviewUrl()) {
+                <div class="mt-5 aspect-[3/2] overflow-hidden rounded-2xl border border-outline-variant/20 bg-surface-container-high/20">
+                  <img
+                    [src]="generatedPreviewUrl()"
+                    alt="Vom Webhook zurueckgelieferte Datei"
+                    class="h-full w-full object-contain"
+                  />
+                </div>
+              } @else if (fileReady()) {
+                <div class="mt-5 flex aspect-[3/2] items-center justify-center rounded-2xl border border-outline-variant/20 bg-surface-container-high/20 px-6 text-center">
+                  <p class="text-sm text-on-surface-variant">
+                    Eine Datei wurde zurueckgegeben, aber sie hat keine direkte Bildvorschau. Du kannst sie trotzdem herunterladen.
+                  </p>
+                </div>
+              } @else {
+                <div class="mt-5 flex aspect-[3/2] items-center justify-center rounded-2xl border border-outline-variant/20 bg-surface-container-high/20 px-6 text-center">
+                  <p class="text-sm text-on-surface-variant">Dieser Lauf hat keine zusaetzliche Datei geliefert.</p>
+                </div>
+              }
+
+              <button
+                (click)="downloadGeneratedFile()"
+                [disabled]="!fileReady()"
+                class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0070FF] px-5 py-3 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#0060db] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <span class="material-symbols-outlined text-base">download</span>
+                Datei herunterladen
+              </button>
+            </section>
+          </aside>
+        </div>
+      } @else if (hasPlatformData()) {
+        <!-- Pure platform-data mode: no SEO structured result, show platform tabs as primary content -->
+        <div class="mt-8 space-y-6">
+          <section class="overflow-hidden rounded-[2rem] border border-outline-variant/20 bg-surface-container">
+            <div class="border-b border-outline-variant/10 px-6 py-5">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Plattform-Produktdaten</p>
+                  <p class="mt-1 text-sm text-on-surface-variant">Fertige Produkttexte für jede e-Commerce-Plattform — direkt kopieren oder herunterladen.</p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                  @if (effectivePlatform()) {
+                    <button
+                      (click)="downloadPlatformData(effectivePlatform()!)"
+                      class="inline-flex items-center gap-2 rounded-xl bg-[#0070FF] px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-[#0060db]"
+                    >
+                      <span class="material-symbols-outlined text-base">download</span>
+                      JSON
+                    </button>
+                    <button
+                      (click)="downloadPlatformDataAsCSV(effectivePlatform()!)"
+                      class="inline-flex items-center gap-2 rounded-xl border border-outline-variant/20 bg-surface-container-high px-4 py-2 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest"
+                    >
+                      <span class="material-symbols-outlined text-base">table_chart</span>
+                      CSV
+                    </button>
+                  }
+                  @if (availablePlatforms().length > 1) {
+                    <button
+                      (click)="downloadAllPlatformData()"
+                      class="inline-flex items-center gap-2 rounded-xl border border-outline-variant/20 bg-surface-container-high px-4 py-2 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest"
+                    >
+                      <span class="material-symbols-outlined text-base">cloud_download</span>
+                      Alle herunterladen
+                    </button>
+                  }
+                </div>
               </div>
             </div>
 
-            @if (generatedPreviewUrl()) {
-              <div class="mt-5 aspect-[3/2] overflow-hidden rounded-2xl border border-outline-variant/20 bg-surface-container-high/20">
-                <img
-                  [src]="generatedPreviewUrl()"
-                  alt="Vom Webhook zurueckgelieferte Datei"
-                  class="h-full w-full object-contain"
-                />
+            <div class="px-6 py-6 space-y-6">
+              <!-- Platform tabs -->
+              <div class="flex flex-wrap gap-2">
+                @for (platform of availablePlatforms(); track platform) {
+                  <button
+                    (click)="selectedPlatform.set(platform)"
+                    class="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition-all"
+                    [class.bg-[#0070FF]]="effectivePlatform() === platform"
+                    [class.text-white]="effectivePlatform() === platform"
+                    [class.shadow-lg]="effectivePlatform() === platform"
+                    [class.bg-surface-container-high]="effectivePlatform() !== platform"
+                    [class.text-on-surface]="effectivePlatform() !== platform"
+                  >
+                    {{ platform | uppercase }}
+                  </button>
+                }
               </div>
-            } @else if (fileReady()) {
-              <div class="mt-5 flex aspect-[3/2] items-center justify-center rounded-2xl border border-outline-variant/20 bg-surface-container-high/20 px-6 text-center">
-                <p class="text-sm text-on-surface-variant">
-                  Eine Datei wurde zurueckgegeben, aber sie hat keine direkte Bildvorschau. Du kannst sie trotzdem herunterladen.
-                </p>
-              </div>
-            } @else {
-              <div class="mt-5 flex aspect-[3/2] items-center justify-center rounded-2xl border border-outline-variant/20 bg-surface-container-high/20 px-6 text-center">
-                <p class="text-sm text-on-surface-variant">Dieser Lauf hat nur Text und keine zusaetzliche Datei geliefert.</p>
-              </div>
-            }
 
-            <button
-              (click)="downloadGeneratedFile()"
-              [disabled]="!fileReady()"
-              class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0070FF] px-5 py-3 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#0060db] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <span class="material-symbols-outlined text-base">download</span>
-              Datei herunterladen
-            </button>
+              @if (platformResult(); as result) {
+                <!-- AMAZON -->
+                @if (effectivePlatform() === 'amazon' && result.amazon) {
+                  <div class="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(280px,1fr)]">
+                    <div class="space-y-4">
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-5">
+                        <div class="flex items-start justify-between gap-3">
+                          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Produktname</p>
+                          <button (click)="copyField(result.amazon!.item_name, 'Produktname')" class="text-outline hover:text-on-surface transition-colors">
+                            <span class="material-symbols-outlined text-base">content_copy</span>
+                          </button>
+                        </div>
+                        <p class="mt-2 text-base font-semibold text-on-surface">{{ result.amazon.item_name }}</p>
+                      </div>
+
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-5">
+                        <div class="flex items-start justify-between gap-3">
+                          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Produktbeschreibung</p>
+                          <button (click)="copyField(result.amazon!.item_description, 'Beschreibung')" class="text-outline hover:text-on-surface transition-colors">
+                            <span class="material-symbols-outlined text-base">content_copy</span>
+                          </button>
+                        </div>
+                        <div class="md-content mt-3 text-sm leading-relaxed text-on-surface-variant" [innerHTML]="result.amazon.item_description"></div>
+                      </div>
+
+                      <div class="space-y-2">
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Bullet Points</p>
+                        @for (i of [1, 2, 3, 4, 5]; track i) {
+                          @if (result.amazon!['bullet_point' + i]) {
+                            <div class="group flex gap-3 rounded-xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <span class="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[#0070FF]/15 text-[10px] font-black text-[#0070FF]">{{ i }}</span>
+                              <p class="flex-1 text-sm text-on-surface-variant">{{ result.amazon!['bullet_point' + i] }}</p>
+                              <button (click)="copyField(result.amazon!['bullet_point' + i], 'Bullet Point')" class="flex-shrink-0 text-outline opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span class="material-symbols-outlined text-sm">content_copy</span>
+                              </button>
+                            </div>
+                          }
+                        }
+                      </div>
+                    </div>
+
+                    <div class="space-y-4">
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Produkttyp</p>
+                        <p class="mt-2 text-sm font-semibold text-on-surface">{{ result.amazon.product_type }}</p>
+                      </div>
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">SKU</p>
+                        <p class="mt-2 text-sm text-on-surface">{{ result.amazon.item_sku || '–' }}</p>
+                      </div>
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Keywords</p>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                          @for (keyword of result.amazon.generic_keywords.split(','); track keyword) {
+                            <span class="rounded-full bg-[#0070FF]/10 px-3 py-1 text-xs font-semibold text-[#0070FF]">{{ keyword.trim() }}</span>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+
+                <!-- SHOPIFY -->
+                @if (effectivePlatform() === 'shopify' && result.shopify) {
+                  <div class="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(280px,1fr)]">
+                    <div class="space-y-4">
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-5">
+                        <div class="flex items-start justify-between gap-3">
+                          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Titel</p>
+                          <button (click)="copyField(result.shopify!.Title, 'Titel')" class="text-outline hover:text-on-surface transition-colors">
+                            <span class="material-symbols-outlined text-base">content_copy</span>
+                          </button>
+                        </div>
+                        <p class="mt-2 text-base font-semibold text-on-surface">{{ result.shopify.Title }}</p>
+                      </div>
+
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-5">
+                        <div class="flex items-start justify-between gap-3">
+                          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Beschreibung (HTML)</p>
+                          <button (click)="copyField(result.shopify!['Body (HTML)'], 'Beschreibung')" class="text-outline hover:text-on-surface transition-colors">
+                            <span class="material-symbols-outlined text-base">content_copy</span>
+                          </button>
+                        </div>
+                        <div class="md-content mt-3 text-sm leading-relaxed text-on-surface-variant" [innerHTML]="result.shopify['Body (HTML)']"></div>
+                      </div>
+
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-5">
+                        <div class="flex items-start justify-between gap-3">
+                          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">SEO-Beschreibung</p>
+                          <button (click)="copyField(result.shopify!['SEO Description'], 'SEO-Beschreibung')" class="text-outline hover:text-on-surface transition-colors">
+                            <span class="material-symbols-outlined text-base">content_copy</span>
+                          </button>
+                        </div>
+                        <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">{{ result.shopify['SEO Description'] }}</p>
+                      </div>
+                    </div>
+
+                    <div class="space-y-4">
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Handle</p>
+                        <p class="mt-2 break-all text-sm font-mono text-on-surface">{{ result.shopify.Handle }}</p>
+                      </div>
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Kategorie</p>
+                        <p class="mt-2 text-sm text-on-surface">{{ result.shopify.Type }}</p>
+                      </div>
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">SEO Titel</p>
+                        <p class="mt-2 text-sm font-semibold text-on-surface">{{ result.shopify['SEO Title'] }}</p>
+                      </div>
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Tags</p>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                          @for (tag of result.shopify.Tags.split(','); track tag) {
+                            <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">{{ tag.trim() }}</span>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+
+                <!-- EBAY -->
+                @if (effectivePlatform() === 'ebay' && result.ebay) {
+                  <div class="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(280px,1fr)]">
+                    <div class="space-y-4">
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-5">
+                        <div class="flex items-start justify-between gap-3">
+                          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Titel</p>
+                          <button (click)="copyField(result.ebay!.Title, 'Titel')" class="text-outline hover:text-on-surface transition-colors">
+                            <span class="material-symbols-outlined text-base">content_copy</span>
+                          </button>
+                        </div>
+                        <p class="mt-2 text-base font-semibold text-on-surface">{{ result.ebay.Title }}</p>
+                      </div>
+
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-5">
+                        <div class="flex items-start justify-between gap-3">
+                          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Beschreibung</p>
+                          <button (click)="copyField(result.ebay!.Description, 'Beschreibung')" class="text-outline hover:text-on-surface transition-colors">
+                            <span class="material-symbols-outlined text-base">content_copy</span>
+                          </button>
+                        </div>
+                        <div class="md-content mt-3 text-sm leading-relaxed text-on-surface-variant" [innerHTML]="result.ebay.Description"></div>
+                      </div>
+                    </div>
+
+                    <div class="space-y-4">
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Zustand</p>
+                        <p class="mt-2 text-sm font-semibold text-on-surface">{{ result.ebay.ConditionDescription }}</p>
+                      </div>
+                      @if (result.ebay.ItemSpecifics) {
+                        @for (entry of [
+                          { label: 'Marke', key: 'Marke' },
+                          { label: 'Material', key: 'Material' },
+                          { label: 'Farbe', key: 'Farbe' },
+                          { label: 'Größe', key: 'Groesse' }
+                        ]; track entry.key) {
+                          @if (result.ebay!.ItemSpecifics[entry.key]) {
+                            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                              <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">{{ entry.label }}</p>
+                              <p class="mt-2 text-sm text-on-surface">{{ result.ebay!.ItemSpecifics[entry.key] }}</p>
+                            </div>
+                          }
+                        }
+                      }
+                    </div>
+                  </div>
+                }
+
+                <!-- SHOPWARE -->
+                @if (effectivePlatform() === 'shopware' && result.shopware) {
+                  <div class="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(280px,1fr)]">
+                    <div class="space-y-4">
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-5">
+                        <div class="flex items-start justify-between gap-3">
+                          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Name</p>
+                          <button (click)="copyField(result.shopware!.name, 'Name')" class="text-outline hover:text-on-surface transition-colors">
+                            <span class="material-symbols-outlined text-base">content_copy</span>
+                          </button>
+                        </div>
+                        <p class="mt-2 text-base font-semibold text-on-surface">{{ result.shopware.name }}</p>
+                      </div>
+
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-5">
+                        <div class="flex items-start justify-between gap-3">
+                          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Beschreibung</p>
+                          <button (click)="copyField(result.shopware!.description, 'Beschreibung')" class="text-outline hover:text-on-surface transition-colors">
+                            <span class="material-symbols-outlined text-base">content_copy</span>
+                          </button>
+                        </div>
+                        <div class="md-content mt-3 text-sm leading-relaxed text-on-surface-variant" [innerHTML]="result.shopware.description"></div>
+                      </div>
+
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-5">
+                        <div class="flex items-start justify-between gap-3">
+                          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Meta-Beschreibung</p>
+                          <button (click)="copyField(result.shopware!.metaDescription, 'Meta-Beschreibung')" class="text-outline hover:text-on-surface transition-colors">
+                            <span class="material-symbols-outlined text-base">content_copy</span>
+                          </button>
+                        </div>
+                        <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">{{ result.shopware.metaDescription }}</p>
+                      </div>
+                    </div>
+
+                    <div class="space-y-4">
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Meta-Titel</p>
+                        <p class="mt-2 text-sm font-semibold text-on-surface">{{ result.shopware.metaTitle }}</p>
+                      </div>
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Keywords</p>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                          @for (kw of result.shopware.keywords.split(','); track kw) {
+                            <span class="rounded-full bg-[#0070FF]/10 px-3 py-1 text-xs font-semibold text-[#0070FF]">{{ kw.trim() }}</span>
+                          }
+                        </div>
+                      </div>
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Tags</p>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                          @for (tag of result.shopware.tags.split(','); track tag) {
+                            <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">{{ tag.trim() }}</span>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+
+                <!-- WOOCOMMERCE -->
+                @if (effectivePlatform() === 'woocommerce' && result.woocommerce) {
+                  <div class="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(280px,1fr)]">
+                    <div class="space-y-4">
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-5">
+                        <div class="flex items-start justify-between gap-3">
+                          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Titel</p>
+                          <button (click)="copyField(result.woocommerce!.post_title, 'Titel')" class="text-outline hover:text-on-surface transition-colors">
+                            <span class="material-symbols-outlined text-base">content_copy</span>
+                          </button>
+                        </div>
+                        <p class="mt-2 text-base font-semibold text-on-surface">{{ result.woocommerce.post_title }}</p>
+                      </div>
+
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-5">
+                        <div class="flex items-start justify-between gap-3">
+                          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Inhalt</p>
+                          <button (click)="copyField(result.woocommerce!.post_content, 'Inhalt')" class="text-outline hover:text-on-surface transition-colors">
+                            <span class="material-symbols-outlined text-base">content_copy</span>
+                          </button>
+                        </div>
+                        <div class="md-content mt-3 text-sm leading-relaxed text-on-surface-variant" [innerHTML]="result.woocommerce.post_content"></div>
+                      </div>
+
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-5">
+                        <div class="flex items-start justify-between gap-3">
+                          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Auszug</p>
+                          <button (click)="copyField(result.woocommerce!.post_excerpt, 'Auszug')" class="text-outline hover:text-on-surface transition-colors">
+                            <span class="material-symbols-outlined text-base">content_copy</span>
+                          </button>
+                        </div>
+                        <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">{{ result.woocommerce.post_excerpt }}</p>
+                      </div>
+                    </div>
+
+                    <div class="space-y-4">
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Yoast-Titel</p>
+                        <p class="mt-2 text-sm font-semibold text-on-surface">{{ result.woocommerce._yoast_wpseo_title }}</p>
+                      </div>
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                        <div class="flex items-start justify-between gap-3">
+                          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Yoast Meta</p>
+                          <button (click)="copyField(result.woocommerce!._yoast_wpseo_metadesc, 'Yoast Meta')" class="text-outline hover:text-on-surface transition-colors">
+                            <span class="material-symbols-outlined text-base">content_copy</span>
+                          </button>
+                        </div>
+                        <p class="mt-2 text-sm text-on-surface-variant">{{ result.woocommerce._yoast_wpseo_metadesc }}</p>
+                      </div>
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Fokus-Keyword</p>
+                        <span class="mt-2 inline-block rounded-full bg-[#0070FF]/10 px-3 py-1 text-xs font-semibold text-[#0070FF]">{{ result.woocommerce._yoast_wpseo_focuskw }}</span>
+                      </div>
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Kategorien</p>
+                        <p class="mt-2 text-sm text-on-surface-variant">{{ result.woocommerce.categories }}</p>
+                      </div>
+                      <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 p-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Tags</p>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                          @for (tag of result.woocommerce.tags.split(','); track tag) {
+                            <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">{{ tag.trim() }}</span>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              }
+            </div>
           </section>
-        </aside>
-      </div>
+        </div>
+      } @else {
+        <div class="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
+          <section class="overflow-hidden rounded-[2rem] border border-outline-variant/20 bg-surface-container">
+            <div class="flex items-center justify-between gap-3 border-b border-outline-variant/10 px-6 py-5">
+              <div>
+                <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Produktbeschreibung</p>
+                <p class="mt-1 text-sm text-on-surface-variant">
+                  Der generierte Text aus dem Produkttext-Webhook wird hier dargestellt.
+                </p>
+              </div>
+              <button
+                (click)="downloadDescription()"
+                class="inline-flex items-center gap-2 rounded-xl border border-outline-variant/20 bg-surface-container-high px-4 py-2 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest"
+              >
+                <span class="material-symbols-outlined text-base">download</span>
+                Text speichern
+              </button>
+            </div>
+
+            <div class="px-6 py-6">
+              @if (renderedPrimaryText()) {
+                <div class="md-content max-w-none text-on-surface-variant" [innerHTML]="renderedPrimaryText()"></div>
+              } @else {
+                <p class="text-sm text-on-surface-variant">Keine lesbare Beschreibung vorhanden.</p>
+              }
+            </div>
+          </section>
+
+          <aside class="space-y-6">
+            <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
+              <div class="flex items-start gap-4">
+                <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
+                  <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">imagesmode</span>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-[10px] font-black uppercase tracking-[0.2em] text-outline">Datei</p>
+                  <p class="mt-2 text-sm text-on-surface-variant">
+                    Wenn der Webhook eine Datei zurueckgibt, findest du sie hier als Vorschau oder Download.
+                  </p>
+                </div>
+              </div>
+
+              @if (generatedPreviewUrl()) {
+                <div class="mt-5 aspect-[3/2] overflow-hidden rounded-2xl border border-outline-variant/20 bg-surface-container-high/20">
+                  <img
+                    [src]="generatedPreviewUrl()"
+                    alt="Vom Webhook zurueckgelieferte Datei"
+                    class="h-full w-full object-contain"
+                  />
+                </div>
+              } @else if (fileReady()) {
+                <div class="mt-5 flex aspect-[3/2] items-center justify-center rounded-2xl border border-outline-variant/20 bg-surface-container-high/20 px-6 text-center">
+                  <p class="text-sm text-on-surface-variant">
+                    Eine Datei wurde zurueckgegeben, aber sie hat keine direkte Bildvorschau. Du kannst sie trotzdem herunterladen.
+                  </p>
+                </div>
+              } @else {
+                <div class="mt-5 flex aspect-[3/2] items-center justify-center rounded-2xl border border-outline-variant/20 bg-surface-container-high/20 px-6 text-center">
+                  <p class="text-sm text-on-surface-variant">Dieser Lauf hat nur Text und keine zusaetzliche Datei geliefert.</p>
+                </div>
+              }
+
+              <button
+                (click)="downloadGeneratedFile()"
+                [disabled]="!fileReady()"
+                class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0070FF] px-5 py-3 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#0060db] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <span class="material-symbols-outlined text-base">download</span>
+                Datei herunterladen
+              </button>
+            </section>
+          </aside>
+        </div>
+      }
     } @else {
       <div class="py-24 text-center text-on-surface-variant">
         <span class="material-symbols-outlined mb-4 block text-5xl opacity-30">hourglass_empty</span>
-        <p>Kein Produkttext-Lauf gefunden. Starte den Agenten erneut mit Produkt-URL oder Bild-URL.</p>
+        <p>Kein Produkttext-Lauf gefunden. Starte den Agenten erneut mit Produkt-URL oder Bild.</p>
         <button
           (click)="goBack()"
           class="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#0070FF] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0060db]"

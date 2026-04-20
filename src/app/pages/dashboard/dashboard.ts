@@ -12,6 +12,14 @@ export interface Agent {
   badgeVariant?: 'primary' | 'secondary';
 }
 
+interface HeroContent {
+  eyebrow: string;
+  titlePrefix: string;
+  titleAccent: string;
+  titleSuffix: string;
+  description: string;
+}
+
 @Component({
   selector: 'app-dashboard',
   imports: [],
@@ -23,6 +31,48 @@ export class Dashboard implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
 
   activeCategory = signal<string>('Alle');
+  private readonly heroContentByCategory: Record<string, HeroContent> = {
+    Alle: {
+      eyebrow: 'Marketplace',
+      titlePrefix: 'Entfessle die ',
+      titleAccent: 'Intelligenz',
+      titleSuffix: '',
+      description:
+        'Wähle aus einer kuratierten Auswahl an spezialisierten KI-Agenten, die darauf trainiert sind, deine operativen Lasten zu automatisieren.',
+    },
+    Sales: {
+      eyebrow: 'Sales Agents',
+      titlePrefix: 'Mehr ',
+      titleAccent: 'Pipeline',
+      titleSuffix: ', weniger manuelle Arbeit',
+      description:
+        'Finde KI-Agenten für Recherche, Lead-Qualifizierung, Outreach und Vertriebsautomatisierung entlang deiner Pipeline.',
+    },
+    Content: {
+      eyebrow: 'Content Agents',
+      titlePrefix: '',
+      titleAccent: 'Content',
+      titleSuffix: ', der schneller live geht',
+      description:
+        'Wähle spezialisierte Agenten für Redaktionsplanung, Produkttexte, Social Media und skalierbare Content-Produktion.',
+    },
+    SEO: {
+      eyebrow: 'SEO Agents',
+      titlePrefix: '',
+      titleAccent: 'Sichtbarkeit',
+      titleSuffix: ' systematisch ausbauen',
+      description:
+        'Nutze Agenten für Audits, Keyword-Strategie, GEO-Analysen und priorisierte Optimierungen mit echtem Suchpotenzial.',
+    },
+    Data: {
+      eyebrow: 'Data Agents',
+      titlePrefix: 'Aus ',
+      titleAccent: 'Daten',
+      titleSuffix: ' wird operative Klarheit',
+      description:
+        'Entdecke Agenten für Recherche, Synchronisation, Reporting und datengetriebene Entscheidungen in deinen Kernprozessen.',
+    },
+  };
 
   private paramSub!: Subscription;
 
@@ -90,7 +140,7 @@ export class Dashboard implements OnInit, OnDestroy {
       id: 'produkttext-agent',
       name: 'Produkttext-Agent',
       description:
-        'Aus einer Produkt-URL oder Bild-URL entsteht automatisch ein passender Produkttext aus dem neuen n8n-Webhook.',
+        'Aus einer Produkt-URL oder einem Bild entsteht automatisch ein passender Produkttext.',
       icon: 'imagesmode',
       category: 'Content',
       badgeLabel: 'LIVE',
@@ -127,6 +177,16 @@ export class Dashboard implements OnInit, OnDestroy {
       name: 'SEO/GEO Analyse Assistent',
       description:
         'Nimmt URL, Marke, Branche und Standort als Formular entgegen, sendet den GEO-Webhook und zeigt die strukturierte Analyse direkt auf der Seite.',
+      icon: 'forum',
+      category: 'SEO',
+      badgeLabel: 'LIVE',
+      badgeVariant: 'primary',
+    },
+    {
+      id: 'seo-geo-analyse-assistent-nollm',
+      name: 'SEO/GEO Analyse Assistent NoLLM',
+      description:
+        'Kopie des SEO/GEO Analyse Assistenten, die dieselben Eingaben direkt an den NoLLM-Webhook sendet und den fertigen Report im Portal rendert.',
       icon: 'forum',
       category: 'SEO',
       badgeLabel: 'LIVE',
@@ -184,6 +244,11 @@ export class Dashboard implements OnInit, OnDestroy {
     if (this.activeCategory() === 'Alle') return this.agents;
     return this.agents.filter((a) => a.category === this.activeCategory());
   }
+
+  get heroContent(): HeroContent {
+    return this.heroContentByCategory[this.activeCategory()] ?? this.heroContentByCategory['Alle'];
+  }
+
   startWorkflow(agentId: string): void {
     this.router.navigate(['/agents', agentId]);
   }

@@ -1,8 +1,13 @@
+import { UpperCasePipe } from '@angular/common';
 import { Component, ViewEncapsulation, computed, inject, signal } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AGENTS_MAP } from '../../data/agents.data';
-import { ProductTextOutput, RunRecord } from '../../models/interfaces';
+import {
+  ProductTextOutput,
+  ProductTextPlatformResult,
+  RunRecord,
+} from '../../models/interfaces';
 import {
   BinaryFileStoreService,
   StoredBinaryFile,
@@ -13,9 +18,22 @@ import { renderMarkdownToHtml } from '../../utils/markdown.utils';
 
 const PRODUCT_TEXT_SESSION_RUN_KEY = 'product-text:last-run';
 
+interface ProductTextKeyValueEntry {
+  key: string;
+  value: string;
+}
+
+interface ProductTextFaqItem {
+  question: string;
+  answer: string;
+}
+
+type PlatformType = 'amazon' | 'shopify' | 'ebay' | 'shopware' | 'woocommerce';
+
 @Component({
   selector: 'app-product-text-result',
   standalone: true,
+  imports: [UpperCasePipe],
   templateUrl: './product-text-result.html',
   styleUrl: './product-text-result.scss',
   encapsulation: ViewEncapsulation.None,
@@ -33,6 +51,7 @@ export class ProductTextResultComponent {
   readonly requestedRunId = this.route.snapshot.queryParamMap.get('runId');
 
   private readonly _run = signal<RunRecord | null>(this.resolveRun());
+  readonly selectedPlatform = signal<PlatformType | null>(null);
 
   readonly run = this._run.asReadonly();
   readonly output = computed(() => {
@@ -41,10 +60,14 @@ export class ProductTextResultComponent {
       return null;
     }
 
-    const productOutput = output as ProductTextOutput & { responseMeta?: ProductTextOutput['responseMeta'] };
+    const productOutput = output as ProductTextOutput & {
+      responseMeta?: ProductTextOutput['responseMeta'];
+      structuredResult?: ProductTextOutput['structuredResult'];
+    };
     return {
       ...productOutput,
       inputReference: productOutput.inputReference ?? productOutput.uploadedImageName,
+      structuredResult: productOutput.structuredResult ?? null,
       responseMeta: productOutput.responseMeta ?? {
         mode: productOutput.generatedFile ? 'binary' : 'text',
         mimeType: productOutput.generatedFile?.mimeType ?? null,
@@ -54,12 +77,49 @@ export class ProductTextResultComponent {
       },
     } as ProductTextOutput;
   });
+  readonly structuredResult = computed(() => this.output()?.structuredResult ?? null);
+  readonly seo = computed(() => this.structuredResult()?.seo ?? null);
+  readonly tags = computed(() => this.structuredResult()?.tags ?? null);
+  readonly contentData = computed(() => this.structuredResult()?.content ?? null);
+  readonly schemaData = computed(() => this.structuredResult()?.schema ?? null);
+  readonly dataflowSeo = computed(() => this.structuredResult()?.dataflowSeo ?? null);
+  readonly hasStructuredResult = computed(() => {
+    const sr = this.structuredResult();
+    return !!(sr && (sr.seo || sr.content || sr.tags || sr.dataflowSeo || sr.schema));
+  });
   readonly inMemoryFile = computed<StoredBinaryFile | null>(() => {
     const run = this._run();
     return run ? this.binaryFileStore.get(run.id) : null;
   });
   readonly fileReady = computed(() => !!this.inMemoryFile() || !!this.output()?.generatedFile?.base64);
-  readonly descriptionLength = computed(() => this.output()?.description.trim().length ?? 0);
+  readonly primaryCopyText = computed(() =>
+    this.contentData()?.productDescription
+    ?? this.contentData()?.intro
+    ?? this.output()?.description
+    ?? '',
+  );
+  readonly descriptionLength = computed(() => this.primaryCopyText().trim().length ?? 0);
+  readonly platformProductName = computed(() => {
+    const r = this.platformResult();
+    return r?.amazon?.item_name ?? r?.shopify?.Title ?? r?.shopware?.name ?? r?.woocommerce?.post_title ?? null;
+  });
+  readonly platformProductDescription = computed(() => {
+    const r = this.platformResult();
+    return r?.amazon?.item_description ?? r?.shopify?.['Body (HTML)'] ?? r?.woocommerce?.post_excerpt ?? null;
+  });
+  readonly heroTitle = computed(() =>
+    this.seo()?.title
+    ?? this.seo()?.h1
+    ?? this.platformProductName()
+    ?? this.contentData()?.productDescription
+    ?? 'Produkttext',
+  );
+  readonly heroSubtitle = computed(() =>
+    this.contentData()?.intro
+    ?? this.seo()?.metaDescription
+    ?? this.output()?.description
+    ?? '',
+  );
   readonly generatedPreviewUrl = computed(() => {
     const file = this.inMemoryFile();
     const base64 = file?.base64 ?? this.output()?.generatedFile?.base64;
@@ -71,28 +131,89 @@ export class ProductTextResultComponent {
 
     return `data:${mimeType};base64,${base64}`;
   });
-  readonly renderedDescription = computed((): SafeHtml | null => {
-    const description = this.output()?.description;
-    if (!description) {
+  readonly renderedPrimaryText = computed((): SafeHtml | null => {
+    const content = this.primaryCopyText();
+    if (!content.trim()) {
       return null;
     }
 
-    return this.sanitizer.bypassSecurityTrustHtml(renderMarkdownToHtml(description));
+    return this.sanitizer.bypassSecurityTrustHtml(renderMarkdownToHtml(content));
   });
+  readonly openGraphEntries = computed<ProductTextKeyValueEntry[]>(() =>
+    this.toKeyValueEntries(this.structuredResult()?.openGraph ?? {}),
+  );
+  readonly twitterCardEntries = computed<ProductTextKeyValueEntry[]>(() =>
+    this.toKeyValueEntries(this.structuredResult()?.twitterCard ?? {}),
+  );
+  readonly specificationEntries = computed<ProductTextKeyValueEntry[]>(() =>
+    this.toUnknownEntries(this.contentData()?.specifications ?? {}),
+  );
+  readonly schemaProductJson = computed(() => this.prettyJson(this.schemaData()?.product));
+  readonly schemaBreadcrumbJson = computed(() => this.prettyJson(this.schemaData()?.breadcrumb));
+  readonly schemaFaqJson = computed(() => this.prettyJson(this.schemaData()?.faqPage));
+  readonly faqItems = computed(() => this.extractFaqItems(this.schemaData()?.faqPage));
+  readonly formattedGeneratedAt = computed(() => this.formatDateTime(this.structuredResult()?.generatedAt));
+  readonly formattedTokensUsed = computed(() => this.formatNumber(this.structuredResult()?.tokensUsed));
+
+  readonly platformResult = computed(() => {
+    const output = this.output();
+    if (!output?.platformResult) {
+      return null;
+    }
+
+    // Handle array (normalize to single object if array with one item)
+    if (Array.isArray(output.platformResult)) {
+      return output.platformResult[0] ?? null;
+    }
+
+    return output.platformResult as ProductTextPlatformResult;
+  });
+
+  readonly availablePlatforms = computed((): PlatformType[] => {
+    const result = this.platformResult();
+    if (!result) {
+      return [];
+    }
+
+    const platforms: PlatformType[] = [];
+    if (result.amazon) platforms.push('amazon');
+    if (result.shopify) platforms.push('shopify');
+    if (result.ebay) platforms.push('ebay');
+    if (result.shopware) platforms.push('shopware');
+    if (result.woocommerce) platforms.push('woocommerce');
+    return platforms;
+  });
+
+  readonly effectivePlatform = computed(() =>
+    this.selectedPlatform() ?? this.availablePlatforms()[0] ?? null,
+  );
+
+  readonly hasPlatformData = computed(() => this.availablePlatforms().length > 0);
 
   goBack(): void {
     this.router.navigate(['/agents', this.agentId]);
   }
 
   copyDescription(): void {
-    const description = this.output()?.description ?? '';
-    if (!description) {
-      this.toastService.show('Keine Beschreibung zum Kopieren vorhanden.', 'error');
+    const description = this.primaryCopyText();
+    if (!description.trim()) {
+      this.toastService.show('Kein Produkttext zum Kopieren vorhanden.', 'error');
       return;
     }
 
     navigator.clipboard.writeText(description).then(() => {
       this.toastService.show('Produkttext kopiert!', 'success');
+    }).catch(() => {
+      this.toastService.show('Kopieren fehlgeschlagen.', 'error');
+    });
+  }
+
+  copyField(value: string, label: string): void {
+    if (!value?.trim()) {
+      return;
+    }
+    navigator.clipboard.writeText(value).then(() => {
+      this.toastService.show(`${label} kopiert!`, 'success');
     }).catch(() => {
       this.toastService.show('Kopieren fehlgeschlagen.', 'error');
     });
@@ -110,15 +231,15 @@ export class ProductTextResultComponent {
   }
 
   downloadDescription(): void {
-    const description = this.output()?.description ?? '';
-    if (!description) {
-      this.toastService.show('Keine Beschreibung zum Download vorhanden.', 'error');
+    const description = this.primaryCopyText();
+    if (!description.trim()) {
+      this.toastService.show('Kein Produkttext zum Download vorhanden.', 'error');
       return;
     }
 
     const blob = new Blob([description], { type: 'text/plain;charset=utf-8' });
     this.downloadBlob(blob, `produkttext-${Date.now()}.txt`);
-    this.toastService.show('Beschreibung wird heruntergeladen…', 'info');
+    this.toastService.show('Produkttext wird heruntergeladen…', 'info');
   }
 
   formatFileSize(bytes: number | null | undefined): string {
@@ -126,6 +247,28 @@ export class ProductTextResultComponent {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  formatDateTime(value: string | null | undefined): string {
+    if (!value) {
+      return '–';
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    return new Intl.DateTimeFormat('de-DE', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(date);
+  }
+
+  formatNumber(value: number | null | undefined): string {
+    return value === null || value === undefined
+      ? '–'
+      : new Intl.NumberFormat('de-DE').format(value);
   }
 
   private resolveDownloadableFile(): (StoredBinaryFile & { blob: Blob }) | null {
@@ -156,6 +299,69 @@ export class ProductTextResultComponent {
     };
   }
 
+  private toKeyValueEntries(record: Record<string, string>): ProductTextKeyValueEntry[] {
+    return Object.entries(record).map(([key, value]) => ({ key, value }));
+  }
+
+  private toUnknownEntries(record: Record<string, unknown>): ProductTextKeyValueEntry[] {
+    return Object.entries(record).flatMap(([key, value]) => {
+      const normalized = this.stringifyValue(value);
+      return normalized ? [{ key, value: normalized }] : [];
+    });
+  }
+
+  private stringifyValue(value: unknown): string | null {
+    if (typeof value === 'string') {
+      return value.trim() ? value.trim() : null;
+    }
+
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return String(value);
+    }
+
+    if (Array.isArray(value)) {
+      return value.length ? value.map((item) => this.stringifyValue(item) ?? '').filter(Boolean).join(', ') : null;
+    }
+
+    if (value && typeof value === 'object') {
+      const entries = this.toUnknownEntries(value as Record<string, unknown>);
+      return entries.length ? entries.map((entry) => `${entry.key}: ${entry.value}`).join(' | ') : null;
+    }
+
+    return null;
+  }
+
+  private prettyJson(value: unknown): string {
+    if (!value || typeof value !== 'object' || !Object.keys(value as Record<string, unknown>).length) {
+      return '';
+    }
+
+    return JSON.stringify(value, null, 2);
+  }
+
+  private extractFaqItems(value: Record<string, unknown> | null | undefined): ProductTextFaqItem[] {
+    const entities = value?.['mainEntity'];
+    if (!Array.isArray(entities)) {
+      return [];
+    }
+
+    return entities.flatMap((item) => {
+      if (!item || typeof item !== 'object' || Array.isArray(item)) {
+        return [];
+      }
+
+      const record = item as Record<string, unknown>;
+      const question = typeof record['name'] === 'string' ? record['name'].trim() : '';
+      const acceptedAnswer = record['acceptedAnswer'];
+      const answerRecord = acceptedAnswer && typeof acceptedAnswer === 'object' && !Array.isArray(acceptedAnswer)
+        ? acceptedAnswer as Record<string, unknown>
+        : null;
+      const answer = typeof answerRecord?.['text'] === 'string' ? answerRecord['text'].trim() : '';
+
+      return question && answer ? [{ question, answer }] : [];
+    });
+  }
+
   private base64ToBlob(base64: string, mimeType: string): Blob {
     const binary = atob(base64.replace(/\s/g, ''));
     const bytes = new Uint8Array(binary.length);
@@ -174,6 +380,115 @@ export class ProductTextResultComponent {
     anchor.download = fileName;
     anchor.click();
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  downloadPlatformData(platform: PlatformType): void {
+    const result = this.platformResult();
+    if (!result || !result[platform]) {
+      this.toastService.show(`Keine Daten für ${platform} verfügbar.`, 'error');
+      return;
+    }
+
+    const data = result[platform] as unknown as Record<string, unknown>;
+    const timestamp = new Date().toISOString().split('T')[0];
+    const fileName = `${platform}-produktdaten-${timestamp}.json`;
+    const jsonString = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
+
+    this.downloadBlob(blob, fileName);
+    this.toastService.show(`${platform} Daten werden heruntergeladen…`, 'info');
+  }
+
+  downloadPlatformDataAsCSV(platform: PlatformType): void {
+    const result = this.platformResult();
+    if (!result || !result[platform]) {
+      this.toastService.show(`Keine Daten für ${platform} verfügbar.`, 'error');
+      return;
+    }
+
+    const data = result[platform] as unknown as Record<string, unknown>;
+    const csv = this.objectToCSV(data);
+    const timestamp = new Date().toISOString().split('T')[0];
+    const fileName = `${platform}-produktdaten-${timestamp}.csv`;
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+
+    this.downloadBlob(blob, fileName);
+    this.toastService.show(`${platform} Daten (CSV) werden heruntergeladen…`, 'info');
+  }
+
+  downloadAllPlatformData(): void {
+    const result = this.platformResult();
+    if (!result || Object.keys(result).length <= 1) {
+      this.toastService.show('Keine Plattformdaten zum Herunterladen verfügbar.', 'error');
+      return;
+    }
+
+    const allData = {
+      success: result.success,
+      platforms: {} as Record<string, unknown>,
+    };
+
+    const platforms: PlatformType[] = ['amazon', 'shopify', 'ebay', 'shopware', 'woocommerce'];
+    platforms.forEach((platform) => {
+      if (result[platform]) {
+        allData.platforms[platform] = result[platform];
+      }
+    });
+
+    const timestamp = new Date().toISOString().split('T')[0];
+    const fileName = `produktdaten-alle-plattformen-${timestamp}.json`;
+    const jsonString = JSON.stringify(allData, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
+
+    this.downloadBlob(blob, fileName);
+    this.toastService.show('Alle Plattformdaten werden heruntergeladen…', 'info');
+  }
+
+  private objectToCSV(obj: Record<string, unknown>): string {
+    const rows: string[] = [];
+
+    // Header
+    const keys = Object.keys(obj);
+    rows.push(keys.map((key) => this.escapeCSV(key)).join(','));
+
+    // Values
+    const values = keys.map((key) => {
+      const value = obj[key];
+      const stringValue = this.objectToString(value);
+      return this.escapeCSV(stringValue);
+    });
+    rows.push(values.join(','));
+
+    return rows.join('\n');
+  }
+
+  private objectToString(value: unknown): string {
+    if (typeof value === 'string') {
+      return value;
+    }
+
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return String(value);
+    }
+
+    if (Array.isArray(value)) {
+      return value.map((item) => this.objectToString(item)).join('; ');
+    }
+
+    if (value && typeof value === 'object') {
+      const entries = Object.entries(value as Record<string, unknown>);
+      return entries.map(([key, val]) => `${key}: ${this.objectToString(val)}`).join(' | ');
+    }
+
+    return '';
+  }
+
+  private escapeCSV(value: string): string {
+    if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+      return `"${value.replace(/"/g, '""')}"`;
+    }
+
+    return value;
   }
 
   private resolveRun(): RunRecord | null {

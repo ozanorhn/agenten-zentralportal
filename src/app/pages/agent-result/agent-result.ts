@@ -568,6 +568,7 @@ export class AgentResult {
         break;
       case 'product-text':
         lines.push(
+          `SEO Title: ${out.structuredResult?.seo?.title ?? out.structuredResult?.seo?.h1 ?? '–'}`,
           `Eingabe: ${out.inputReference ?? out.uploadedImageName}`,
           `Datei: ${out.generatedFile?.fileName ?? 'Keine Datei erhalten'}`,
           '',

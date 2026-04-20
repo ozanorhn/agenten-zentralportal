@@ -3,14 +3,13 @@
   <!-- Hero Header -->
   <div class="mb-12 max-w-4xl">
     <span class="text-secondary font-headline font-bold tracking-[0.2em] uppercase text-xs mb-4 block">
-      Marketplace
+      {{ heroContent.eyebrow }}
     </span>
     <h1 class="text-5xl md:text-7xl font-black font-headline tracking-tighter text-on-surface mb-6 leading-none">
-      Entfessle die <span class="text-[#0070FF]">Intelligenz</span>
+      {{ heroContent.titlePrefix }}<span class="text-[#0070FF]">{{ heroContent.titleAccent }}</span>{{ heroContent.titleSuffix }}
     </h1>
     <p class="text-on-surface-variant text-xl max-w-2xl font-light leading-relaxed">
-      Wähle aus einer kuratierten Auswahl an spezialisierten KI-Agenten, die darauf trainiert sind,
-      deine operativen Lasten zu automatisieren.
+      {{ heroContent.description }}
     </p>
   </div>
 

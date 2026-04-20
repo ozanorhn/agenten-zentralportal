@@ -7,7 +7,6 @@ import {
   ViewChild,
 } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import {
   Chart,
   BarController,
@@ -76,7 +75,7 @@ interface ProcessStat {
 
 @Component({
   selector: 'app-kpi-dashboard',
-  imports: [RouterLink, NgClass],
+  imports: [NgClass],
   templateUrl: './kpi-dashboard.html',
   styleUrl: './kpi-dashboard.scss',
 })

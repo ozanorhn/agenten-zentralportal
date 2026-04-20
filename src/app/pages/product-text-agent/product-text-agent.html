@@ -8,7 +8,7 @@
       Zurück zum Marketplace
     </a>
 
-    <div class="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(320px,0.92fr)]">
       <section class="overflow-hidden rounded-[2rem] border border-outline-variant/20 bg-surface-container shadow-[0_24px_64px_rgba(0,0,0,0.18)]">
         <div
           class="border-b border-outline-variant/10 px-8 py-8"
@@ -23,13 +23,12 @@
 
           <div class="space-y-3">
             <h1 class="text-4xl font-headline font-black tracking-tight text-white md:text-5xl">
-              Produkt-URL rein.
-              <span class="text-[#7DB4FF]">SEO-Text raus.</span>
+              URL oder Bild rein.
+              <span class="text-[#7DB4FF]">Produkttext raus.</span>
             </h1>
             <p class="max-w-2xl text-sm leading-relaxed text-blue-50/75 md:text-base">
-              Der Agent sendet genau eine JSON-Anfrage an den n8n-Test-Webhook
-              <span class="font-semibold text-white">`/webhook-test/seo-product-description`</span>.
-              Du waehlst entweder eine Produkt-URL oder eine Bild-URL und kannst optional Hinweise fuer die KI mitschicken.
+              Gib eine Produktseite an oder lade ein einzelnes Produktbild hoch. Optional kannst du noch Hinweise
+              ergänzen, damit der Text genauer auf Material, Zielgruppe oder Nutzen passt.
             </p>
           </div>
         </div>
@@ -37,7 +36,7 @@
         <div class="space-y-6 px-8 py-8">
           <div class="space-y-3">
             <label class="block text-[10px] font-black uppercase tracking-[0.22em] text-outline">
-              Eingabevariante
+              Was möchtest du senden?
             </label>
 
             <div class="grid gap-3 sm:grid-cols-2">
@@ -45,59 +44,110 @@
                 type="button"
                 (click)="setInputMode('productUrl')"
                 class="rounded-[1.5rem] border px-5 py-4 text-left transition-all"
-                [class.border-[#0070FF]/50]="inputMode() === 'productUrl'"
-                [class.bg-[#0070FF]/10]="inputMode() === 'productUrl'"
-                [class.border-outline-variant/20]="inputMode() !== 'productUrl'"
+                [class.border-[#0070FF]/50]="isUrlMode()"
+                [class.bg-[#0070FF]/10]="isUrlMode()"
+                [class.border-outline-variant/20]="!isUrlMode()"
               >
-                <p class="text-sm font-semibold text-on-surface">Variante A</p>
-                <p class="mt-1 text-xs text-on-surface-variant/70">`productUrl` senden</p>
+                <p class="text-sm font-semibold text-on-surface">URL senden</p>
+                <p class="mt-1 text-xs text-on-surface-variant/70">Für Produktseiten und Shop-Links</p>
               </button>
 
               <button
                 type="button"
                 (click)="setInputMode('imageUrl')"
                 class="rounded-[1.5rem] border px-5 py-4 text-left transition-all"
-                [class.border-[#0070FF]/50]="inputMode() === 'imageUrl'"
-                [class.bg-[#0070FF]/10]="inputMode() === 'imageUrl'"
-                [class.border-outline-variant/20]="inputMode() !== 'imageUrl'"
+                [class.border-[#0070FF]/50]="isImageMode()"
+                [class.bg-[#0070FF]/10]="isImageMode()"
+                [class.border-outline-variant/20]="!isImageMode()"
               >
-                <p class="text-sm font-semibold text-on-surface">Variante B</p>
-                <p class="mt-1 text-xs text-on-surface-variant/70">`imageUrl` senden</p>
+                <p class="text-sm font-semibold text-on-surface">Bild senden</p>
+                <p class="mt-1 text-xs text-on-surface-variant/70">Für einzelne Produktbilder ohne URL</p>
               </button>
             </div>
           </div>
 
-          <div class="space-y-3">
-            <label class="block text-[10px] font-black uppercase tracking-[0.22em] text-outline">
-              {{ activeInputLabel() }}
-            </label>
-            <input
-              #referenceInput
-              type="url"
-              [value]="activeInputValue()"
-              [placeholder]="activeInputPlaceholder()"
-              (input)="inputMode() === 'productUrl' ? updateProductUrl(referenceInput.value) : updateImageUrl(referenceInput.value)"
-              class="w-full rounded-[1.5rem] border border-outline-variant/20 bg-surface-container-high/40 px-5 py-4 text-sm text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/45 focus:border-[#0070FF]/55"
-            />
-            <p class="text-xs text-on-surface-variant/60">
-              Pflichtfeld: genau eine Variante verwenden, also entweder `productUrl` oder `imageUrl`.
-            </p>
-          </div>
+          @if (isUrlMode()) {
+            <div class="space-y-3">
+              <label class="block text-[10px] font-black uppercase tracking-[0.22em] text-outline">
+                Produkt-URL
+              </label>
+              <input
+                #productUrlInput
+                type="url"
+                [value]="productUrl()"
+                placeholder="https://shop.example.com/produkt/sneaker-x"
+                (input)="updateProductUrl(productUrlInput.value)"
+                class="w-full rounded-[1.5rem] border border-outline-variant/20 bg-surface-container-high/40 px-5 py-4 text-sm text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/45 focus:border-[#0070FF]/55"
+              />
+              <p class="text-xs text-on-surface-variant/60">
+                Am besten funktioniert die direkte Produktseite statt einer Übersichts- oder Startseite.
+              </p>
+            </div>
+          } @else {
+            <div class="space-y-3">
+              <label class="block text-[10px] font-black uppercase tracking-[0.22em] text-outline">
+                Produktbild
+              </label>
+
+              <div
+                class="relative overflow-hidden rounded-[1.75rem] border-2 border-dashed p-6 transition-all"
+                [class.border-[#0070FF]/60]="dragOver() || hasSelectedImage()"
+                [class.bg-[#0070FF]/8]="dragOver()"
+                [class.border-outline-variant/30]="!dragOver() && !hasSelectedImage()"
+                (drop)="onDrop($event)"
+                (dragover)="onDragOver($event)"
+                (dragleave)="onDragLeave()"
+                (click)="imageInput.click()"
+              >
+                <input #imageInput type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
+
+                <div class="flex flex-col items-center justify-center gap-3 py-6 text-center">
+                  <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
+                    <span class="material-symbols-outlined text-4xl" style="font-variation-settings:'FILL' 1;">add_photo_alternate</span>
+                  </div>
+                  <div>
+                    <p class="text-base font-semibold text-on-surface">
+                      Bild hier hineinziehen oder auswählen
+                    </p>
+                    <p class="mt-1 text-sm text-on-surface-variant/60">
+                      JPG, PNG, WEBP oder ein anderes Browser-kompatibles Bildformat
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              @if (hasSelectedImage()) {
+                <div class="flex items-center justify-between gap-4 rounded-2xl border border-[#0070FF]/20 bg-[#0070FF]/6 px-5 py-4">
+                  <div class="min-w-0">
+                    <p class="truncate text-sm font-semibold text-on-surface">{{ selectedImageName() }}</p>
+                    <p class="mt-1 text-xs text-on-surface-variant/60">{{ selectedImageSize() }}</p>
+                  </div>
+                  <button
+                    type="button"
+                    (click)="clearSelectedImage()"
+                    class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-outline-variant/20 bg-surface-container-high text-on-surface-variant transition-colors hover:text-on-surface"
+                  >
+                    <span class="material-symbols-outlined text-base">close</span>
+                  </button>
+                </div>
+              }
+            </div>
+          }
 
           <div class="space-y-3">
             <label class="block text-[10px] font-black uppercase tracking-[0.22em] text-outline">
-              Beschreibung
+              Zusätzliche Hinweise
             </label>
             <textarea
               #descriptionInput
               rows="4"
               [value]="description()"
-              placeholder="Optional: extra Hinweise fuer die KI"
+              placeholder="z.B. Damen-Sneaker, wasserdicht, Größen 36-42"
               (input)="updateDescription(descriptionInput.value)"
               class="w-full rounded-[1.5rem] border border-outline-variant/20 bg-surface-container-high/40 px-5 py-4 text-sm text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/45 focus:border-[#0070FF]/55"
             ></textarea>
             <p class="text-xs text-on-surface-variant/60">
-              Optional, aber hilfreich. Besonders bei einer reinen Bild-URL wird der Produkttext dadurch meist praeziser.
+              Optional, aber hilfreich. Nenne hier Materialien, Varianten, Zielgruppe oder besondere Vorteile.
             </p>
           </div>
 
@@ -118,7 +168,7 @@
               (click)="clearForm()"
               class="inline-flex items-center justify-center gap-2 rounded-2xl border border-outline-variant/20 bg-surface-container-high px-6 py-4 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest"
             >
-              Zuruecksetzen
+              Alles löschen
             </button>
 
             <button
@@ -129,9 +179,9 @@
             >
               @if (isSubmitting()) {
                 <span class="material-symbols-outlined animate-spin text-base">progress_activity</span>
-                Verarbeitung laeuft…
+                Verarbeitung läuft…
               } @else {
-                Agent starten
+                Text erstellen
                 <span class="material-symbols-outlined text-base">arrow_forward</span>
               }
             </button>
@@ -142,44 +192,66 @@
       <aside class="space-y-6">
         <section class="overflow-hidden rounded-[2rem] border border-outline-variant/20 bg-surface-container">
           <div class="border-b border-outline-variant/10 px-6 py-5">
-            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Payload Preview</p>
-            <p class="mt-2 text-sm text-on-surface-variant">So wird der Request als JSON an n8n gesendet.</p>
+            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Deine Eingabe</p>
+            <p class="mt-2 text-sm text-on-surface-variant">
+              So sieht die Auswahl aus, mit der der Agent gerade arbeitet.
+            </p>
           </div>
 
           <div class="p-6">
-            <pre class="overflow-x-auto rounded-[1.5rem] border border-outline-variant/20 bg-[#0B1220] p-5 text-xs leading-6 text-[#C8E1FF]"><code>{{ payloadPreview() }}</code></pre>
+            @if (isUrlMode()) {
+              <div class="rounded-[1.5rem] border border-outline-variant/20 bg-surface-container-high/40 p-5">
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Produkt-URL</p>
+                <p class="mt-3 break-all text-sm leading-relaxed text-on-surface">
+                  {{ productUrl() || 'Noch keine URL eingetragen.' }}
+                </p>
+              </div>
+            } @else {
+              <div class="overflow-hidden rounded-[1.5rem] border border-outline-variant/20 bg-surface-container-high/40">
+                @if (previewUrl()) {
+                  <img [src]="previewUrl()" [alt]="selectedImageName()" class="h-[320px] w-full object-cover" />
+                } @else {
+                  <div class="flex h-[320px] flex-col items-center justify-center gap-3 px-6 text-center">
+                    <span class="material-symbols-outlined text-5xl text-on-surface-variant/30">image</span>
+                    <p class="text-sm font-semibold text-on-surface-variant">Noch kein Bild ausgewählt</p>
+                    <p class="text-xs text-on-surface-variant/50">
+                      Nach dem Upload wird hier sofort die Vorschau angezeigt.
+                    </p>
+                  </div>
+                }
+              </div>
+            }
           </div>
         </section>
 
         <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
-          <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Webhook</p>
+          <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Was du bekommst</p>
           <div class="mt-5 space-y-4">
-            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-4">
-              <p class="text-xs font-semibold text-on-surface">POST</p>
-              <p class="mt-2 break-all text-sm text-on-surface-variant">https://n8n.eom.de/webhook-test/seo-product-description</p>
-            </div>
-
-            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-4">
-              <p class="text-xs font-semibold text-on-surface">Header</p>
-              <p class="mt-2 text-sm text-on-surface-variant">`Content-Type: application/json`</p>
-            </div>
-          </div>
-        </section>
-
-        <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
-          <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Workflow</p>
-          <div class="mt-5 space-y-4">
-            @for (step of [
-              'Waehle exakt eine Eingabevariante: Produkt-URL oder Bild-URL.',
-              'Optional kannst du zusaetzliche Hinweise in `description` mitschicken.',
-              'Das Frontend sendet alles als JSON an den n8n-Test-Webhook.',
-              'Die Antwort wird als Produkttext angezeigt und eine eventuell gelieferte Datei bleibt im Ergebnis verfuegbar.'
-            ]; track step) {
+            @for (item of [
+              'Einen fertigen Produkttext mit klarer Struktur.',
+              'SEO-relevante Bausteine wie Titel, Keywords und Meta-Daten.',
+              'Ein aufgeräumtes Ergebnis auf der nächsten Seite.'
+            ]; track item) {
               <div class="flex gap-3">
                 <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#0070FF]/10 text-[11px] font-black text-[#0070FF]">
                   {{ $index + 1 }}
                 </span>
-                <p class="text-sm leading-relaxed text-on-surface-variant">{{ step }}</p>
+                <p class="text-sm leading-relaxed text-on-surface-variant">{{ item }}</p>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
+          <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Tipps für bessere Ergebnisse</p>
+          <div class="mt-5 space-y-4">
+            @for (tip of [
+              'Nutze bei URLs möglichst die direkte Produktseite.',
+              'Lade bei Bildern ein einzelnes, gut sichtbares Produktfoto hoch.',
+              'Ergänze bei Bedarf Material, Zielgruppe oder besondere Merkmale.'
+            ]; track tip) {
+              <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 px-4 py-4">
+                <p class="text-sm leading-relaxed text-on-surface-variant">{{ tip }}</p>
               </div>
             }
           </div>

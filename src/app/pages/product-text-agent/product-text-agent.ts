@@ -1,8 +1,8 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AGENTS_MAP } from '../../data/agents.data';
-import { ProductTextOutput, RunRecord } from '../../models/interfaces';
+import { ProductTextOutput, ProductTextPlatformResult, RunRecord } from '../../models/interfaces';
 import { NotificationService } from '../../services/notification.service';
 import { RunHistoryService } from '../../services/run-history.service';
 import {
@@ -30,6 +30,12 @@ interface ProductTextRequestPayload {
   description?: string;
 }
 
+interface PreparedProductTextRequest {
+  body: ProductTextRequestPayload | FormData;
+  requestKind: 'json' | 'multipart';
+  inputReference: string;
+}
+
 interface ParsedBinaryFile {
   blob: Blob;
   fileName: string;
@@ -53,6 +59,8 @@ interface ParsedProductTextResponse {
   file: ParsedBinaryFile | null;
   fileMeta: ParsedBinaryMeta | null;
   fileBase64: string | null;
+  structuredResult: ProductTextOutput['structuredResult'];
+  platformResult: ProductTextOutput['platformResult'];
   mode: ProductTextOutput['responseMeta']['mode'];
   mimeType: string | null;
   descriptionSource: ProductTextOutput['responseMeta']['descriptionSource'];
@@ -77,26 +85,25 @@ export class ProductTextAgentComponent {
 
   readonly inputMode = signal<ProductTextInputMode>('productUrl');
   readonly productUrl = signal('');
-  readonly imageUrl = signal('');
+  readonly selectedImage = signal<File | null>(null);
+  readonly previewUrl = signal<string | null>(null);
+  readonly dragOver = signal(false);
   readonly description = signal('');
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal('');
-  readonly statusLabel = signal('Gib eine Produkt-URL oder Bild-URL ein und starte dann den Agenten.');
+  readonly statusLabel = signal('Gib eine Produkt-URL ein oder lade ein Bild hoch und starte dann den Agenten.');
+  readonly isUrlMode = computed(() => this.inputMode() === 'productUrl');
+  readonly isImageMode = computed(() => this.inputMode() === 'imageUrl');
+  readonly hasSelectedImage = computed(() => !!this.selectedImage());
+  readonly selectedImageName = computed(() => this.selectedImage()?.name ?? 'Noch kein Bild ausgewählt');
+  readonly selectedImageSize = computed(() => {
+    const file = this.selectedImage();
+    return file ? this.formatFileSize(file.size) : '–';
+  });
 
-  readonly activeInputLabel = computed(() =>
-    this.inputMode() === 'productUrl' ? 'Produkt-URL' : 'Bild-URL',
-  );
-  readonly activeInputPlaceholder = computed(() =>
-    this.inputMode() === 'productUrl'
-      ? 'https://shop.example.com/produkt/sneaker-x'
-      : 'https://cdn.example.com/produkt-bild.jpg',
-  );
-  readonly activeInputValue = computed(() =>
-    this.inputMode() === 'productUrl' ? this.productUrl() : this.imageUrl(),
-  );
-  readonly payloadPreview = computed(() =>
-    JSON.stringify(this.buildRequestPayloadPreview(), null, 2),
-  );
+  ngOnDestroy(): void {
+    this.revokePreviewUrl();
+  }
 
   setInputMode(mode: ProductTextInputMode): void {
     if (this.inputMode() === mode) {
@@ -105,7 +112,11 @@ export class ProductTextAgentComponent {
 
     this.inputMode.set(mode);
     this.errorMessage.set('');
-    this.statusLabel.set('Eingabe gewechselt. Du kannst den Produkttext-Agenten jetzt starten.');
+    this.statusLabel.set(
+      mode === 'productUrl'
+        ? 'URL-Modus aktiv. Du kannst jetzt eine Produktseite einfügen.'
+        : 'Bild-Modus aktiv. Du kannst jetzt ein Produktbild hochladen.',
+    );
   }
 
   updateProductUrl(value: string): void {
@@ -113,21 +124,48 @@ export class ProductTextAgentComponent {
     this.errorMessage.set('');
   }
 
-  updateImageUrl(value: string): void {
-    this.imageUrl.set(value);
-    this.errorMessage.set('');
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    this.applyImageFile(file);
+    input.value = '';
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.dragOver.set(false);
+    const file = event.dataTransfer?.files?.[0] ?? null;
+    this.applyImageFile(file);
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.dragOver.set(true);
+  }
+
+  onDragLeave(): void {
+    this.dragOver.set(false);
   }
 
   updateDescription(value: string): void {
     this.description.set(value);
   }
 
+  clearSelectedImage(): void {
+    this.selectedImage.set(null);
+    this.revokePreviewUrl();
+    this.errorMessage.set('');
+    this.statusLabel.set('Bild entfernt. Du kannst ein neues Produktbild auswählen.');
+  }
+
   clearForm(): void {
     this.productUrl.set('');
-    this.imageUrl.set('');
+    this.selectedImage.set(null);
+    this.revokePreviewUrl();
+    this.dragOver.set(false);
     this.description.set('');
     this.errorMessage.set('');
-    this.statusLabel.set('Gib eine Produkt-URL oder Bild-URL ein und starte dann den Agenten.');
+    this.statusLabel.set('Gib eine Produkt-URL ein oder lade ein Bild hoch und starte dann den Agenten.');
   }
 
   async submit(): Promise<void> {
@@ -135,26 +173,29 @@ export class ProductTextAgentComponent {
       return;
     }
 
-    const payload = this.buildRequestPayload();
-    if (!payload) {
+    const preparedRequest = await this.buildRequestPayload();
+    if (!preparedRequest) {
       return;
     }
 
-    const inputReference = payload.productUrl ?? payload.imageUrl ?? 'produkttext-output';
-
     this.isSubmitting.set(true);
     this.errorMessage.set('');
-    this.statusLabel.set('Anfrage wird an den Produkttext-Webhook gesendet…');
+    this.statusLabel.set(
+      this.isUrlMode()
+        ? 'Produktseite wird analysiert…'
+        : 'Produktbild wird hochgeladen…',
+    );
 
     try {
       const response = await this.callWebhook(
         PRODUCT_TEXT_WEBHOOKS,
-        payload,
-        'Der Produkttext-Webhook',
+        preparedRequest.body,
+        preparedRequest.requestKind,
+        'Der Produkttext-Service',
       );
 
-      this.statusLabel.set('Antwort wird verarbeitet…');
-      const parsed = await this.parseWebhookResponse(response, inputReference);
+      this.statusLabel.set('Ergebnis wird aufbereitet…');
+      const parsed = await this.parseWebhookResponse(response, preparedRequest.inputReference);
       const runId = `run-${Date.now()}`;
 
       if (parsed.file) {
@@ -176,7 +217,7 @@ export class ProductTextAgentComponent {
       }
 
       this.statusLabel.set('Ergebnis wird gespeichert…');
-      const output = await this.buildOutput(parsed, inputReference);
+      const output = await this.buildOutput(parsed, preparedRequest.inputReference);
       const record: RunRecord = {
         id: runId,
         agentId: 'produkttext-agent',
@@ -185,11 +226,16 @@ export class ProductTextAgentComponent {
         agentCategory: this.agentMeta.category,
         timestamp: Date.now(),
         inputData: {
-          productReference: inputReference,
+          productReference: preparedRequest.inputReference,
         },
-        outputSummary: output.generatedFile?.fileName ?? 'Produkttext generiert',
+        outputSummary: output.structuredResult?.seo?.title
+          ?? output.structuredResult?.seo?.h1
+          ?? (output.platformResult as ProductTextPlatformResult | null | undefined)?.amazon?.item_name
+          ?? (output.platformResult as ProductTextPlatformResult | null | undefined)?.shopify?.Title
+          ?? output.generatedFile?.fileName
+          ?? 'Produkttext generiert',
         fullOutput: output,
-        tokenCount: Math.floor(Math.random() * 450) + 250,
+        tokenCount: output.structuredResult?.tokensUsed ?? (Math.floor(Math.random() * 450) + 250),
       };
 
       this.runHistory.addRun(record);
@@ -199,7 +245,7 @@ export class ProductTextAgentComponent {
         agentName: this.agentMeta.name,
         agentIcon: this.agentMeta.icon,
         message: parsed.file
-          ? `${this.agentMeta.name} hat Produkttext und eine Datei bereitgestellt.`
+          ? `${this.agentMeta.name} hat Produkttext und eine zusätzliche Datei bereitgestellt.`
           : `${this.agentMeta.name} hat einen Produkttext bereitgestellt.`,
         time: 'Gerade eben',
         read: false,
@@ -216,59 +262,93 @@ export class ProductTextAgentComponent {
     } catch (error) {
       console.error(error);
       this.errorMessage.set(this.toErrorMessage(error));
-      this.statusLabel.set('Der Produkttext-Webhook ist fehlgeschlagen.');
+      this.statusLabel.set('Etwas ist schiefgelaufen. Bitte versuche es erneut.');
     } finally {
       this.isSubmitting.set(false);
     }
   }
 
-  private buildRequestPayload(): ProductTextRequestPayload | null {
-    const mode = this.inputMode();
-    const rawValue = mode === 'productUrl' ? this.productUrl() : this.imageUrl();
-    const trimmedValue = rawValue.trim();
-
-    if (!trimmedValue) {
-      this.errorMessage.set(`${this.activeInputLabel()} ist erforderlich.`);
-      return null;
-    }
-
-    if (!this.isValidHttpUrl(trimmedValue)) {
-      this.errorMessage.set(`${this.activeInputLabel()} muss mit http:// oder https:// beginnen.`);
-      return null;
-    }
-
-    const trimmedDescription = this.description().trim();
-    const payload: ProductTextRequestPayload = mode === 'productUrl'
-      ? { productUrl: trimmedValue }
-      : { imageUrl: trimmedValue };
-
-    if (trimmedDescription) {
-      payload.description = trimmedDescription;
-    }
-
-    return payload;
+  formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
-  private buildRequestPayloadPreview(): ProductTextRequestPayload {
-    const productUrl = this.productUrl().trim() || 'https://shop.example.com/produkt/sneaker-x';
-    const imageUrl = this.imageUrl().trim() || 'https://cdn.example.com/produkt-bild.jpg';
-    const description = this.description().trim();
+  private applyImageFile(file: File | null): void {
+    this.errorMessage.set('');
 
-    if (this.inputMode() === 'productUrl') {
-      return description
-        ? { productUrl, description }
-        : {
-            productUrl,
-            description: 'Optional: extra Hinweise für die KI',
-          };
+    if (!file) {
+      return;
     }
 
-    return description
-      ? { imageUrl, description }
-      : {
-          imageUrl,
-          description: 'Sneaker fuer Damen, wasserdicht, Groessen 36-42',
-        };
+    if (!file.type.startsWith('image/')) {
+      this.errorMessage.set('Bitte lade ein Bild hoch. Andere Dateitypen werden hier nicht verarbeitet.');
+      return;
+    }
+
+    this.selectedImage.set(file);
+    this.updatePreviewUrl(file);
+    this.statusLabel.set('Bild bereit. Du kannst den Agenten jetzt starten.');
+  }
+
+  private updatePreviewUrl(file: File): void {
+    this.revokePreviewUrl();
+    this.previewUrl.set(URL.createObjectURL(file));
+  }
+
+  private revokePreviewUrl(): void {
+    const current = this.previewUrl();
+    if (current) {
+      URL.revokeObjectURL(current);
+      this.previewUrl.set(null);
+    }
+  }
+
+  private async buildRequestPayload(): Promise<PreparedProductTextRequest | null> {
+    const mode = this.inputMode();
+    const trimmedDescription = this.description().trim();
+
+    if (mode === 'productUrl') {
+      const trimmedValue = this.productUrl().trim();
+      if (!trimmedValue) {
+        this.errorMessage.set('Bitte gib eine Produkt-URL ein.');
+        return null;
+      }
+
+      if (!this.isValidHttpUrl(trimmedValue)) {
+        this.errorMessage.set('Die URL muss mit http:// oder https:// beginnen.');
+        return null;
+      }
+
+      const payload: ProductTextRequestPayload = { productUrl: trimmedValue };
+      if (trimmedDescription) {
+        payload.description = trimmedDescription;
+      }
+
+      return {
+        body: payload,
+        requestKind: 'json',
+        inputReference: trimmedValue,
+      };
+    }
+
+    const file = this.selectedImage();
+    if (!file) {
+      this.errorMessage.set('Bitte füge ein Produktbild hinzu.');
+      return null;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    if (trimmedDescription) {
+      formData.append('description', trimmedDescription);
+    }
+
+    return {
+      body: formData,
+      requestKind: 'multipart',
+      inputReference: file.name,
+    };
   }
 
   private isValidHttpUrl(value: string): boolean {
@@ -285,8 +365,8 @@ export class ProductTextAgentComponent {
     inputReference: string,
   ): Promise<ProductTextOutput> {
     const fallbackDescription = parsed.file
-      ? 'Die Datei wurde erfolgreich zurueckgeliefert, aber der Produkttext-Webhook hat keinen lesbaren Produkttext geliefert.'
-      : 'Der Produkttext-Webhook hat keine lesbare Produktbeschreibung geliefert.';
+      ? 'Die Datei wurde erfolgreich zurueckgeliefert, aber es wurde kein lesbarer Produkttext gefunden.'
+      : 'Es wurde keine lesbare Produktbeschreibung gefunden.';
 
     let generatedFile: ProductTextOutput['generatedFile'] = null;
 
@@ -321,6 +401,8 @@ export class ProductTextAgentComponent {
       inputReference,
       uploadedImageName: inputReference,
       generatedFile,
+      structuredResult: parsed.structuredResult,
+      platformResult: parsed.platformResult ?? null,
       responseMeta: {
         mode: parsed.mode,
         mimeType: parsed.mimeType,
@@ -358,6 +440,8 @@ export class ProductTextAgentComponent {
           }
         : null,
       fileBase64: null,
+      structuredResult: null,
+      platformResult: null,
       mode: file ? 'binary' : 'empty',
       mimeType: file?.mimeType ?? (response.headers.get('content-type')?.split(';')[0]?.trim() ?? null),
       descriptionSource: headerDescription ? 'header' : 'none',
@@ -410,6 +494,8 @@ export class ProductTextAgentComponent {
             }
           : null,
         fileBase64: null,
+        structuredResult: null,
+        platformResult: null,
         mode: 'multipart',
         mimeType: file?.mimeType ?? (contentType.split(';')[0]?.trim() || null),
         descriptionSource: description ? 'multipart-field' : headerDescription ? 'header' : 'none',
@@ -445,6 +531,8 @@ export class ProductTextAgentComponent {
         file: null,
         fileMeta: null,
         fileBase64: null,
+        structuredResult: null,
+        platformResult: null,
         mode: 'empty',
         mimeType: contentType.split(';')[0]?.trim() || null,
         descriptionSource: headerDescription ? 'header' : 'none',
@@ -463,6 +551,8 @@ export class ProductTextAgentComponent {
       file: null,
       fileMeta: null,
       fileBase64: null,
+      structuredResult: null,
+      platformResult: null,
       mode: 'text',
       mimeType: contentType.split(';')[0]?.trim() || 'text/plain',
       descriptionSource: 'text-body',
@@ -476,17 +566,21 @@ export class ProductTextAgentComponent {
     inputReference: string,
     headers?: Headers,
   ): ParsedProductTextResponse {
+    const structuredResult = this.extractStructuredResult(value);
+    const platformResult = this.extractPlatformResult(value);
     const fileBase64 = this.extractBinaryBase64FromPayload(value);
     const fileMeta = this.extractBinaryMetaFromPayload(value, inputReference);
     const file = this.createFileFromPayload(fileBase64, fileMeta);
     const headerDescription = this.extractDescriptionHeader(headers);
-    const payloadDescription = this.extractDescriptionFromPayload(value);
+    const payloadDescription = this.extractDescriptionFromPayload(structuredResult, value);
 
     return {
       description: payloadDescription ?? headerDescription?.value ?? '',
       file,
       fileMeta,
       fileBase64,
+      structuredResult,
+      platformResult,
       mode: 'json',
       mimeType: headers?.get('content-type')?.split(';')[0]?.trim() ?? 'application/json',
       descriptionSource: payloadDescription ? 'payload' : headerDescription ? 'header' : 'none',
@@ -495,7 +589,33 @@ export class ProductTextAgentComponent {
     };
   }
 
-  private extractDescriptionFromPayload(value: unknown): string | undefined {
+  private extractPlatformResult(value: unknown): ProductTextPlatformResult | null {
+    const candidates = Array.isArray(value) ? value : [value];
+    for (const item of candidates) {
+      if (!item || typeof item !== 'object' || Array.isArray(item)) {
+        continue;
+      }
+      const record = item as Record<string, unknown>;
+      const hasPlatform = ['amazon', 'shopify', 'ebay', 'shopware', 'woocommerce'].some((k) => k in record);
+      if (hasPlatform) {
+        return record as unknown as ProductTextPlatformResult;
+      }
+    }
+    return null;
+  }
+
+  private extractDescriptionFromPayload(
+    structuredResult: ProductTextOutput['structuredResult'],
+    fallbackValue: unknown,
+  ): string | undefined {
+    const structuredDescription = structuredResult?.content?.productDescription
+      ?? structuredResult?.content?.intro
+      ?? structuredResult?.seo?.metaDescription
+      ?? undefined;
+    if (structuredDescription?.trim()) {
+      return structuredDescription.trim();
+    }
+
     const strongKeys = [
       'productText',
       'product_text',
@@ -506,6 +626,9 @@ export class ProductTextAgentComponent {
       'productDescription',
       'product_description',
       'produktbeschreibung',
+      'metaDescription',
+      'meta_description',
+      'intro',
       'text',
       'body',
       'content',
@@ -518,17 +641,302 @@ export class ProductTextAgentComponent {
       'description',
     ];
 
-    const direct = this.findStringByKeys(value, strongKeys);
+    const direct = this.findStringByKeys(fallbackValue, strongKeys);
     if (direct) {
       return direct;
     }
 
-    const longText = this.findLongText(value);
+    const longText = this.findLongText(fallbackValue);
     if (longText) {
       return longText;
     }
 
-    return this.findStringByKeys(value, fallbackKeys);
+    return this.findStringByKeys(fallbackValue, fallbackKeys);
+  }
+
+  private extractStructuredResult(value: unknown): ProductTextOutput['structuredResult'] {
+    const record = this.unwrapStructuredResult(value);
+    if (!record) {
+      return null;
+    }
+
+    return {
+      success: this.toNullableBoolean(record['success']),
+      generatedAt: this.toNullableString(record['generatedAt']),
+      model: this.toNullableString(record['model']),
+      tokensUsed: this.toNullableNumber(record['tokensUsed']),
+      seo: this.normalizeSeoData(record['seo']),
+      tags: this.normalizeTagsData(record['tags']),
+      content: this.normalizeContentData(record['content']),
+      schema: this.normalizeSchemaData(record['schema']),
+      openGraph: this.normalizeStringRecord(record['openGraph']),
+      twitterCard: this.normalizeStringRecord(record['twitterCard']),
+      dataflowSeo: this.normalizeDataflowSeo(record['dataflowSeo']),
+    };
+  }
+
+  private unwrapStructuredResult(value: unknown): Record<string, unknown> | null {
+    if (!value || typeof value !== 'object') {
+      return null;
+    }
+
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        const found = this.unwrapStructuredResult(item);
+        if (found) {
+          return found;
+        }
+      }
+      return null;
+    }
+
+    const record = value as Record<string, unknown>;
+    if (this.hasStructuredProductFields(record)) {
+      return record;
+    }
+
+    for (const nested of Object.values(record)) {
+      const found = this.unwrapStructuredResult(nested);
+      if (found) {
+        return found;
+      }
+    }
+
+    return null;
+  }
+
+  private hasStructuredProductFields(record: Record<string, unknown>): boolean {
+    return [
+      'generatedAt',
+      'model',
+      'tokensUsed',
+      'seo',
+      'tags',
+      'content',
+      'schema',
+      'openGraph',
+      'twitterCard',
+      'dataflowSeo',
+    ].some((key) => key in record);
+  }
+
+  private normalizeSeoData(value: unknown): NonNullable<ProductTextOutput['structuredResult']>['seo'] {
+    const record = this.toRecord(value);
+    if (!record) {
+      return null;
+    }
+
+    const normalized = {
+      title: this.toNullableString(record['title']),
+      metaDescription: this.toNullableString(record['metaDescription']),
+      h1: this.toNullableString(record['h1']),
+      focusKeyword: this.toNullableString(record['focusKeyword']),
+      secondaryKeywords: this.toStringArray(record['secondaryKeywords']),
+      lsiKeywords: this.toStringArray(record['lsiKeywords']),
+      longTailKeywords: this.toStringArray(record['longTailKeywords']),
+      slug: this.toNullableString(record['slug']),
+      canonicalUrl: this.toNullableString(record['canonicalUrl']),
+      robots: this.toNullableString(record['robots']),
+      readabilityLevel: this.toNullableString(record['readabilityLevel']),
+      keywordDensityTarget: this.toNullableString(record['keywordDensityTarget']),
+    };
+
+    return this.hasMeaningfulValues([
+      normalized.title,
+      normalized.metaDescription,
+      normalized.h1,
+      normalized.focusKeyword,
+      normalized.slug,
+      normalized.canonicalUrl,
+      normalized.robots,
+      normalized.readabilityLevel,
+      normalized.keywordDensityTarget,
+      normalized.secondaryKeywords,
+      normalized.lsiKeywords,
+      normalized.longTailKeywords,
+    ]) ? normalized : null;
+  }
+
+  private normalizeTagsData(value: unknown): NonNullable<ProductTextOutput['structuredResult']>['tags'] {
+    const record = this.toRecord(value);
+    if (!record) {
+      return null;
+    }
+
+    const normalized = {
+      productTags: this.toStringArray(record['productTags']),
+      categoryPath: this.toStringArray(record['categoryPath']),
+      breadcrumb: this.toStringArray(record['breadcrumb']),
+      cmsTags: this.toStringArray(record['cmsTags']),
+    };
+
+    return this.hasMeaningfulValues([
+      normalized.productTags,
+      normalized.categoryPath,
+      normalized.breadcrumb,
+      normalized.cmsTags,
+    ]) ? normalized : null;
+  }
+
+  private normalizeContentData(value: unknown): NonNullable<ProductTextOutput['structuredResult']>['content'] {
+    const record = this.toRecord(value);
+    if (!record) {
+      return null;
+    }
+
+    const normalized = {
+      intro: this.toNullableString(record['intro']),
+      productDescription: this.toNullableString(record['productDescription']),
+      contentOutline: this.normalizeContentOutline(record['contentOutline']),
+      features: this.toStringArray(record['features']),
+      benefits: this.toStringArray(record['benefits']),
+      specifications: this.toRecord(record['specifications']) ?? {},
+      callToAction: this.toNullableString(record['callToAction']),
+      socialProofHook: this.toNullableString(record['socialProofHook']),
+      imageAltTexts: this.toStringArray(record['imageAltTexts']),
+    };
+
+    return this.hasMeaningfulValues([
+      normalized.intro,
+      normalized.productDescription,
+      normalized.contentOutline,
+      normalized.features,
+      normalized.benefits,
+      normalized.specifications,
+      normalized.callToAction,
+      normalized.socialProofHook,
+      normalized.imageAltTexts,
+    ]) ? normalized : null;
+  }
+
+  private normalizeContentOutline(value: unknown): NonNullable<NonNullable<ProductTextOutput['structuredResult']>['content']>['contentOutline'] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value.flatMap((item) => {
+      const record = this.toRecord(item);
+      if (!record) {
+        return [];
+      }
+
+      const h2 = this.toNullableString(record['h2']);
+      if (!h2) {
+        return [];
+      }
+
+      return [{
+        h2,
+        h3s: this.toStringArray(record['h3s']),
+        keyFocus: this.toNullableString(record['keyFocus']),
+      }];
+    });
+  }
+
+  private normalizeSchemaData(value: unknown): NonNullable<ProductTextOutput['structuredResult']>['schema'] {
+    const record = this.toRecord(value);
+    if (!record) {
+      return null;
+    }
+
+    const normalized = {
+      product: this.toRecord(record['product']),
+      breadcrumb: this.toRecord(record['breadcrumb']),
+      faqPage: this.toRecord(record['faqPage']),
+    };
+
+    return this.hasMeaningfulValues([
+      normalized.product,
+      normalized.breadcrumb,
+      normalized.faqPage,
+    ]) ? normalized : null;
+  }
+
+  private normalizeDataflowSeo(value: unknown): NonNullable<ProductTextOutput['structuredResult']>['dataflowSeo'] {
+    const record = this.toRecord(value);
+    if (!record) {
+      return null;
+    }
+
+    const normalized = {
+      primaryIntent: this.toNullableString(record['primaryIntent']),
+      keywordStrategy: this.toNullableString(record['keywordStrategy']),
+      contentScore: this.toDisplayString(record['contentScore']),
+      eeatSignals: this.toStringArray(record['eeatSignals']),
+      internalLinkOpportunities: this.normalizeInternalLinkOpportunities(record['internalLinkOpportunities']),
+      competitorDifferentiators: this.toStringArray(record['competitorDifferentiators']),
+      topicalClusters: this.toStringArray(record['topicalClusters']),
+    };
+
+    return this.hasMeaningfulValues([
+      normalized.primaryIntent,
+      normalized.keywordStrategy,
+      normalized.contentScore,
+      normalized.eeatSignals,
+      normalized.internalLinkOpportunities,
+      normalized.competitorDifferentiators,
+      normalized.topicalClusters,
+    ]) ? normalized : null;
+  }
+
+  private normalizeInternalLinkOpportunities(
+    value: unknown,
+  ): NonNullable<NonNullable<ProductTextOutput['structuredResult']>['dataflowSeo']>['internalLinkOpportunities'] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value.flatMap((item) => {
+      const record = this.toRecord(item);
+      if (!record) {
+        return [];
+      }
+
+      const anchorText = this.toNullableString(record['anchorText']);
+      const targetTopic = this.toNullableString(record['targetTopic']);
+      if (!anchorText || !targetTopic) {
+        return [];
+      }
+
+      return [{ anchorText, targetTopic }];
+    });
+  }
+
+  private normalizeStringRecord(value: unknown): Record<string, string> {
+    const record = this.toRecord(value);
+    if (!record) {
+      return {};
+    }
+
+    return Object.entries(record).reduce<Record<string, string>>((acc, [key, item]) => {
+      const normalized = this.toDisplayString(item);
+      if (normalized) {
+        acc[key] = normalized;
+      }
+      return acc;
+    }, {});
+  }
+
+  private hasMeaningfulValues(values: unknown[]): boolean {
+    return values.some((value) => {
+      if (value === null || value === undefined) {
+        return false;
+      }
+
+      if (typeof value === 'string') {
+        return value.trim().length > 0;
+      }
+
+      if (Array.isArray(value)) {
+        return value.length > 0;
+      }
+
+      if (typeof value === 'object') {
+        return Object.keys(value as Record<string, unknown>).length > 0;
+      }
+
+      return true;
+    });
   }
 
   private findStringByKeys(value: unknown, keys: string[]): string | undefined {
@@ -882,6 +1290,52 @@ export class ProductTextAgentComponent {
     }
   }
 
+  private toRecord(value: unknown): Record<string, unknown> | null {
+    return value && typeof value === 'object' && !Array.isArray(value)
+      ? value as Record<string, unknown>
+      : null;
+  }
+
+  private toNullableString(value: unknown): string | null {
+    return typeof value === 'string' && value.trim() ? value.trim() : null;
+  }
+
+  private toDisplayString(value: unknown): string | null {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return String(value);
+    }
+
+    return this.toNullableString(value);
+  }
+
+  private toNullableNumber(value: unknown): number | null {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string' && value.trim()) {
+      const parsed = Number(value.trim());
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    return null;
+  }
+
+  private toNullableBoolean(value: unknown): boolean | null {
+    return typeof value === 'boolean' ? value : null;
+  }
+
+  private toStringArray(value: unknown): string[] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value.flatMap((item) => {
+      const normalized = this.toDisplayString(item);
+      return normalized ? [normalized] : [];
+    });
+  }
+
   private toNonEmptyString(value: unknown): string | undefined {
     return typeof value === 'string' && value.trim() ? value.trim() : undefined;
   }
@@ -924,20 +1378,26 @@ export class ProductTextAgentComponent {
 
   private async callWebhook(
     urls: readonly string[],
-    payload: ProductTextRequestPayload,
+    body: ProductTextRequestPayload | FormData,
+    requestKind: 'json' | 'multipart',
     label: string,
   ): Promise<Response> {
     let lastError: Error | null = null;
 
     for (const url of urls) {
       try {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        });
+        const response = requestKind === 'multipart'
+          ? await fetch(url, {
+              method: 'POST',
+              body: body as FormData,
+            })
+          : await fetch(url, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(body as ProductTextRequestPayload),
+            });
 
         if (response.ok) {
           return response;
@@ -968,19 +1428,19 @@ export class ProductTextAgentComponent {
       : null;
     const backendMessage = this.toNonEmptyString(record?.['message']);
 
-    if (/Produkttext-Webhook/.test(text)) {
+    if (/Produkttext-Service/.test(text)) {
       return text;
     }
 
     if (/not registered/i.test(text)) {
-      return 'Der n8n-Test-Webhook fuer Produkttexte ist aktuell nicht aktiv. Bitte pruefe den Endpoint /webhook-test/seo-product-description.';
+      return 'Der Produkttext-Service ist gerade nicht erreichbar. Bitte versuche es in ein paar Minuten erneut.';
     }
 
     if (backendMessage) {
-      return `n8n meldet einen Workflow-Fehler: ${backendMessage}`;
+      return backendMessage;
     }
 
-    return 'Die Antwort des Produkttext-Webhooks konnte nicht verarbeitet werden. Bitte pruefe Produkt-URL, Bild-URL und optionale Beschreibung.';
+    return 'Deine Eingabe konnte gerade nicht verarbeitet werden. Bitte pruefe URL, Bild und Hinweise und versuche es erneut.';
   }
 
   private persistSessionRun(record: RunRecord): void {

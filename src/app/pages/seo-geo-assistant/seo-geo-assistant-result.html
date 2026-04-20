@@ -37,12 +37,12 @@
           </div>
         </div>
 
-        <div class="mt-5 grid gap-3 md:grid-cols-2">
+        <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           @for (box of scoreBoxes(); track box.label) {
             <div class="rounded-2xl bg-surface-container-high/40 px-4 py-4 text-center">
               <p class="mb-2 text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ box.label }}</p>
               <p class="text-3xl font-medium" [class]="scoreNumberClass(box)">
-                {{ formatValue(box.value) }}<span class="text-sm text-outline">/100</span>
+                {{ formatScoreBoxValue(box) }}<span class="text-sm text-outline">{{ scoreBoxSuffix(box) }}</span>
               </p>
               <div class="mt-3 h-1.5 rounded-full bg-outline-variant/30">
                 <div class="h-1.5 rounded-full" [class]="scoreBarClass(box)" [style.width]="scoreBarWidth(box.value, box.max)"></div>
@@ -55,6 +55,39 @@
         </div>
       </section>
 
+      @if (executiveSummary().length || radarChartUrl()) {
+        <section class="mt-4 rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+          <div class="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_320px]">
+            <div>
+              <h2 class="text-base font-medium text-on-surface">Executive Summary</h2>
+              <div class="mt-4 space-y-2">
+                @for (item of executiveSummary(); track item) {
+                  <div class="flex gap-3 rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3 text-sm text-on-surface-variant">
+                    <span class="text-outline">•</span>
+                    <span>{{ item }}</span>
+                  </div>
+                } @empty {
+                  <p class="text-sm text-on-surface-variant">Keine Executive Summary im Report vorhanden.</p>
+                }
+              </div>
+            </div>
+
+            @if (radarChartUrl(); as radarChart) {
+              <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 p-4">
+                <p class="text-sm font-medium text-on-surface">Radar Chart</p>
+                <p class="mt-1 text-xs text-on-surface-variant">Visualisierte GEO-Performance über alle Kerndimensionen.</p>
+                <img
+                  [src]="radarChart"
+                  alt="GEO Radar Chart"
+                  loading="lazy"
+                  class="mt-4 w-full rounded-2xl bg-white/60"
+                />
+              </div>
+            }
+          </div>
+        </section>
+      }
+
       <section class="mt-4 rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -62,6 +95,11 @@
             <p class="mt-1 text-sm text-on-surface-variant">
               Faktenbasierte Bewertung der wichtigsten GEO-Signale je Dimension.
             </p>
+          </div>
+          <div class="flex items-center gap-4 text-[12px] text-on-surface-variant">
+            <span class="flex items-center gap-1.5"><span class="font-black text-[#22c55e]">✓</span> Gut</span>
+            <span class="flex items-center gap-1.5"><span class="font-black text-[#f59e0b]">!</span> Ausbaufähig</span>
+            <span class="flex items-center gap-1.5"><span class="font-black text-[#ef4444]">✗</span> Kritisch</span>
           </div>
         </div>
 
@@ -77,7 +115,9 @@
                 </div>
                 <div class="text-right">
                   <p class="text-base font-semibold" [class]="metricTextClass(dimension.score)">{{ formatValue(dimension.score) }}</p>
-                  <p class="text-[11px] text-on-surface-variant">{{ dimension.labelText }}</p>
+                  <p class="text-[11px] text-on-surface-variant">
+                    {{ dimension.indicator ? dimension.indicator + ' ' : '' }}{{ dimension.statusLabel }}
+                  </p>
                 </div>
               </div>
 
@@ -149,6 +189,34 @@
               </div>
             </div>
 
+            @if (activeTab() === 'onpage' && contentDetails().length) {
+              <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+                <h3 class="text-sm font-medium text-on-surface">Content & E-E-A-T Details</h3>
+                <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  @for (item of contentDetails(); track item.label) {
+                    <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3">
+                      <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ item.label }}</p>
+                      <p class="mt-2 text-sm font-medium" [class]="detailToneClass(item.tone)">{{ item.value }}</p>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (activeTab() === 'offpage' && authorityDetails().length) {
+              <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+                <h3 class="text-sm font-medium text-on-surface">Autoritätsdaten</h3>
+                <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  @for (item of authorityDetails(); track item.label) {
+                    <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3">
+                      <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ item.label }}</p>
+                      <p class="mt-2 text-sm font-medium" [class]="detailToneClass(item.tone)">{{ item.value }}</p>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
             <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
               <h3 class="text-sm font-medium text-on-surface">Quick Wins</h3>
               <div class="mt-4 space-y-3">
@@ -182,16 +250,54 @@
             </div>
 
             @if (activeTab() === 'technik') {
+              @if (technicalDetails().length) {
+                <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+                  <h3 class="text-sm font-medium text-on-surface">Technische Details</h3>
+                  <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    @for (item of technicalDetails(); track item.label) {
+                      <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3">
+                        <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ item.label }}</p>
+                        <p class="mt-2 text-sm font-medium" [class]="detailToneClass(item.tone)">{{ item.value }}</p>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
               <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
                 <h3 class="text-sm font-medium text-on-surface">Bot Accessibility</h3>
-                <div class="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                  @for (bot of techniqueBotCards(); track bot.name + bot.provider) {
-                    <div class="rounded-2xl border px-4 py-3" [class]="botCardClass(bot)">
-                      <p class="text-sm font-medium text-on-surface">{{ bot.name }}</p>
-                      <p class="mt-1 text-xs text-on-surface-variant">{{ bot.provider }} · {{ bot.statusCode ?? '–' }}</p>
-                    </div>
-                  }
-                </div>
+                @if (botSummaryItems().length) {
+                  <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    @for (item of botSummaryItems(); track item.label) {
+                      <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3">
+                        <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ item.label }}</p>
+                        <p class="mt-2 text-sm font-medium" [class]="detailToneClass(item.tone)">{{ item.value }}</p>
+                      </div>
+                    }
+                  </div>
+                }
+
+                @if (botAssessmentFacts().length) {
+                  <div class="mt-4 space-y-2">
+                    @for (item of botAssessmentFacts(); track item) {
+                      <div class="flex gap-3 rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3 text-sm text-on-surface-variant">
+                        <span class="text-outline">•</span>
+                        <span>{{ item }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+
+                @if (techniqueBotCards().length) {
+                  <div class="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    @for (bot of techniqueBotCards(); track bot.name + bot.provider) {
+                      <div class="rounded-2xl border px-4 py-3" [class]="botCardClass(bot)">
+                        <p class="text-sm font-medium text-on-surface">{{ bot.name }}</p>
+                        <p class="mt-1 text-xs text-on-surface-variant">{{ bot.provider }} · {{ bot.statusCode ?? '–' }}</p>
+                      </div>
+                    }
+                  </div>
+                }
 
                 @if (analysis.botAccessibilityCheck?.assessment?.recommendation) {
                   <div class="mt-4 rounded-2xl bg-red-500/10 px-4 py-3 text-sm text-red-300">
@@ -199,9 +305,14 @@
                   </div>
                 }
 
-                @if (blockedBots().length) {
-                  <div class="mt-3 text-xs text-on-surface-variant">
-                    Blockiert: {{ blockedBots().join(', ') }}
+                @if (criticalBlockingBots().length) {
+                  <div class="mt-4">
+                    <p class="text-xs font-medium uppercase tracking-[0.05em] text-on-surface-variant">Kritisch blockiert</p>
+                    <div class="mt-2 flex flex-wrap gap-2">
+                      @for (bot of criticalBlockingBots(); track bot) {
+                        <span class="rounded-full bg-red-500/10 px-3 py-1 text-xs font-medium text-red-300">{{ bot }}</span>
+                      }
+                    </div>
                   </div>
                 }
               </div>
@@ -254,7 +365,12 @@
                 <div class="py-3">
                   <div class="flex items-start justify-between gap-3">
                     <div class="min-w-0 flex-1">
-                      <p class="text-sm font-medium text-on-surface">{{ platform.name }}</p>
+                      <p class="text-sm font-medium text-on-surface">
+                        {{ platform.name }}
+                        @if (platform.indicator) {
+                          <span class="ml-1 text-xs text-on-surface-variant">{{ platform.indicator }}</span>
+                        }
+                      </p>
                       <p class="mt-1 text-xs text-on-surface-variant">{{ platform.limitingFactor || '–' }}</p>
                     </div>
                     <div class="min-w-[58px] text-right text-sm font-medium" [class]="metricTextClass(platform.score)">
@@ -299,8 +415,157 @@
               }
             </div>
           </div>
+
+          @if (schemaAnalysis() || artifactCards().length) {
+            <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+              <h3 class="text-sm font-medium text-on-surface">Schema & Artefakte</h3>
+
+              @if (schemaAnalysis(); as schema) {
+                <div class="mt-4 grid gap-3 lg:grid-cols-3">
+                  <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
+                    <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">Vorhanden</p>
+                    <div class="mt-3 space-y-1.5">
+                      @for (item of schema.present ?? []; track item) {
+                        <div class="flex items-start gap-2 text-[12px] leading-4 text-on-surface-variant">
+                          <span class="material-symbols-outlined mt-[-1px] text-sm leading-none text-emerald-300">check</span>
+                          <span>{{ item }}</span>
+                        </div>
+                      } @empty {
+                        <p class="text-[12px] leading-4 text-on-surface-variant">Keine vorhandenen Schema-Typen gemeldet.</p>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
+                    <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">Fehlend</p>
+                    <div class="mt-3 space-y-1.5">
+                      @for (item of schema.missing ?? []; track item) {
+                        <div class="flex items-start gap-2 text-[12px] leading-4 text-on-surface-variant">
+                          <span class="material-symbols-outlined mt-[-1px] text-sm leading-none text-red-300">close</span>
+                          <span>{{ item }}</span>
+                        </div>
+                      } @empty {
+                        <p class="text-[12px] leading-4 text-on-surface-variant">Keine fehlenden Schema-Typen gemeldet.</p>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
+                    <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">Gefundene H2 Fragen</p>
+                    <div class="mt-3 space-y-1.5">
+                      @for (item of schema.h2QuestionsFound ?? []; track item) {
+                        <div class="flex items-start gap-2 text-[12px] leading-4 text-on-surface-variant">
+                          <span class="material-symbols-outlined mt-[-1px] text-sm leading-none text-amber-300">help</span>
+                          <span>{{ item }}</span>
+                        </div>
+                      } @empty {
+                        <p class="text-[12px] leading-4 text-on-surface-variant">Keine H2-Fragen erkannt.</p>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                @if (schema.deployInstructions) {
+                  <div class="mt-4 rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
+                    <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">Deploy Hinweise</p>
+                    <p class="mt-2 text-sm text-on-surface-variant">{{ schema.deployInstructions }}</p>
+                  </div>
+                }
+              }
+
+              <div class="mt-4 space-y-4">
+                @for (artifact of artifactCards(); track artifact.key) {
+                  <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
+                    <div class="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p class="text-sm font-medium text-on-surface">{{ artifact.title }}</p>
+                        <p class="mt-1 text-xs text-on-surface-variant">{{ artifact.description }}</p>
+                      </div>
+                    </div>
+                    <pre class="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-xl border border-outline-variant/20 bg-surface-container-lowest/60 px-3 py-3 text-xs text-on-surface-variant">{{ artifact.content }}</pre>
+                  </div>
+                } @empty {
+                  <p class="text-sm text-on-surface-variant">Keine Artefakte im Report vorhanden.</p>
+                }
+              </div>
+            </div>
+          }
         </section>
       }
+    } @else if (pendingState()) {
+      <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-6 md:px-6">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Live Status</p>
+            <h1 class="mt-2 text-xl font-medium text-on-surface">{{ currentJobUrl() }}</h1>
+            <p class="mt-1 text-sm text-on-surface-variant">
+              {{ currentJobStatusLabel() }} · {{ currentJobStep() }}
+            </p>
+          </div>
+
+          <div class="inline-flex items-center gap-2 rounded-full bg-[#0070FF]/10 px-3 py-1 text-xs font-semibold text-[#0A4FB7]">
+            <span class="material-symbols-outlined animate-spin text-sm">progress_activity</span>
+            Polling aktiv
+          </div>
+        </div>
+
+        <div class="mt-6 rounded-[1.5rem] border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
+          <div class="flex items-center justify-between gap-3">
+            <p class="text-sm font-medium text-on-surface">Analysefortschritt</p>
+            <p class="text-sm font-semibold text-[#0070FF]">{{ currentJobProgress() }}%</p>
+          </div>
+
+          <div class="mt-3 h-2 rounded-full bg-outline-variant/25">
+            <div
+              class="h-2 rounded-full bg-[#0070FF] transition-all duration-500"
+              [style.width.%]="currentJobProgress()"
+            ></div>
+          </div>
+
+          <div class="mt-4 flex items-start gap-3 rounded-2xl bg-surface-container-lowest/70 px-4 py-3">
+            <span class="material-symbols-outlined text-[#0070FF]">radar</span>
+            <div>
+              <p class="text-sm font-medium text-on-surface">{{ currentJobStep() }}</p>
+              <p class="mt-1 text-sm text-on-surface-variant">
+                Die Seite fragt den Status automatisch ab und lädt den fertigen Report, sobald n8n ihn gespeichert hat.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    } @else if (statusErrorMessage()) {
+      <section class="rounded-[2rem] border border-red-500/20 bg-surface-container px-5 py-6 md:px-6">
+        <div class="flex items-start gap-4">
+          <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-500/10 text-red-300">
+            <span class="material-symbols-outlined text-2xl">error</span>
+          </div>
+          <div class="flex-1">
+            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Status Fehler</p>
+            <h1 class="mt-2 text-xl font-medium text-on-surface">Der Live-Status konnte nicht abgeschlossen werden</h1>
+            <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">{{ statusErrorMessage() }}</p>
+
+            <div class="mt-5 flex flex-wrap gap-3">
+              <button
+                type="button"
+                (click)="retryPolling()"
+                class="inline-flex items-center gap-2 rounded-xl bg-[#0070FF] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0060db]"
+              >
+                <span class="material-symbols-outlined text-base">refresh</span>
+                Status erneut laden
+              </button>
+
+              <button
+                type="button"
+                (click)="goBack()"
+                class="inline-flex items-center gap-2 rounded-xl border border-outline-variant/20 bg-surface-container-high px-5 py-3 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest"
+              >
+                <span class="material-symbols-outlined text-base">arrow_back</span>
+                Zurück zum Formular
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
     } @else {
       <div class="py-24 text-center text-on-surface-variant">
         <span class="material-symbols-outlined mb-4 block text-5xl opacity-30">hourglass_empty</span>

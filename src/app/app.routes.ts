@@ -40,12 +40,24 @@ export const routes: Routes = [
           import('./pages/seo-geo-assistant/seo-geo-assistant').then((m) => m.SeoGeoAssistantComponent),
       },
       {
+        path: 'agents/seo-geo-analyse-assistent-nollm',
+        loadComponent: () =>
+          import('./pages/seo-geo-assistant-nollm/seo-geo-assistant-nollm').then((m) => m.SeoGeoAssistantNoLlmComponent),
+      },
+      {
         path: 'agents/geo-report-alternative',
         loadComponent: () =>
           import('./pages/geo-report-alternative/geo-report-alternative').then((m) => m.GeoReportAlternativeComponent),
       },
       {
         path: 'agents/seo-geo-analyse-assistent/result',
+        data: { agentId: 'seo-geo-analyse-assistent' },
+        loadComponent: () =>
+          import('./pages/seo-geo-assistant/seo-geo-assistant-result').then((m) => m.SeoGeoAssistantResultComponent),
+      },
+      {
+        path: 'agents/seo-geo-analyse-assistent-nollm/result',
+        data: { agentId: 'seo-geo-analyse-assistent-nollm' },
         loadComponent: () =>
           import('./pages/seo-geo-assistant/seo-geo-assistant-result').then((m) => m.SeoGeoAssistantResultComponent),
       },
@@ -65,10 +77,11 @@ export const routes: Routes = [
           import('./pages/agent-result/agent-result').then((m) => m.AgentResult),
       },
       {
-        path: 'conversations',
+        path: 'history',
         loadComponent: () =>
           import('./pages/conversations/conversations').then((m) => m.Conversations),
       },
+      { path: 'conversations', redirectTo: 'history', pathMatch: 'full' },
       {
         path: 'analytics',
         loadComponent: () =>

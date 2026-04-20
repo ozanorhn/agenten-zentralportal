@@ -310,6 +310,81 @@ export interface ProductTextFileReference {
   persisted: boolean;
 }
 
+export interface ProductTextContentOutlineItem {
+  h2: string;
+  h3s: string[];
+  keyFocus: string | null;
+}
+
+export interface ProductTextInternalLinkOpportunity {
+  anchorText: string;
+  targetTopic: string;
+}
+
+export interface ProductTextSeoData {
+  title: string | null;
+  metaDescription: string | null;
+  h1: string | null;
+  focusKeyword: string | null;
+  secondaryKeywords: string[];
+  lsiKeywords: string[];
+  longTailKeywords: string[];
+  slug: string | null;
+  canonicalUrl: string | null;
+  robots: string | null;
+  readabilityLevel: string | null;
+  keywordDensityTarget: string | null;
+}
+
+export interface ProductTextTagsData {
+  productTags: string[];
+  categoryPath: string[];
+  breadcrumb: string[];
+  cmsTags: string[];
+}
+
+export interface ProductTextContentData {
+  intro: string | null;
+  productDescription: string | null;
+  contentOutline: ProductTextContentOutlineItem[];
+  features: string[];
+  benefits: string[];
+  specifications: Record<string, unknown>;
+  callToAction: string | null;
+  socialProofHook: string | null;
+  imageAltTexts: string[];
+}
+
+export interface ProductTextSchemaData {
+  product: Record<string, unknown> | null;
+  breadcrumb: Record<string, unknown> | null;
+  faqPage: Record<string, unknown> | null;
+}
+
+export interface ProductTextDataflowSeoData {
+  primaryIntent: string | null;
+  keywordStrategy: string | null;
+  contentScore: string | null;
+  eeatSignals: string[];
+  internalLinkOpportunities: ProductTextInternalLinkOpportunity[];
+  competitorDifferentiators: string[];
+  topicalClusters: string[];
+}
+
+export interface ProductTextStructuredResult {
+  success: boolean | null;
+  generatedAt: string | null;
+  model: string | null;
+  tokensUsed: number | null;
+  seo: ProductTextSeoData | null;
+  tags: ProductTextTagsData | null;
+  content: ProductTextContentData | null;
+  schema: ProductTextSchemaData | null;
+  openGraph: Record<string, string>;
+  twitterCard: Record<string, string>;
+  dataflowSeo: ProductTextDataflowSeoData | null;
+}
+
 export type ProductTextResponseMode = 'binary' | 'json' | 'text' | 'multipart' | 'empty';
 export type ProductTextDescriptionSource = 'header' | 'payload' | 'text-body' | 'multipart-field' | 'none';
 export type ProductTextFileSource = 'response-body' | 'payload-base64' | 'multipart-part' | 'none';
@@ -322,13 +397,86 @@ export interface ProductTextResponseMeta {
   fileSource: ProductTextFileSource;
 }
 
+export interface ProductTextAmazonData {
+  [key: string]: string;
+  item_sku: string;
+  item_name: string;
+  item_description: string;
+  bullet_point1: string;
+  bullet_point2: string;
+  bullet_point3: string;
+  bullet_point4: string;
+  bullet_point5: string;
+  generic_keywords: string;
+  product_type: string;
+}
+
+export interface ProductTextShopifyData {
+  Handle: string;
+  Title: string;
+  'Body (HTML)': string;
+  Vendor: string;
+  Type: string;
+  Tags: string;
+  Published: string;
+  'SEO Title': string;
+  'SEO Description': string;
+}
+
+export interface ProductTextEbayItemSpecifics {
+  Marke?: string;
+  Material?: string;
+  Farbe?: string;
+  Groesse?: string;
+  [key: string]: string | undefined;
+}
+
+export interface ProductTextEbayData {
+  Title: string;
+  Description: string;
+  ConditionDescription: string;
+  ItemSpecifics: ProductTextEbayItemSpecifics;
+}
+
+export interface ProductTextShopwareData {
+  name: string;
+  description: string;
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string;
+  tags: string;
+  customSearchKeywords: string;
+}
+
+export interface ProductTextWooCommerceData {
+  post_title: string;
+  post_content: string;
+  post_excerpt: string;
+  tags: string;
+  categories: string;
+  _yoast_wpseo_title: string;
+  _yoast_wpseo_metadesc: string;
+  _yoast_wpseo_focuskw: string;
+}
+
+export interface ProductTextPlatformResult {
+  success: boolean;
+  amazon?: ProductTextAmazonData;
+  shopify?: ProductTextShopifyData;
+  ebay?: ProductTextEbayData;
+  shopware?: ProductTextShopwareData;
+  woocommerce?: ProductTextWooCommerceData;
+}
+
 export interface ProductTextOutput {
   type: 'product-text';
   description: string;
   inputReference: string;
   uploadedImageName: string;
   generatedFile: ProductTextFileReference | null;
+  structuredResult: ProductTextStructuredResult | null;
   responseMeta: ProductTextResponseMeta;
+  platformResult?: ProductTextPlatformResult | ProductTextPlatformResult[] | null;
 }
 
 // ─── Notifications ────────────────────────────────────────────────────────────

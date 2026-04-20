@@ -260,10 +260,11 @@ export class AgentOutputService {
   private generateProductTextPlaceholder(inputReference: string): ProductTextOutput {
     return {
       type: 'product-text',
-      description: 'Sende eine Produkt-URL oder Bild-URL, um hier automatisch die erzeugte Produktbeschreibung aus dem Webhook zu sehen.',
+      description: 'Sende eine Produkt-URL oder ein Bild, um hier automatisch die erzeugte Produktbeschreibung zu sehen.',
       inputReference,
       uploadedImageName: inputReference,
       generatedFile: null,
+      structuredResult: null,
       responseMeta: {
         mode: 'empty',
         mimeType: null,

@@ -12,13 +12,13 @@ import { RunHistoryService } from '../../services/run-history.service';
       <!-- Hero -->
       <div class="mb-12 max-w-4xl">
         <span class="text-secondary font-headline font-bold tracking-[0.2em] uppercase text-xs mb-4 block">
-          Content
+          History
         </span>
         <h1 class="text-5xl md:text-7xl font-black font-headline tracking-tighter text-on-surface mb-6 leading-none">
-          Content <span class="text-[#0070FF]">History</span>
+          Workflow <span class="text-[#0070FF]">History</span>
         </h1>
         <p class="text-on-surface-variant text-xl max-w-2xl font-light leading-relaxed">
-          Alle generierten Inhalte und Workflow-Historien deiner Agenten.
+          Alle Läufe, Ergebnisse und Verlaufseinträge deiner Agenten an einem Ort.
         </p>
       </div>
 

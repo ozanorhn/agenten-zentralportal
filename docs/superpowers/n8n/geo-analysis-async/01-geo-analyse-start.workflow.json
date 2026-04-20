@@ -1,0 +1,333 @@
+{
+  "name": "SEO GEO Analysis - Start Async",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "geo-analyse-start",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "6fb8f52f-f488-44c7-b907-dc5020cf8e41",
+      "name": "Start Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -920,
+        0
+      ],
+      "webhookId": "geo-analyse-start"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? {};\nconst rawUrl = String(body.url ?? '').trim();\nif (!rawUrl) {\n  throw new Error('url is required');\n}\n\nconst normalizedUrl = /^https?:\\/\\//i.test(rawUrl) ? rawUrl : `https://${rawUrl}`;\nconst input = {\n  url: normalizedUrl,\n  brand: String(body.brand ?? '').trim(),\n  industry: String(body.industry ?? '').trim(),\n  location: String(body.location ?? '').trim() || 'Deutschland',\n};\nconst now = new Date().toISOString();\nconst jobId = `geo-${Date.now()}`;\n\nreturn [{\n  json: {\n    jobId,\n    status: 'running',\n    progress: 5,\n    step: 'Analyse gestartet',\n    createdAt: now,\n    updatedAt: now,\n    inputJson: JSON.stringify(input),\n    resultJson: '',\n    errorJson: '',\n    ...input,\n  },\n}];"
+      },
+      "id": "2b37b5eb-896e-4058-a08c-590916f39b20",
+      "name": "Build Job Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -688,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "geo_analysis_jobs"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "jobId",
+              "keyValue": "={{ $json.jobId }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "jobId": "={{ $json.jobId }}",
+            "status": "={{ $json.status }}",
+            "progress": "={{ $json.progress }}",
+            "step": "={{ $json.step }}",
+            "createdAt": "={{ $json.createdAt }}",
+            "updatedAt": "={{ $json.updatedAt }}",
+            "inputJson": "={{ $json.inputJson }}",
+            "resultJson": "={{ $json.resultJson }}",
+            "errorJson": "={{ $json.errorJson }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "jobId",
+              "displayName": "jobId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "progress",
+              "displayName": "progress",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "step",
+              "displayName": "step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "createdAt",
+              "displayName": "createdAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "updatedAt",
+              "displayName": "updatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "inputJson",
+              "displayName": "inputJson",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "resultJson",
+              "displayName": "resultJson",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "errorJson",
+              "displayName": "errorJson",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "1ec51a0d-f880-4fb9-8b12-7d5001673685",
+      "name": "Save Pending Job",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_WITH_WORKER_WORKFLOW_ID"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "jobId": "={{ $json.jobId }}",
+            "url": "={{ $json.url }}",
+            "brand": "={{ $json.brand }}",
+            "industry": "={{ $json.industry }}",
+            "location": "={{ $json.location }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "jobId",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "jobId",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "url",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "url",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "brand",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "brand",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "industry",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "industry",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "location",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "location",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "id": "ef8c5312-9886-4d12-b4cf-f6886af59423",
+      "name": "Run GEO Worker",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -176,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ jobId: $json.jobId, status: $json.status, progress: $json.progress, step: $json.step }) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "id": "8af62edc-d4cf-4cc0-858d-f918d0c87292",
+      "name": "Return Start Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Start Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build Job Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Job Payload": {
+      "main": [
+        [
+          {
+            "node": "Save Pending Job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Pending Job": {
+      "main": [
+        [
+          {
+            "node": "Run GEO Worker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run GEO Worker": {
+      "main": [
+        [
+          {
+            "node": "Return Start Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

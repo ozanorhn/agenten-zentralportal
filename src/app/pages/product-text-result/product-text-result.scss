@@ -36,3 +36,16 @@
   padding: 0.15rem 0.4rem;
   color: rgb(var(--color-on-surface));
 }
+
+.seo-code-block {
+  overflow-x: auto;
+  border-radius: 1rem;
+  border: 1px solid rgba(var(--color-outline-variant), 0.2);
+  background: #0b1220;
+  padding: 1rem;
+  color: #c8e1ff;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}

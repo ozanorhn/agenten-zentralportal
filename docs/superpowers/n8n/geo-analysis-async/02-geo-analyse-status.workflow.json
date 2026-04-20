@@ -1,0 +1,159 @@
+{
+  "name": "SEO GEO Analysis - Status Async",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "geo-analyse-status",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "03eac747-f111-4884-97cf-7899f18e1d9f",
+      "name": "Status Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -920,
+        0
+      ],
+      "webhookId": "geo-analyse-status"
+    },
+    {
+      "parameters": {
+        "jsCode": "const query = $json.query ?? {};\nconst jobId = String(query.jobId ?? '').trim();\nif (!jobId) {\n  throw new Error('jobId query parameter is required');\n}\nreturn [{ json: { jobId } }];"
+      },
+      "id": "63bb13c7-0d4e-4f90-b2c1-e2ff00da4e1f",
+      "name": "Extract Job Id",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -688,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "geo_analysis_jobs"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "jobId",
+              "keyValue": "={{ $json.jobId }}"
+            }
+          ]
+        },
+        "returnAll": false
+      },
+      "id": "10d7d1ee-4ea5-40fa-974a-6f53d1a46fe3",
+      "name": "Load Job Row",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "position": [
+        -432,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const row = $input.first()?.json;\nif (!row || !row.jobId) {\n  return [{ json: { found: false, statusCode: 404, error: { message: 'Job nicht gefunden' } } }];\n}\n\nconst parseJson = (value) => {\n  if (!value || typeof value !== 'string') return null;\n  try {\n    return JSON.parse(value);\n  } catch {\n    return null;\n  }\n};\n\nreturn [{\n  json: {\n    found: true,\n    statusCode: 200,\n    jobId: row.jobId,\n    status: row.status ?? 'running',\n    progress: Number(row.progress ?? 0),\n    step: row.step ?? '',\n    createdAt: row.createdAt ?? null,\n    updatedAt: row.updatedAt ?? null,\n    input: parseJson(row.inputJson),\n    result: parseJson(row.resultJson),\n    error: parseJson(row.errorJson),\n  },\n}];"
+      },
+      "id": "f7744d64-6fd4-4f87-901d-730d9f464fbf",
+      "name": "Normalize Job Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json.found ? { jobId: $json.jobId, status: $json.status, progress: $json.progress, step: $json.step, createdAt: $json.createdAt, updatedAt: $json.updatedAt, input: $json.input, result: $json.result, error: $json.error } : { error: $json.error }) }}",
+        "options": {
+          "responseCode": "={{ $json.statusCode }}",
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "id": "e7c31b72-8489-44f1-9153-08093de0475e",
+      "name": "Return Status Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Status Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract Job Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Job Id": {
+      "main": [
+        [
+          {
+            "node": "Load Job Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Job Row": {
+      "main": [
+        [
+          {
+            "node": "Normalize Job Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Job Response": {
+      "main": [
+        [
+          {
+            "node": "Return Status Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

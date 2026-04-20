@@ -29,13 +29,13 @@ interface AgentRow {
       <!-- Hero -->
       <div class="mb-12 max-w-4xl">
         <span class="text-secondary font-headline font-bold tracking-[0.2em] uppercase text-xs mb-4 block">
-          Admin / CEO
+          Executive
         </span>
         <h1 class="text-5xl md:text-7xl font-black font-headline tracking-tighter text-on-surface mb-6 leading-none">
-          CEO <span class="text-[#0070FF]">Dashboard</span>
+          ROI <span class="text-[#0070FF]">Übersicht</span>
         </h1>
         <p class="text-on-surface-variant text-xl max-w-2xl font-light leading-relaxed">
-          Echtzeit-Übersicht über den ROI deiner KI-Automatisierung — Zeit, Kosten und Kapazität auf einen Blick.
+          Verdichtete Management-Sicht auf eingesparte Zeit, Kosten und Teamwirkung deiner KI-Automatisierung.
         </p>
       </div>
 

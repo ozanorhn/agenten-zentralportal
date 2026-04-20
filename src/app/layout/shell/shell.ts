@@ -53,12 +53,11 @@ export class Shell {
     {
       label: 'Admin',
       items: [
-        { label: 'Conversations', icon: 'chat', route: '/conversations' },
-        { label: 'Analytics', icon: 'bar_chart', route: '/analytics' },
+        { label: 'Operations', icon: 'bar_chart', route: '/analytics' },
         { label: 'Management', icon: 'tune', route: '/management' },
-        { label: 'History', icon: 'history', route: '/conversations' },
-        { label: 'CEO Dashboard', icon: 'speed', route: '/ceo-dashboard' },
-        { label: 'KPI Dashboard', icon: 'bar_chart', route: '/kpi-dashboard' },
+        { label: 'History', icon: 'history', route: '/history' },
+        { label: 'ROI Übersicht', icon: 'speed', route: '/ceo-dashboard' },
+        { label: 'Live KPIs', icon: 'query_stats', route: '/kpi-dashboard' },
         { label: 'Reporting Bot', icon: 'summarize', route: '/reporting-bot' },
       ],
     },

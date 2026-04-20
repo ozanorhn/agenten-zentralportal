@@ -3,10 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import {
-  GeoAnalysisStartResponse,
-} from './seo-geo-assistant.models';
+  extractGeoWebhookResult,
+  saveSeoGeoReport,
+  StoredSeoGeoReport,
+} from '../seo-geo-assistant/seo-geo-assistant.models';
 
-type RequestErrorCode = 'network' | 'api';
+type RequestErrorCode = 'timeout' | 'network' | 'api' | 'empty';
 
 class RequestError extends Error {
   constructor(
@@ -17,15 +19,16 @@ class RequestError extends Error {
     super(code);
   }
 }
-const LONG_WAIT_NOTICE_MS = 15_000;
+
+const WEBHOOK_TIMEOUT_MS = 90_000;
 
 @Component({
-  selector: 'app-seo-geo-assistant',
+  selector: 'app-seo-geo-assistant-nollm',
   standalone: true,
   imports: [FormsModule, RouterLink],
-  templateUrl: './seo-geo-assistant.html',
+  templateUrl: './seo-geo-assistant-nollm.html',
 })
-export class SeoGeoAssistantComponent {
+export class SeoGeoAssistantNoLlmComponent {
   private readonly router = inject(Router);
 
   readonly environment = environment;
@@ -34,11 +37,9 @@ export class SeoGeoAssistantComponent {
   brand = '';
   industry = '';
   location = 'Deutschland';
-  private longWaitNoticeTimeoutId: number | null = null;
 
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal('');
-  readonly showLongWaitNotice = signal(false);
 
   async submit(): Promise<void> {
     if (this.isSubmitting()) {
@@ -54,8 +55,6 @@ export class SeoGeoAssistantComponent {
     this.websiteUrl = normalizedUrl;
     this.errorMessage.set('');
     this.isSubmitting.set(true);
-    this.showLongWaitNotice.set(false);
-    this.startLongWaitNoticeTimer();
 
     try {
       const requestBody = {
@@ -65,41 +64,52 @@ export class SeoGeoAssistantComponent {
         location: this.location.trim() || 'Deutschland',
       };
 
-      const response = await this.fetchWebhookResponse(environment.geoAnalysisStartWebhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
+      const response = await this.fetchWithTimeout(
+        environment.geoAnalysisNoLlmWebhookUrl,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify(requestBody),
         },
-        body: JSON.stringify(requestBody),
-      });
+        WEBHOOK_TIMEOUT_MS,
+      );
+
+      const rawResponse = await response.text().catch(() => '');
 
       if (!response.ok) {
-        const errorText = await response.text().catch(() => '');
-        console.error('Geo analysis webhook error', {
+        console.error('Geo analysis NoLLM webhook error', {
           status: response.status,
-          url: environment.geoAnalysisStartWebhookUrl,
+          url: environment.geoAnalysisNoLlmWebhookUrl,
           method: 'POST',
           requestBody,
-          responseBody: errorText,
+          responseBody: rawResponse,
         });
-        throw new RequestError('api', response.status, errorText);
+        throw new RequestError('api', response.status, rawResponse);
       }
 
-      const startResponse = this.extractStartResponse(await this.readJson(response));
-      if (!startResponse?.jobId) {
-        throw new RequestError('api');
+      const payload = extractGeoWebhookResult(this.parseJson(rawResponse));
+      if (!payload) {
+        throw new RequestError('empty', response.status, rawResponse);
       }
 
-      await this.router.navigate(['/agents', 'seo-geo-analyse-assistent', 'result'], {
-        queryParams: { jobId: startResponse.jobId },
+      const record: StoredSeoGeoReport = {
+        id: `seo-geo-nollm-${Date.now()}`,
+        createdAt: Date.now(),
+        payload,
+      };
+
+      saveSeoGeoReport(record);
+
+      await this.router.navigate(['/agents', 'seo-geo-analyse-assistent-nollm', 'result'], {
+        queryParams: { reportId: record.id },
       });
     } catch (error) {
       this.errorMessage.set(this.toFriendlyErrorMessage(error));
-      console.error('SEO/GEO form request failed', error);
+      console.error('SEO/GEO NoLLM form request failed', error);
     } finally {
-      this.clearLongWaitNoticeTimer();
-      this.showLongWaitNotice.set(false);
       this.isSubmitting.set(false);
     }
   }
@@ -111,62 +121,37 @@ export class SeoGeoAssistantComponent {
     this.location = 'Hannover, DE';
   }
 
-  private async fetchWebhookResponse(url: string, init: RequestInit): Promise<Response> {
+  private async fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
+
     try {
-      return await fetch(url, init);
+      return await fetch(url, { ...init, signal: controller.signal });
     } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        throw new RequestError('timeout');
+      }
+
       if (error instanceof TypeError) {
         throw new RequestError('network');
       }
 
       throw error;
+    } finally {
+      window.clearTimeout(timeout);
     }
   }
 
-  private startLongWaitNoticeTimer(): void {
-    this.clearLongWaitNoticeTimer();
-    this.longWaitNoticeTimeoutId = window.setTimeout(() => {
-      this.showLongWaitNotice.set(true);
-    }, LONG_WAIT_NOTICE_MS);
-  }
-
-  private clearLongWaitNoticeTimer(): void {
-    if (this.longWaitNoticeTimeoutId !== null) {
-      window.clearTimeout(this.longWaitNoticeTimeoutId);
-      this.longWaitNoticeTimeoutId = null;
-    }
-  }
-
-  private async readJson(response: Response): Promise<unknown> {
-    const text = await response.text();
-    if (!text) {
+  private parseJson(raw: string): unknown {
+    if (!raw) {
       return null;
     }
 
     try {
-      return JSON.parse(text);
+      return JSON.parse(raw);
     } catch {
-      return text;
+      return raw;
     }
-  }
-
-  private extractStartResponse(data: unknown): GeoAnalysisStartResponse | null {
-    let parsed = data;
-
-    if (typeof parsed === 'string') {
-      try {
-        parsed = JSON.parse(parsed);
-      } catch {
-        return null;
-      }
-    }
-
-    const payload = Array.isArray(parsed) ? (parsed[0] ?? null) : parsed;
-    if (!payload || typeof payload !== 'object') {
-      return null;
-    }
-
-    return payload as GeoAnalysisStartResponse;
   }
 
   private normalizeUrl(value: string): string {
@@ -188,15 +173,19 @@ export class SeoGeoAssistantComponent {
   private toFriendlyErrorMessage(error: unknown): string {
     if (error instanceof RequestError) {
       switch (error.code) {
+        case 'timeout':
+          return 'Der NoLLM-Webhook braucht länger als erwartet. Bitte versuche es erneut.';
         case 'network':
           return 'Keine Verbindung. Bitte Internetverbindung prüfen.';
+        case 'empty':
+          return 'Der NoLLM-Webhook hat keine verwertbare Analyse zurückgegeben.';
         default:
           if (error.status === 500) {
-            return 'Die Analyse konnte nicht gestartet werden, weil der Start-Webhook mit HTTP 500 geantwortet hat.';
+            return 'Der NoLLM-Webhook antwortet mit HTTP 500.';
           }
 
           if (error.status === 404) {
-            return 'Der Start-Endpunkt wurde nicht gefunden. Bitte den n8n-Webhook prüfen.';
+            return 'Der NoLLM-Webhook wurde nicht gefunden.';
           }
 
           return 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.';

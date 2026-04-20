@@ -8,12 +8,14 @@ import { Component } from '@angular/core';
 
       <!-- Hero -->
       <header class="mb-12 max-w-4xl">
+        <span class="text-secondary font-headline font-bold tracking-[0.2em] uppercase text-xs mb-4 block">
+          Operations
+        </span>
         <h1 class="font-headline text-5xl md:text-7xl font-black tracking-tight text-white mb-4">
-          Kinetic <span class="text-[#0070FF]" style="text-shadow: 0 0 15px rgba(0,112,255,0.4);">Efficiency</span>
+          Operations <span class="text-[#0070FF]" style="text-shadow: 0 0 15px rgba(0,112,255,0.4);">Monitor</span>
         </h1>
         <p class="text-on-surface-variant max-w-xl text-lg leading-relaxed font-light">
-          Your autonomous workforce has been operational for 12 days.
-          Optimization is currently at 94.2% capacity.
+          Überblick über Agenten-Auslastung, Credits und operative Kapazität deiner KI-Workflows.
         </p>
       </header>
 
