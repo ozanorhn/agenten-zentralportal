@@ -37,8 +37,6 @@ export class Dashboard implements OnInit, OnDestroy {
     this.paramSub.unsubscribe();
   }
 
-  categories = ['Alle', 'Sales', 'Content', 'SEO', 'Data'];
-
   agents: Agent[] = [
     // ── OMR Special (pinned first) ──────────────────────────────────────
     {
@@ -92,7 +90,7 @@ export class Dashboard implements OnInit, OnDestroy {
       id: 'produkttext-agent',
       name: 'Produkttext-Agent',
       description:
-        'Aus einem einzigen Produktbild entstehen automatisch ein passender Produkttext und die vom Webhook zurückgelieferte Datei.',
+        'Aus einer Produkt-URL oder Bild-URL entsteht automatisch ein passender Produkttext aus dem neuen n8n-Webhook.',
       icon: 'imagesmode',
       category: 'Content',
       badgeLabel: 'LIVE',
@@ -130,6 +128,16 @@ export class Dashboard implements OnInit, OnDestroy {
       description:
         'Nimmt URL, Marke, Branche und Standort als Formular entgegen, sendet den GEO-Webhook und zeigt die strukturierte Analyse direkt auf der Seite.',
       icon: 'forum',
+      category: 'SEO',
+      badgeLabel: 'LIVE',
+      badgeVariant: 'primary',
+    },
+    {
+      id: 'geo-report-alternative',
+      name: 'Geo Report Alternative',
+      description:
+        'Nimmt genau eine URL entgegen, sendet sie an einen separaten n8n-Testwebhook und rendert den gelieferten Markdown-Report auf einer eigenen Seite.',
+      icon: 'description',
       category: 'SEO',
       badgeLabel: 'LIVE',
       badgeVariant: 'primary',
@@ -176,11 +184,6 @@ export class Dashboard implements OnInit, OnDestroy {
     if (this.activeCategory() === 'Alle') return this.agents;
     return this.agents.filter((a) => a.category === this.activeCategory());
   }
-
-  setCategory(cat: string): void {
-    this.activeCategory.set(cat);
-  }
-
   startWorkflow(agentId: string): void {
     this.router.navigate(['/agents', agentId]);
   }

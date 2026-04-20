@@ -1,4 +1,4 @@
-import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AGENTS_MAP } from '../../data/agents.data';
@@ -10,8 +10,7 @@ import {
   StoredBinaryFile,
 } from '../../services/binary-file-store.service';
 
-const PRODUCT_TEXT_DESCRIPTION_PATH = '/webhook/produktbeschreibung';
-const PRODUCT_TEXT_IMAGE_PATH = '/webhook/produktbild';
+const PRODUCT_TEXT_WEBHOOK_PATH = '/webhook-test/seo-product-description';
 const MAX_PERSISTED_BINARY_BYTES = 3_500_000;
 const PRODUCT_TEXT_SESSION_RUN_KEY = 'product-text:last-run';
 
@@ -21,8 +20,15 @@ function buildWebhookCandidates(path: string): readonly string[] {
     : [`${environment.n8nBase}${path}`];
 }
 
-const PRODUCT_TEXT_DESCRIPTION_WEBHOOKS = buildWebhookCandidates(PRODUCT_TEXT_DESCRIPTION_PATH);
-const PRODUCT_TEXT_IMAGE_WEBHOOKS = buildWebhookCandidates(PRODUCT_TEXT_IMAGE_PATH);
+const PRODUCT_TEXT_WEBHOOKS = buildWebhookCandidates(PRODUCT_TEXT_WEBHOOK_PATH);
+
+type ProductTextInputMode = 'productUrl' | 'imageUrl';
+
+interface ProductTextRequestPayload {
+  productUrl?: string;
+  imageUrl?: string;
+  description?: string;
+}
 
 interface ParsedBinaryFile {
   blob: Blob;
@@ -61,7 +67,7 @@ interface ParsedProductTextResponse {
   templateUrl: './product-text-agent.html',
   styleUrl: './product-text-agent.scss',
 })
-export class ProductTextAgentComponent implements OnDestroy {
+export class ProductTextAgentComponent {
   private readonly router = inject(Router);
   private readonly runHistory = inject(RunHistoryService);
   private readonly notifications = inject(NotificationService);
@@ -69,83 +75,86 @@ export class ProductTextAgentComponent implements OnDestroy {
 
   readonly agentMeta = AGENTS_MAP['produkttext-agent'];
 
-  readonly selectedFile = signal<File | null>(null);
-  readonly previewUrl = signal<string | null>(null);
-  readonly dragOver = signal(false);
+  readonly inputMode = signal<ProductTextInputMode>('productUrl');
+  readonly productUrl = signal('');
+  readonly imageUrl = signal('');
+  readonly description = signal('');
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal('');
-  readonly statusLabel = signal('Lade ein einziges Produktbild hoch und starte dann den Agenten.');
+  readonly statusLabel = signal('Gib eine Produkt-URL oder Bild-URL ein und starte dann den Agenten.');
 
-  readonly selectedFileName = computed(() => this.selectedFile()?.name ?? 'Kein Bild ausgewählt');
-  readonly selectedFileSize = computed(() => {
-    const file = this.selectedFile();
-    return file ? this.formatFileSize(file.size) : '–';
-  });
+  readonly activeInputLabel = computed(() =>
+    this.inputMode() === 'productUrl' ? 'Produkt-URL' : 'Bild-URL',
+  );
+  readonly activeInputPlaceholder = computed(() =>
+    this.inputMode() === 'productUrl'
+      ? 'https://shop.example.com/produkt/sneaker-x'
+      : 'https://cdn.example.com/produkt-bild.jpg',
+  );
+  readonly activeInputValue = computed(() =>
+    this.inputMode() === 'productUrl' ? this.productUrl() : this.imageUrl(),
+  );
+  readonly payloadPreview = computed(() =>
+    JSON.stringify(this.buildRequestPayloadPreview(), null, 2),
+  );
 
-  ngOnDestroy(): void {
-    this.revokePreviewUrl();
-  }
-
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
-    this.applyFile(file);
-    input.value = '';
-  }
-
-  onDrop(event: DragEvent): void {
-    event.preventDefault();
-    this.dragOver.set(false);
-    const file = event.dataTransfer?.files?.[0] ?? null;
-    this.applyFile(file);
-  }
-
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    this.dragOver.set(true);
-  }
-
-  onDragLeave(): void {
-    this.dragOver.set(false);
-  }
-
-  clearFile(): void {
-    this.errorMessage.set('');
-    this.selectedFile.set(null);
-    this.revokePreviewUrl();
-    this.statusLabel.set('Lade ein einziges Produktbild hoch und starte dann den Agenten.');
-  }
-
-  async submit(): Promise<void> {
-    const file = this.selectedFile();
-    if (!file || this.isSubmitting()) {
+  setInputMode(mode: ProductTextInputMode): void {
+    if (this.inputMode() === mode) {
       return;
     }
 
+    this.inputMode.set(mode);
+    this.errorMessage.set('');
+    this.statusLabel.set('Eingabe gewechselt. Du kannst den Produkttext-Agenten jetzt starten.');
+  }
+
+  updateProductUrl(value: string): void {
+    this.productUrl.set(value);
+    this.errorMessage.set('');
+  }
+
+  updateImageUrl(value: string): void {
+    this.imageUrl.set(value);
+    this.errorMessage.set('');
+  }
+
+  updateDescription(value: string): void {
+    this.description.set(value);
+  }
+
+  clearForm(): void {
+    this.productUrl.set('');
+    this.imageUrl.set('');
+    this.description.set('');
+    this.errorMessage.set('');
+    this.statusLabel.set('Gib eine Produkt-URL oder Bild-URL ein und starte dann den Agenten.');
+  }
+
+  async submit(): Promise<void> {
+    if (this.isSubmitting()) {
+      return;
+    }
+
+    const payload = this.buildRequestPayload();
+    if (!payload) {
+      return;
+    }
+
+    const inputReference = payload.productUrl ?? payload.imageUrl ?? 'produkttext-output';
+
     this.isSubmitting.set(true);
     this.errorMessage.set('');
-    this.statusLabel.set('Produktbild wird parallel an Beschreibung und Bild gesendet…');
+    this.statusLabel.set('Anfrage wird an den Produkttext-Webhook gesendet…');
 
     try {
-      const [descriptionResponse, imageResponse] = await Promise.all([
-        this.callWebhook(
-          PRODUCT_TEXT_DESCRIPTION_WEBHOOKS,
-          this.buildFormData(file),
-          'Der Beschreibungs-Webhook',
-        ),
-        this.callWebhook(
-          PRODUCT_TEXT_IMAGE_WEBHOOKS,
-          this.buildFormData(file),
-          'Der Bild-Webhook',
-        ),
-      ]);
+      const response = await this.callWebhook(
+        PRODUCT_TEXT_WEBHOOKS,
+        payload,
+        'Der Produkttext-Webhook',
+      );
 
-      this.statusLabel.set('Text- und Bildantwort werden zusammengeführt…');
-      const [descriptionParsed, imageParsed] = await Promise.all([
-        this.parseWebhookResponse(descriptionResponse, file.name),
-        this.parseWebhookResponse(imageResponse, file.name),
-      ]);
-      const parsed = this.mergeParsedResponses(descriptionParsed, imageParsed);
+      this.statusLabel.set('Antwort wird verarbeitet…');
+      const parsed = await this.parseWebhookResponse(response, inputReference);
       const runId = `run-${Date.now()}`;
 
       if (parsed.file) {
@@ -157,7 +166,6 @@ export class ProductTextAgentComponent implements OnDestroy {
           base64: parsed.file.size <= MAX_PERSISTED_BINARY_BYTES ? parsed.fileBase64 ?? undefined : undefined,
         };
         this.binaryFileStore.set(runId, storedFile);
-        this.downloadBlob(parsed.file.blob, parsed.file.fileName);
       } else if (parsed.fileBase64 && parsed.fileMeta) {
         this.binaryFileStore.set(runId, {
           fileName: parsed.fileMeta.fileName,
@@ -167,8 +175,8 @@ export class ProductTextAgentComponent implements OnDestroy {
         });
       }
 
-      this.statusLabel.set('Beschreibung und Bild werden gespeichert…');
-      const output = await this.buildOutput(parsed, file.name);
+      this.statusLabel.set('Ergebnis wird gespeichert…');
+      const output = await this.buildOutput(parsed, inputReference);
       const record: RunRecord = {
         id: runId,
         agentId: 'produkttext-agent',
@@ -177,7 +185,7 @@ export class ProductTextAgentComponent implements OnDestroy {
         agentCategory: this.agentMeta.category,
         timestamp: Date.now(),
         inputData: {
-          productImageName: file.name,
+          productReference: inputReference,
         },
         outputSummary: output.generatedFile?.fileName ?? 'Produkttext generiert',
         fullOutput: output,
@@ -190,13 +198,15 @@ export class ProductTextAgentComponent implements OnDestroy {
         agentId: 'produkttext-agent',
         agentName: this.agentMeta.name,
         agentIcon: this.agentMeta.icon,
-        message: `${this.agentMeta.name} hat Produkttext und Datei bereitgestellt.`,
+        message: parsed.file
+          ? `${this.agentMeta.name} hat Produkttext und eine Datei bereitgestellt.`
+          : `${this.agentMeta.name} hat einen Produkttext bereitgestellt.`,
         time: 'Gerade eben',
         read: false,
         link: '/agents/produkttext-agent/result',
       });
 
-      this.statusLabel.set(parsed.file ? 'Beschreibung und Bild bereit ✓' : 'Beschreibung bereit ✓');
+      this.statusLabel.set(parsed.file ? 'Produkttext und Datei bereit ✓' : 'Produkttext bereit ✓');
 
       setTimeout(() => {
         this.router.navigate(['/agents', 'produkttext-agent', 'result'], {
@@ -206,85 +216,77 @@ export class ProductTextAgentComponent implements OnDestroy {
     } catch (error) {
       console.error(error);
       this.errorMessage.set(this.toErrorMessage(error));
-      this.statusLabel.set('Die Antworten der Webhooks sind fehlgeschlagen.');
+      this.statusLabel.set('Der Produkttext-Webhook ist fehlgeschlagen.');
     } finally {
       this.isSubmitting.set(false);
     }
   }
 
-  formatFileSize(bytes: number): string {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  }
+  private buildRequestPayload(): ProductTextRequestPayload | null {
+    const mode = this.inputMode();
+    const rawValue = mode === 'productUrl' ? this.productUrl() : this.imageUrl();
+    const trimmedValue = rawValue.trim();
 
-  private applyFile(file: File | null): void {
-    this.errorMessage.set('');
-
-    if (!file) {
-      return;
+    if (!trimmedValue) {
+      this.errorMessage.set(`${this.activeInputLabel()} ist erforderlich.`);
+      return null;
     }
 
-    if (!file.type.startsWith('image/')) {
-      this.errorMessage.set('Bitte lade ein Bild hoch. Andere Dateitypen werden hier nicht verarbeitet.');
-      return;
+    if (!this.isValidHttpUrl(trimmedValue)) {
+      this.errorMessage.set(`${this.activeInputLabel()} muss mit http:// oder https:// beginnen.`);
+      return null;
     }
 
-    this.selectedFile.set(file);
-    this.updatePreviewUrl(file);
-    this.statusLabel.set('Bild bereit. Du kannst den Produkttext-Agenten jetzt starten.');
-  }
+    const trimmedDescription = this.description().trim();
+    const payload: ProductTextRequestPayload = mode === 'productUrl'
+      ? { productUrl: trimmedValue }
+      : { imageUrl: trimmedValue };
 
-  private updatePreviewUrl(file: File): void {
-    this.revokePreviewUrl();
-    this.previewUrl.set(URL.createObjectURL(file));
-  }
-
-  private revokePreviewUrl(): void {
-    const current = this.previewUrl();
-    if (current) {
-      URL.revokeObjectURL(current);
-      this.previewUrl.set(null);
+    if (trimmedDescription) {
+      payload.description = trimmedDescription;
     }
+
+    return payload;
   }
 
-  private buildFormData(file: File): FormData {
-    const formData = new FormData();
-    formData.append('file', file, file.name);
-    return formData;
+  private buildRequestPayloadPreview(): ProductTextRequestPayload {
+    const productUrl = this.productUrl().trim() || 'https://shop.example.com/produkt/sneaker-x';
+    const imageUrl = this.imageUrl().trim() || 'https://cdn.example.com/produkt-bild.jpg';
+    const description = this.description().trim();
+
+    if (this.inputMode() === 'productUrl') {
+      return description
+        ? { productUrl, description }
+        : {
+            productUrl,
+            description: 'Optional: extra Hinweise für die KI',
+          };
+    }
+
+    return description
+      ? { imageUrl, description }
+      : {
+          imageUrl,
+          description: 'Sneaker fuer Damen, wasserdicht, Groessen 36-42',
+        };
   }
 
-  private mergeParsedResponses(
-    descriptionResponse: ParsedProductTextResponse,
-    imageResponse: ParsedProductTextResponse,
-  ): ParsedProductTextResponse {
-    const descriptionCandidate = this.hasDescription(descriptionResponse)
-      ? descriptionResponse
-      : imageResponse;
-    const fileCandidate = this.hasFilePayload(imageResponse)
-      ? imageResponse
-      : descriptionResponse;
-
-    return {
-      description: descriptionCandidate.description,
-      file: fileCandidate.file,
-      fileMeta: fileCandidate.fileMeta,
-      fileBase64: fileCandidate.fileBase64,
-      mode: this.hasFilePayload(fileCandidate) ? fileCandidate.mode : descriptionCandidate.mode,
-      mimeType: fileCandidate.mimeType ?? descriptionCandidate.mimeType,
-      descriptionSource: descriptionCandidate.descriptionSource,
-      descriptionHeaderName: descriptionCandidate.descriptionHeaderName,
-      fileSource: this.hasFilePayload(fileCandidate) ? fileCandidate.fileSource : 'none',
-    };
+  private isValidHttpUrl(value: string): boolean {
+    try {
+      const parsed = new URL(value);
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch {
+      return false;
+    }
   }
 
   private async buildOutput(
     parsed: ParsedProductTextResponse,
-    uploadedImageName: string,
+    inputReference: string,
   ): Promise<ProductTextOutput> {
     const fallbackDescription = parsed.file
-      ? 'Das Bild wurde erfolgreich zurückgeliefert, aber der Beschreibungs-Webhook hat keinen lesbaren Produkttext geliefert.'
-      : 'Der Beschreibungs-Webhook hat keine lesbare Produktbeschreibung geliefert.';
+      ? 'Die Datei wurde erfolgreich zurueckgeliefert, aber der Produkttext-Webhook hat keinen lesbaren Produkttext geliefert.'
+      : 'Der Produkttext-Webhook hat keine lesbare Produktbeschreibung geliefert.';
 
     let generatedFile: ProductTextOutput['generatedFile'] = null;
 
@@ -316,7 +318,8 @@ export class ProductTextAgentComponent implements OnDestroy {
     return {
       type: 'product-text',
       description: parsed.description || fallbackDescription,
-      uploadedImageName,
+      inputReference,
+      uploadedImageName: inputReference,
       generatedFile,
       responseMeta: {
         mode: parsed.mode,
@@ -330,19 +333,19 @@ export class ProductTextAgentComponent implements OnDestroy {
 
   private async parseWebhookResponse(
     response: Response,
-    uploadedImageName: string,
+    inputReference: string,
   ): Promise<ParsedProductTextResponse> {
-    const multipart = await this.tryParseMultipartResponse(response.clone(), uploadedImageName);
+    const multipart = await this.tryParseMultipartResponse(response.clone(), inputReference);
     if (multipart) {
       return multipart;
     }
 
-    const textual = await this.tryParseTextualResponse(response.clone(), uploadedImageName);
+    const textual = await this.tryParseTextualResponse(response.clone(), inputReference);
     if (textual) {
       return textual;
     }
 
-    const file = await this.extractBinaryFile(response, uploadedImageName);
+    const file = await this.extractBinaryFile(response, inputReference);
     const headerDescription = this.extractDescriptionHeader(response.headers);
     return {
       description: headerDescription?.value ?? '',
@@ -365,7 +368,7 @@ export class ProductTextAgentComponent implements OnDestroy {
 
   private async tryParseMultipartResponse(
     response: Response,
-    uploadedImageName: string,
+    inputReference: string,
   ): Promise<ParsedProductTextResponse | null> {
     const contentType = response.headers.get('content-type')?.toLowerCase() ?? '';
     if (!contentType.startsWith('multipart/')) {
@@ -378,7 +381,7 @@ export class ProductTextAgentComponent implements OnDestroy {
       let description = '';
       let file: ParsedBinaryFile | null = null;
 
-      for (const [key, value] of formData.entries()) {
+      for (const [, value] of formData.entries()) {
         if (typeof value === 'string') {
           if (!description && this.isReadableText(value)) {
             description = value.trim();
@@ -389,12 +392,11 @@ export class ProductTextAgentComponent implements OnDestroy {
         if (!file) {
           file = {
             blob: value,
-            fileName: value.name || this.buildDownloadName(uploadedImageName, value.type),
+            fileName: value.name || this.buildDownloadName(inputReference, value.type),
             mimeType: value.type || 'application/octet-stream',
             size: value.size,
           };
         }
-
       }
 
       return {
@@ -421,7 +423,7 @@ export class ProductTextAgentComponent implements OnDestroy {
 
   private async tryParseTextualResponse(
     response: Response,
-    uploadedImageName: string,
+    inputReference: string,
   ): Promise<ParsedProductTextResponse | null> {
     const contentType = response.headers.get('content-type')?.toLowerCase() ?? '';
     const isLikelyText = contentType.includes('json')
@@ -453,7 +455,7 @@ export class ProductTextAgentComponent implements OnDestroy {
 
     const parsedJson = this.tryParseJson(trimmed);
     if (parsedJson !== null) {
-      return this.normalizeJsonPayload(parsedJson, uploadedImageName, response.headers);
+      return this.normalizeJsonPayload(parsedJson, inputReference, response.headers);
     }
 
     return {
@@ -471,11 +473,11 @@ export class ProductTextAgentComponent implements OnDestroy {
 
   private normalizeJsonPayload(
     value: unknown,
-    uploadedImageName: string,
+    inputReference: string,
     headers?: Headers,
   ): ParsedProductTextResponse {
     const fileBase64 = this.extractBinaryBase64FromPayload(value);
-    const fileMeta = this.extractBinaryMetaFromPayload(value, uploadedImageName);
+    const fileMeta = this.extractBinaryMetaFromPayload(value, inputReference);
     const file = this.createFileFromPayload(fileBase64, fileMeta);
     const headerDescription = this.extractDescriptionHeader(headers);
     const payloadDescription = this.extractDescriptionFromPayload(value);
@@ -494,12 +496,16 @@ export class ProductTextAgentComponent implements OnDestroy {
   }
 
   private extractDescriptionFromPayload(value: unknown): string | undefined {
-    const prioritized = [
+    const strongKeys = [
+      'productText',
+      'product_text',
+      'generatedText',
+      'generated_text',
+      'generatedDescription',
+      'generated_description',
       'productDescription',
       'product_description',
       'produktbeschreibung',
-      'beschreibung',
-      'description',
       'text',
       'body',
       'content',
@@ -507,13 +513,22 @@ export class ProductTextAgentComponent implements OnDestroy {
       'message',
       'caption',
     ];
+    const fallbackKeys = [
+      'beschreibung',
+      'description',
+    ];
 
-    const direct = this.findStringByKeys(value, prioritized);
+    const direct = this.findStringByKeys(value, strongKeys);
     if (direct) {
       return direct;
     }
 
-    return this.findLongText(value);
+    const longText = this.findLongText(value);
+    if (longText) {
+      return longText;
+    }
+
+    return this.findStringByKeys(value, fallbackKeys);
   }
 
   private findStringByKeys(value: unknown, keys: string[]): string | undefined {
@@ -616,7 +631,7 @@ export class ProductTextAgentComponent implements OnDestroy {
 
   private extractBinaryMetaFromPayload(
     value: unknown,
-    uploadedImageName: string,
+    inputReference: string,
   ): ParsedBinaryMeta | null {
     if (!value || typeof value !== 'object') {
       return null;
@@ -624,7 +639,7 @@ export class ProductTextAgentComponent implements OnDestroy {
 
     if (Array.isArray(value)) {
       for (const item of value) {
-        const found = this.extractBinaryMetaFromPayload(item, uploadedImageName);
+        const found = this.extractBinaryMetaFromPayload(item, inputReference);
         if (found) {
           return found;
         }
@@ -633,13 +648,13 @@ export class ProductTextAgentComponent implements OnDestroy {
     }
 
     const record = value as Record<string, unknown>;
-    const direct = this.binaryMetaFromRecord(record, uploadedImageName);
+    const direct = this.binaryMetaFromRecord(record, inputReference);
     if (direct) {
       return direct;
     }
 
     for (const nested of Object.values(record)) {
-      const found = this.extractBinaryMetaFromPayload(nested, uploadedImageName);
+      const found = this.extractBinaryMetaFromPayload(nested, inputReference);
       if (found) {
         return found;
       }
@@ -650,7 +665,7 @@ export class ProductTextAgentComponent implements OnDestroy {
 
   private binaryMetaFromRecord(
     record: Record<string, unknown>,
-    uploadedImageName: string,
+    inputReference: string,
   ): ParsedBinaryMeta | null {
     const fileName = this.toNonEmptyString(record['fileName'])
       ?? this.toNonEmptyString(record['filename'])
@@ -665,7 +680,7 @@ export class ProductTextAgentComponent implements OnDestroy {
     }
 
     return {
-      fileName: fileName ?? this.buildDownloadName(uploadedImageName, mimeType ?? 'application/octet-stream'),
+      fileName: fileName ?? this.buildDownloadName(inputReference, mimeType ?? 'application/octet-stream'),
       mimeType: mimeType ?? 'application/octet-stream',
       size: fileSize ?? 0,
     };
@@ -694,7 +709,7 @@ export class ProductTextAgentComponent implements OnDestroy {
 
   private async extractBinaryFile(
     response: Response,
-    uploadedImageName: string,
+    inputReference: string,
   ): Promise<ParsedBinaryFile | null> {
     const blob = await response.blob();
     if (!blob.size) {
@@ -707,7 +722,7 @@ export class ProductTextAgentComponent implements OnDestroy {
 
     return {
       blob,
-      fileName: this.extractFileNameFromHeaders(response.headers) ?? this.buildDownloadName(uploadedImageName, mimeType),
+      fileName: this.extractFileNameFromHeaders(response.headers) ?? this.buildDownloadName(inputReference, mimeType),
       mimeType,
       size: blob.size,
     };
@@ -751,14 +766,31 @@ export class ProductTextAgentComponent implements OnDestroy {
       return undefined;
     }
 
-    const match = contentDisposition.match(/filename\*?=(?:UTF-8''|")?([^\";]+)/i);
+    const match = contentDisposition.match(/filename\*?=(?:UTF-8''|")?([^";]+)/i);
     return match?.[1] ? decodeURIComponent(match[1].replace(/"/g, '').trim()) : undefined;
   }
 
-  private buildDownloadName(uploadedImageName: string, mimeType: string): string {
-    const baseName = uploadedImageName.replace(/\.[^.]+$/, '') || 'produkttext-output';
+  private buildDownloadName(inputReference: string, mimeType: string): string {
+    const baseName = this.sanitizeFileBaseName(inputReference) || 'produkttext-output';
     const extension = this.extensionForMimeType(mimeType);
     return `${baseName}-output.${extension}`;
+  }
+
+  private sanitizeFileBaseName(value: string): string {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return 'produkttext';
+    }
+
+    const withoutProtocol = trimmed.replace(/^https?:\/\//i, '');
+    const cleaned = withoutProtocol
+      .replace(/[?#].*$/, '')
+      .replace(/\.[a-z0-9]{2,6}$/i, '')
+      .replace(/[^a-z0-9]+/gi, '-')
+      .replace(/^-+|-+$/g, '')
+      .toLowerCase();
+
+    return cleaned.slice(0, 60) || 'produkttext';
   }
 
   private extensionForMimeType(mimeType: string): string {
@@ -812,14 +844,6 @@ export class ProductTextAgentComponent implements OnDestroy {
     }
 
     return /^[A-Za-z0-9+/=\s_-]{32,}$/.test(trimmed) ? trimmed : undefined;
-  }
-
-  private hasDescription(value: ParsedProductTextResponse): boolean {
-    return value.description.trim().length > 0;
-  }
-
-  private hasFilePayload(value: ParsedProductTextResponse): boolean {
-    return !!value.file || !!value.fileMeta || !!value.fileBase64;
   }
 
   private base64ToBlob(base64: string, mimeType: string): Blob {
@@ -900,7 +924,7 @@ export class ProductTextAgentComponent implements OnDestroy {
 
   private async callWebhook(
     urls: readonly string[],
-    formData: FormData,
+    payload: ProductTextRequestPayload,
     label: string,
   ): Promise<Response> {
     let lastError: Error | null = null;
@@ -909,7 +933,10 @@ export class ProductTextAgentComponent implements OnDestroy {
       try {
         const response = await fetch(url, {
           method: 'POST',
-          body: formData,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
         });
 
         if (response.ok) {
@@ -941,19 +968,19 @@ export class ProductTextAgentComponent implements OnDestroy {
       : null;
     const backendMessage = this.toNonEmptyString(record?.['message']);
 
-    if (/Beschreibungs-Webhook|Bild-Webhook/.test(text)) {
+    if (/Produkttext-Webhook/.test(text)) {
       return text;
     }
 
     if (/not registered/i.test(text)) {
-      return 'Mindestens einer der n8n-Webhooks ist aktuell nicht aktiv. Bitte pruefe die produktiven Endpunkte fuer Produktbeschreibung und Produktbild.';
+      return 'Der n8n-Test-Webhook fuer Produkttexte ist aktuell nicht aktiv. Bitte pruefe den Endpoint /webhook-test/seo-product-description.';
     }
 
     if (backendMessage) {
       return `n8n meldet einen Workflow-Fehler: ${backendMessage}`;
     }
 
-    return 'Die Antworten der beiden n8n-Webhooks konnten nicht verarbeitet werden. Bitte versuche es mit einem anderen Bild erneut.';
+    return 'Die Antwort des Produkttext-Webhooks konnte nicht verarbeitet werden. Bitte pruefe Produkt-URL, Bild-URL und optionale Beschreibung.';
   }
 
   private persistSessionRun(record: RunRecord): void {
@@ -962,14 +989,5 @@ export class ProductTextAgentComponent implements OnDestroy {
     } catch {
       // Ignore storage quota issues.
     }
-  }
-
-  private downloadBlob(blob: Blob, fileName: string): void {
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = fileName;
-    anchor.click();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 }

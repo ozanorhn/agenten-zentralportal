@@ -38,7 +38,7 @@
         class="inline-flex items-center gap-2 rounded-xl bg-[#0070FF] px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-[#0060db] disabled:cursor-not-allowed disabled:opacity-50"
       >
         <span class="material-symbols-outlined text-base">download</span>
-        Bild herunterladen
+        Datei herunterladen
       </button>
     </div>
   </div>
@@ -60,19 +60,19 @@
             </div>
             <div>
               <h1 class="text-3xl font-headline font-black tracking-tight text-white md:text-5xl">
-                Produktbeschreibung und Bild
+                Produktbeschreibung
               </h1>
               <p class="mt-3 max-w-2xl text-sm leading-relaxed text-blue-50/75 md:text-base">
-                Dein Bild wurde verarbeitet. Hier siehst du den generierten Produkttext und die zurückgelieferte
-                Bildversion in einer aufgeräumten Ansicht.
+                Hier siehst du den generierten Produkttext. Falls der Webhook zusaetzlich eine Datei zurueckliefert,
+                kannst du sie direkt aus dieser Ansicht herunterladen.
               </p>
             </div>
           </div>
 
           <div class="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur xl:w-[20rem]">
-            <p class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-100/45">Upload</p>
-            <p class="mt-3 text-sm font-semibold text-white break-all">{{ result.uploadedImageName }}</p>
-            <p class="mt-1 text-xs text-blue-100/55">{{ descriptionLength() }} Zeichen Beschreibung</p>
+            <p class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-100/45">Eingabe</p>
+            <p class="mt-3 text-sm font-semibold text-white break-all">{{ result.inputReference }}</p>
+            <p class="mt-1 text-xs text-blue-100/55">{{ descriptionLength() }} Zeichen Produkttext</p>
           </div>
         </div>
       </section>
@@ -83,7 +83,7 @@
             <div>
               <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Produktbeschreibung</p>
               <p class="mt-1 text-sm text-on-surface-variant">
-                Der generierte Text wird hier sauber formatiert dargestellt.
+                Der generierte Text aus dem neuen Produkttext-Webhook wird hier sauber formatiert dargestellt.
               </p>
             </div>
             <button
@@ -111,9 +111,9 @@
                 <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">imagesmode</span>
               </div>
               <div class="min-w-0">
-                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-outline">Bild</p>
+                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-outline">Datei</p>
                 <p class="mt-2 text-sm text-on-surface-variant">
-                  Die zurückgelieferte Bildversion wird hier direkt angezeigt.
+                  Wenn der Webhook eine Datei zurueckgibt, findest du sie hier als Vorschau oder Download.
                 </p>
               </div>
             </div>
@@ -122,13 +122,19 @@
               <div class="mt-5 aspect-[3/2] overflow-hidden rounded-2xl border border-outline-variant/20 bg-surface-container-high/20">
                 <img
                   [src]="generatedPreviewUrl()"
-                  alt="Vom Webhook zurückgeliefertes Bild"
+                  alt="Vom Webhook zurueckgelieferte Datei"
                   class="h-full w-full object-contain"
                 />
               </div>
+            } @else if (fileReady()) {
+              <div class="mt-5 flex aspect-[3/2] items-center justify-center rounded-2xl border border-outline-variant/20 bg-surface-container-high/20 px-6 text-center">
+                <p class="text-sm text-on-surface-variant">
+                  Eine Datei wurde zurueckgegeben, aber sie hat keine direkte Bildvorschau. Du kannst sie trotzdem herunterladen.
+                </p>
+              </div>
             } @else {
               <div class="mt-5 flex aspect-[3/2] items-center justify-center rounded-2xl border border-outline-variant/20 bg-surface-container-high/20 px-6 text-center">
-                <p class="text-sm text-on-surface-variant">Noch kein Bild für die Vorschau verfügbar.</p>
+                <p class="text-sm text-on-surface-variant">Dieser Lauf hat nur Text und keine zusaetzliche Datei geliefert.</p>
               </div>
             }
 
@@ -138,7 +144,7 @@
               class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0070FF] px-5 py-3 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#0060db] disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span class="material-symbols-outlined text-base">download</span>
-              Bild herunterladen
+              Datei herunterladen
             </button>
           </section>
         </aside>
@@ -146,7 +152,7 @@
     } @else {
       <div class="py-24 text-center text-on-surface-variant">
         <span class="material-symbols-outlined mb-4 block text-5xl opacity-30">hourglass_empty</span>
-        <p>Kein Produkttext-Lauf gefunden. Starte den Agenten erneut mit einem Bild.</p>
+        <p>Kein Produkttext-Lauf gefunden. Starte den Agenten erneut mit Produkt-URL oder Bild-URL.</p>
         <button
           (click)="goBack()"
           class="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#0070FF] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0060db]"

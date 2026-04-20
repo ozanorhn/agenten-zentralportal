@@ -60,7 +60,7 @@ export class AgentOutputService {
           input.outline || '## Was ist Content Marketing im B2B?\n## Wie unterscheidet sich B2B von B2C?\n## Welche Formate funktionieren?\n## FAQ',
         );
       case 'produkttext-agent':
-        return this.generateProductTextPlaceholder(input.productImageName || 'produktbild.jpg');
+        return this.generateProductTextPlaceholder(input.productReference || input.productImageName || 'shop.example.com/produkt');
       default:
         return this.generateColdEmail(audience, url, tone);
     }
@@ -257,11 +257,12 @@ export class AgentOutputService {
     };
   }
 
-  private generateProductTextPlaceholder(uploadedImageName: string): ProductTextOutput {
+  private generateProductTextPlaceholder(inputReference: string): ProductTextOutput {
     return {
       type: 'product-text',
-      description: 'Upload ein Produktbild, um hier automatisch die erzeugte Produktbeschreibung aus dem Webhook zu sehen.',
-      uploadedImageName,
+      description: 'Sende eine Produkt-URL oder Bild-URL, um hier automatisch die erzeugte Produktbeschreibung aus dem Webhook zu sehen.',
+      inputReference,
+      uploadedImageName: inputReference,
       generatedFile: null,
       responseMeta: {
         mode: 'empty',

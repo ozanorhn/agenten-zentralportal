@@ -14,22 +14,6 @@
     </p>
   </div>
 
-  <!-- Category Filter -->
-  <div class="flex flex-wrap gap-2 mb-10">
-    @for (cat of categories; track cat) {
-      <button
-        (click)="setCategory(cat)"
-        [class.bg-[#0070FF]]="activeCategory() === cat"
-        [class.text-white]="activeCategory() === cat"
-        [class.bg-surface-container-high]="activeCategory() !== cat"
-        [class.text-on-surface-variant]="activeCategory() !== cat"
-        class="px-5 py-2 rounded-xl text-sm font-bold transition-all duration-200 hover:brightness-110"
-      >
-        {{ cat }}
-      </button>
-    }
-  </div>
-
   <!-- Agent Grid -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
 

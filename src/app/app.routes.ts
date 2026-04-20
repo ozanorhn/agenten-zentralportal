@@ -40,9 +40,19 @@ export const routes: Routes = [
           import('./pages/seo-geo-assistant/seo-geo-assistant').then((m) => m.SeoGeoAssistantComponent),
       },
       {
+        path: 'agents/geo-report-alternative',
+        loadComponent: () =>
+          import('./pages/geo-report-alternative/geo-report-alternative').then((m) => m.GeoReportAlternativeComponent),
+      },
+      {
         path: 'agents/seo-geo-analyse-assistent/result',
         loadComponent: () =>
           import('./pages/seo-geo-assistant/seo-geo-assistant-result').then((m) => m.SeoGeoAssistantResultComponent),
+      },
+      {
+        path: 'agents/geo-report-alternative/result',
+        loadComponent: () =>
+          import('./pages/geo-report-alternative/geo-report-alternative-result').then((m) => m.GeoReportAlternativeResultComponent),
       },
       {
         path: 'agents/:id',

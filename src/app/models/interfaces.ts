@@ -18,6 +18,7 @@ export interface RunInputData {
   wordCount?: number;
   outline?: string;
   productImageName?: string;
+  productReference?: string;
 }
 
 export interface RunRecord {
@@ -324,6 +325,7 @@ export interface ProductTextResponseMeta {
 export interface ProductTextOutput {
   type: 'product-text';
   description: string;
+  inputReference: string;
   uploadedImageName: string;
   generatedFile: ProductTextFileReference | null;
   responseMeta: ProductTextResponseMeta;

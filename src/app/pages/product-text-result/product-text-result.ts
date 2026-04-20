@@ -1,7 +1,6 @@
 import { Component, ViewEncapsulation, computed, inject, signal } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { marked } from 'marked';
 import { AGENTS_MAP } from '../../data/agents.data';
 import { ProductTextOutput, RunRecord } from '../../models/interfaces';
 import {
@@ -10,6 +9,7 @@ import {
 } from '../../services/binary-file-store.service';
 import { RunHistoryService } from '../../services/run-history.service';
 import { ToastService } from '../../services/toast.service';
+import { renderMarkdownToHtml } from '../../utils/markdown.utils';
 
 const PRODUCT_TEXT_SESSION_RUN_KEY = 'product-text:last-run';
 
@@ -44,6 +44,7 @@ export class ProductTextResultComponent {
     const productOutput = output as ProductTextOutput & { responseMeta?: ProductTextOutput['responseMeta'] };
     return {
       ...productOutput,
+      inputReference: productOutput.inputReference ?? productOutput.uploadedImageName,
       responseMeta: productOutput.responseMeta ?? {
         mode: productOutput.generatedFile ? 'binary' : 'text',
         mimeType: productOutput.generatedFile?.mimeType ?? null,
@@ -76,9 +77,7 @@ export class ProductTextResultComponent {
       return null;
     }
 
-    const result = marked.parse(description);
-    const html = typeof result === 'string' ? result : '';
-    return this.sanitizer.bypassSecurityTrustHtml(html);
+    return this.sanitizer.bypassSecurityTrustHtml(renderMarkdownToHtml(description));
   });
 
   goBack(): void {
@@ -102,12 +101,12 @@ export class ProductTextResultComponent {
   downloadGeneratedFile(): void {
     const file = this.resolveDownloadableFile();
     if (!file) {
-      this.toastService.show('Das zurückgelieferte Bild ist in dieser Sitzung nicht mehr verfügbar.', 'error');
+      this.toastService.show('Die zurueckgelieferte Datei ist in dieser Sitzung nicht mehr verfuegbar.', 'error');
       return;
     }
 
     this.downloadBlob(file.blob, file.fileName);
-    this.toastService.show('Bild wird heruntergeladen…', 'info');
+    this.toastService.show('Datei wird heruntergeladen…', 'info');
   }
 
   downloadDescription(): void {

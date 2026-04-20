@@ -28,6 +28,7 @@ import {
   RunInputData,
   RunRecord,
 } from '../../models/interfaces';
+import { extractMarkdownContent } from '../../utils/markdown.utils';
 
 const N8N = environment.n8nBase;
 const LEAD_RESEARCHER_WEBHOOK = `${N8N}/webhook/ac9a9c6c-a2f0-4389-9462-06cc82bebe8b`;
@@ -232,48 +233,12 @@ export class AgentDetail {
   private completeLeadResearcher(rawResponse: string): void {
     const output: MarkdownOutput = {
       type: 'markdown',
-      content: this.extractMarkdownContent(rawResponse),
+      content: extractMarkdownContent(rawResponse),
       companyName: this.companyName(),
       websiteUrl: this.websiteUrl(),
     };
 
     this.saveAndNavigate(output, `Sales Briefing: ${this.companyName()}`);
-  }
-
-  private extractMarkdownContent(raw: string): string {
-    let content = raw.trim();
-
-    // Try to extract from JSON (handles single and double-encoded responses)
-    for (let i = 0; i < 2; i++) {
-      if (!content.startsWith('{') && !content.startsWith('[')) break;
-      try {
-        const parsed = JSON.parse(content);
-        const obj = Array.isArray(parsed) ? parsed[0] : parsed;
-        const extracted: unknown = obj?.briefing ?? obj?.output ?? obj?.body ?? obj?.content;
-        if (typeof extracted === 'string') {
-          content = extracted;
-        } else {
-          break;
-        }
-      } catch {
-        // Malformed JSON — try regex extraction as fallback
-        const match = raw.match(/"(?:briefing|output|body|content)"\s*:\s*"([\s\S]+?)"\s*[,}]/);
-        if (match) {
-          content = match[1].replace(/\\n/g, '\n').replace(/\\r/g, '').replace(/\\"/g, '"');
-        }
-        break;
-      }
-    }
-
-    // Strip leading type-prefix artifact e.g. "markdown\n" that n8n may prepend
-    content = content.replace(/^markdown\r?\n/, '');
-
-    // If no real newlines but literal \n sequences exist, unescape them
-    if (!content.includes('\n') && content.includes('\\n')) {
-      content = content.replace(/\\n/g, '\n');
-    }
-
-    return content;
   }
 
   private runFirmenFinderWorkflow(): void {

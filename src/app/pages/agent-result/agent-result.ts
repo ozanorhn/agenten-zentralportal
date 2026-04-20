@@ -2,7 +2,6 @@ import { DecimalPipe } from '@angular/common';
 import { Component, inject, signal, computed, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { marked } from 'marked';
 import { RunHistoryService } from '../../services/run-history.service';
 import { AgentOutputService } from '../../services/agent-output.service';
 import { ToastService } from '../../services/toast.service';
@@ -26,6 +25,7 @@ import {
   ProductTextOutput,
 } from '../../models/interfaces';
 import { AGENTS_MAP } from '../../data/agents.data';
+import { renderMarkdownToHtml } from '../../utils/markdown.utils';
 
 interface GeoAuditDistributionItem {
   label: string;
@@ -117,16 +117,12 @@ export class AgentResult {
   readonly renderedContentStrategyBrief = computed((): SafeHtml | null => {
     const brief = this.contentStrategyOutput()?.brief;
     if (!brief) return null;
-    const result = marked.parse(brief);
-    const html = typeof result === 'string' ? result : '';
-    return this.sanitizer.bypassSecurityTrustHtml(html);
+    return this.sanitizer.bypassSecurityTrustHtml(renderMarkdownToHtml(brief));
   });
   readonly renderedContentStrategyAnalysis = computed((): SafeHtml | null => {
     const analysis = this.contentStrategyOutput()?.structuredAnalysis;
     if (!analysis) return null;
-    const result = marked.parse(analysis);
-    const html = typeof result === 'string' ? result : '';
-    return this.sanitizer.bypassSecurityTrustHtml(html);
+    return this.sanitizer.bypassSecurityTrustHtml(renderMarkdownToHtml(analysis));
   });
   readonly contentStrategyIntentGroups = computed<ContentStrategyIntentGroup[]>(() =>
     this.buildContentStrategyIntentGroups(this.contentStrategyOutput()?.longTailKeywords ?? [])
@@ -183,30 +179,22 @@ export class AgentResult {
       const escaped = this.escapeHtml(md.content);
       return this.sanitizer.bypassSecurityTrustHtml(`<pre class="geo-audit-report">${escaped}</pre>`);
     }
-    const result = marked.parse(md.content);
-    const html = typeof result === 'string' ? result : '';
-    return this.sanitizer.bypassSecurityTrustHtml(html);
+    return this.sanitizer.bypassSecurityTrustHtml(renderMarkdownToHtml(md.content));
   });
   readonly renderedBlogReport = computed((): SafeHtml | null => {
     const report = this.blogEditorOutput()?.report;
     if (!report) return null;
-    const result = marked.parse(report);
-    const html = typeof result === 'string' ? result : '';
-    return this.sanitizer.bypassSecurityTrustHtml(html);
+    return this.sanitizer.bypassSecurityTrustHtml(renderMarkdownToHtml(report));
   });
   readonly renderedBlogArticle = computed((): SafeHtml | null => {
     const article = this.blogEditorOutput()?.article;
     if (!article) return null;
-    const result = marked.parse(article);
-    const html = typeof result === 'string' ? result : '';
-    return this.sanitizer.bypassSecurityTrustHtml(html);
+    return this.sanitizer.bypassSecurityTrustHtml(renderMarkdownToHtml(article));
   });
   readonly renderedBlogOutline = computed((): SafeHtml | null => {
     const outline = this.blogEditorOutput()?.outline;
     if (!outline) return null;
-    const result = marked.parse(outline);
-    const html = typeof result === 'string' ? result : '';
-    return this.sanitizer.bypassSecurityTrustHtml(html);
+    return this.sanitizer.bypassSecurityTrustHtml(renderMarkdownToHtml(outline));
   });
 
   readonly markdownTitle = computed(() =>
@@ -580,7 +568,7 @@ export class AgentResult {
         break;
       case 'product-text':
         lines.push(
-          `Upload: ${out.uploadedImageName}`,
+          `Eingabe: ${out.inputReference ?? out.uploadedImageName}`,
           `Datei: ${out.generatedFile?.fileName ?? 'Keine Datei erhalten'}`,
           '',
           out.description,
