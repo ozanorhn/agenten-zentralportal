@@ -22,9 +22,7 @@ class RequestError extends Error {
 }
 
 const WEBHOOK_TIMEOUT_MS = 90_000;
-const OVERLAY_MIN_VISIBLE_MS = 1_000;
 const OVERLAY_STEP_ADVANCE_MS = 1_400;
-const OVERLAY_COMPLETE_DELAY_MS = 300;
 const OVERLAY_PROGRESS_STOPS = [18, 36, 58, 78, 92] as const;
 const ANALYSIS_STEPS = [
   'Analysiere Website-Struktur und Crawler-Zugriff...',
@@ -43,7 +41,6 @@ const ANALYSIS_STEPS = [
 export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
   private readonly router = inject(Router);
   private overlayStepTimerId: number | null = null;
-  private overlayStartedAtMs: number | null = null;
 
   readonly environment = environment;
   readonly analysisSteps = ANALYSIS_STEPS;
@@ -104,6 +101,7 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
       );
 
       const rawResponse = await response.text().catch(() => '');
+      const parsedResponse = this.parseJson(rawResponse);
 
       if (!response.ok) {
         console.error('Geo analysis NoLLM webhook error', {
@@ -116,18 +114,20 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
         throw new RequestError('api', response.status, rawResponse);
       }
 
-      const payload = extractGeoWebhookResult(this.parseJson(rawResponse));
+      const payload = extractGeoWebhookResult(parsedResponse);
       if (!payload) {
         throw new RequestError('empty', response.status, rawResponse);
       }
 
-      await this.ensureMinimumOverlayVisibility();
-      await this.completeLoadingOverlay();
-
       const record: StoredSeoGeoReport = {
         id: `seo-geo-nollm-${Date.now()}`,
         createdAt: Date.now(),
-        payload,
+        payload: {
+          ...payload,
+          secondaryQuickWinsLoading: true,
+          secondaryQuickWinsRequested: false,
+          secondaryQuickWinsRequestBody: requestBody,
+        },
       };
 
       saveSeoGeoReport(record);
@@ -160,25 +160,11 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
 
   private startLoadingOverlay(): void {
     this.clearOverlayTimer();
-    this.overlayStartedAtMs = Date.now();
     this.showLoadingOverlay.set(true);
     this.overlayCompleted.set(false);
     this.activeStepIndex.set(0);
     this.overlayProgress.set(OVERLAY_PROGRESS_STOPS[0]);
     this.scheduleNextOverlayStep();
-  }
-
-  private async ensureMinimumOverlayVisibility(): Promise<void> {
-    if (this.overlayStartedAtMs === null) {
-      return;
-    }
-
-    const elapsedMs = Date.now() - this.overlayStartedAtMs;
-    const remainingMs = OVERLAY_MIN_VISIBLE_MS - elapsedMs;
-
-    if (remainingMs > 0) {
-      await this.delay(remainingMs);
-    }
   }
 
   private scheduleNextOverlayStep(): void {
@@ -210,17 +196,8 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
     }, OVERLAY_STEP_ADVANCE_MS);
   }
 
-  private async completeLoadingOverlay(): Promise<void> {
-    this.clearOverlayTimer();
-    this.overlayCompleted.set(true);
-    this.activeStepIndex.set(this.analysisSteps.length - 1);
-    this.overlayProgress.set(100);
-    await this.delay(OVERLAY_COMPLETE_DELAY_MS);
-  }
-
   private resetLoadingOverlay(): void {
     this.clearOverlayTimer();
-    this.overlayStartedAtMs = null;
     this.showLoadingOverlay.set(false);
     this.overlayCompleted.set(false);
     this.activeStepIndex.set(0);
@@ -232,12 +209,6 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
       window.clearTimeout(this.overlayStepTimerId);
       this.overlayStepTimerId = null;
     }
-  }
-
-  private delay(ms: number): Promise<void> {
-    return new Promise((resolve) => {
-      window.setTimeout(resolve, ms);
-    });
   }
 
   private async fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {

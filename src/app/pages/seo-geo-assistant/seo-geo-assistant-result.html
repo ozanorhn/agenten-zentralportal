@@ -97,7 +97,7 @@
           </div>
         </div>
 
-        <div class="mt-4 grid gap-3 md:grid-cols-3">
+        <div class="mt-4 grid gap-3">
           @for (dimension of dimensionCards(); track dimension.key) {
             <article class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 px-4 py-4">
               <div class="flex items-start justify-between gap-3">
@@ -236,101 +236,161 @@
             <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
               <h3 class="text-sm font-medium text-on-surface">Quick Wins</h3>
               <div class="mt-4 space-y-3">
-                @for (quickWin of currentQuickWins(); track quickWin.titel || $index) {
-                  <div class="rounded-2xl bg-surface-container-high/40 px-4 py-4">
-                    <div class="flex items-center justify-between gap-3">
-                      <p class="text-sm font-medium text-on-surface">{{ quickWin.titel }}</p>
-                      <span class="rounded-full px-3 py-1 text-xs" [class]="effortClass(quickWin.aufwand)">Aufwand: {{ quickWin.aufwand || '–' }}</span>
-                    </div>
-                    @if (quickWin.loesung?.length) {
-                      <div class="mt-3 space-y-2">
-                        @for (step of quickWin.loesung ?? []; track step) {
-                          <div class="flex gap-3 text-sm text-on-surface-variant">
-                            <span class="text-outline">→</span>
-                            <span>{{ step }}</span>
-                          </div>
-                        }
-                      </div>
+                @if (secondaryQuickWinsMeta(); as meta) {
+                  <div class="flex flex-wrap items-center gap-2 text-xs text-on-surface-variant">
+                    @if (meta.focus) {
+                      <span class="rounded-full border border-outline-variant/20 bg-surface-container-high/30 px-3 py-1">
+                        Fokus: {{ meta.focus }}
+                      </span>
                     }
-                    @if (quickWin.beispiel) {
-                      <pre class="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-xl border border-outline-variant/20 bg-surface-container-lowest/60 px-3 py-3 text-xs text-on-surface-variant">{{ quickWin.beispiel }}</pre>
-                    }
-                    @if (quickWin.scoreImpact) {
-                      <p class="mt-3 text-sm font-medium text-emerald-300">{{ quickWin.scoreImpact }}</p>
+                    @if (meta.count !== undefined) {
+                      <span class="rounded-full border border-outline-variant/20 bg-surface-container-high/30 px-3 py-1">
+                        {{ meta.count }} Quick Wins
+                      </span>
                     }
                   </div>
-                } @empty {
+                }
+
+                @if (isSecondaryQuickWinsLoading()) {
+                  <div class="rounded-2xl border border-[#0070FF]/15 bg-[#0070FF]/5 px-4 py-4">
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#0070FF]">Zweiter Webhook</p>
+                        <p class="mt-2 text-sm font-medium text-on-surface">Quick Wins werden geladen</p>
+                        <p class="mt-1 text-sm text-on-surface-variant">
+                          {{ secondaryQuickWinsLoadingLabel() }}
+                        </p>
+                      </div>
+
+                      <div class="min-w-[72px] text-right">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-outline">Fortschritt</p>
+                        <p class="mt-2 text-xl font-black text-[#0070FF]">{{ secondaryQuickWinsProgress() }}%</p>
+                      </div>
+                    </div>
+
+                    <div class="mt-4 h-2 overflow-hidden rounded-full bg-outline-variant/20">
+                      <div
+                        class="h-full rounded-full bg-[linear-gradient(90deg,#38bdf8_0%,#0070FF_60%,#7dd3fc_100%)] transition-[width] duration-700 ease-out"
+                        [style.width.%]="secondaryQuickWinsProgress()"
+                      ></div>
+                    </div>
+                  </div>
+                }
+
+                @if (currentQuickWins().length) {
+                  @for (quickWin of currentQuickWins(); track quickWin.titel || $index) {
+                    <div class="rounded-2xl bg-surface-container-high/40 px-4 py-4">
+                      <div class="flex items-center justify-between gap-3">
+                        <p class="text-sm font-medium text-on-surface">{{ quickWin.titel }}</p>
+                        <span class="rounded-full px-3 py-1 text-xs" [class]="effortClass(quickWin.aufwand)">Aufwand: {{ quickWin.aufwand || '–' }}</span>
+                      </div>
+                      @if (quickWin.loesung?.length) {
+                        <div class="mt-3 space-y-2">
+                          @for (step of quickWin.loesung ?? []; track step) {
+                            <div class="flex gap-3 text-sm text-on-surface-variant">
+                              <span class="text-outline">→</span>
+                              <span>{{ step }}</span>
+                            </div>
+                          }
+                        </div>
+                      }
+                      @if (quickWin.beispiel) {
+                        <pre class="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-xl border border-outline-variant/20 bg-surface-container-lowest/60 px-3 py-3 text-xs text-on-surface-variant">{{ quickWin.beispiel }}</pre>
+                      }
+                      @if (quickWin.scoreImpact) {
+                        <p class="mt-3 text-sm font-medium text-emerald-300">{{ quickWin.scoreImpact }}</p>
+                      }
+                    </div>
+                  }
+                } @else if (!isSecondaryQuickWinsLoading()) {
                   <p class="text-sm text-on-surface-variant">Keine Quick Wins im Report vorhanden.</p>
+                }
+
+                @if (agentId === 'seo-geo-analyse-assistent-nollm' && secondaryQuickWinsDebug(); as debug) {
+                  <div class="rounded-2xl border border-amber-500/20 bg-amber-500/5 px-4 py-4">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-amber-300">Debug Quick Wins</p>
+                    <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                      <div class="rounded-xl border border-outline-variant/15 bg-surface-container-high/20 px-3 py-3">
+                        <p class="text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">Request Quelle</p>
+                        <p class="mt-1 text-sm text-on-surface">{{ debug.requestSource || '–' }}</p>
+                      </div>
+                      <div class="rounded-xl border border-outline-variant/15 bg-surface-container-high/20 px-3 py-3">
+                        <p class="text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">HTTP Status</p>
+                        <p class="mt-1 text-sm text-on-surface">{{ debug.responseStatus ?? '–' }}</p>
+                      </div>
+                      <div class="rounded-xl border border-outline-variant/15 bg-surface-container-high/20 px-3 py-3">
+                        <p class="text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">Antwortformat</p>
+                        <p class="mt-1 text-sm text-on-surface">{{ debug.responseShape || '–' }}</p>
+                      </div>
+                      <div class="rounded-xl border border-outline-variant/15 bg-surface-container-high/20 px-3 py-3">
+                        <p class="text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">Erkannte Quick Wins</p>
+                        <p class="mt-1 text-sm text-on-surface">{{ debug.recognizedCount ?? 0 }}</p>
+                      </div>
+                    </div>
+
+                    <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                      <div class="rounded-xl border border-outline-variant/15 bg-surface-container-high/20 px-3 py-3">
+                        <p class="text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">Gestartet</p>
+                        <p class="mt-1 text-sm text-on-surface">{{ debug.startedAt || '–' }}</p>
+                      </div>
+                      <div class="rounded-xl border border-outline-variant/15 bg-surface-container-high/20 px-3 py-3">
+                        <p class="text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">Abgeschlossen</p>
+                        <p class="mt-1 text-sm text-on-surface">{{ debug.completedAt || '–' }}</p>
+                      </div>
+                    </div>
+
+                    @if (debug.topLevelKeys?.length) {
+                      <div class="mt-3 rounded-xl border border-outline-variant/15 bg-surface-container-high/20 px-3 py-3">
+                        <p class="text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">Top-Level Keys</p>
+                        <p class="mt-1 break-words text-sm text-on-surface">{{ debug.topLevelKeys?.join(', ') }}</p>
+                      </div>
+                    }
+
+                    @if (debug.error) {
+                      <div class="mt-3 rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-3">
+                        <p class="text-[10px] uppercase tracking-[0.08em] text-red-200">Fehler</p>
+                        <p class="mt-1 break-words text-sm text-red-100">{{ debug.error }}</p>
+                      </div>
+                    }
+                  </div>
                 }
               </div>
             </div>
 
             @if (activeTab() === 'technik') {
               @if (technicalDetails().length) {
-                <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
-                  <h3 class="text-sm font-medium text-on-surface">Technische Details</h3>
-                  <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    @for (item of technicalDetails(); track item.label) {
-                      <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3">
-                        <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ item.label }}</p>
-                        <p class="mt-2 text-sm font-medium" [class]="detailToneClass(item.tone)">{{ item.value }}</p>
-                      </div>
-                    }
+                <div class="overflow-hidden rounded-[2rem] border border-outline-variant/20 bg-surface-container">
+                  <div class="border-b border-outline-variant/15 px-5 py-5 md:px-6">
+                    <h3 class="text-sm font-medium text-on-surface">Technische Details</h3>
+                  </div>
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                      <thead>
+                        <tr class="border-b border-outline-variant/15 bg-surface-container-high/20">
+                          <th class="px-5 py-4 text-left text-[11px] uppercase tracking-[0.08em] text-on-surface-variant md:px-6">Signal</th>
+                          <th class="px-5 py-4 text-left text-[11px] uppercase tracking-[0.08em] text-on-surface-variant md:px-6">Status</th>
+                          <th class="px-5 py-4 text-right text-[11px] uppercase tracking-[0.08em] text-on-surface-variant md:px-6">Bewertung</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-outline-variant/10">
+                        @for (item of technicalDetails(); track item.label) {
+                          <tr class="bg-surface-container transition-colors hover:bg-surface-container-high/20">
+                            <td class="px-5 py-4 font-medium text-on-surface md:px-6">{{ item.label }}</td>
+                            <td class="px-5 py-4 md:px-6">
+                              <span class="font-medium" [class]="detailToneClass(item.tone)">{{ item.value }}</span>
+                            </td>
+                            <td class="px-5 py-4 text-right md:px-6">
+                              <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold" [class]="detailToneBadgeClass(item.tone)">
+                                {{ detailToneLabel(item.tone) }}
+                              </span>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               }
-
-              @if (fileCheckDetails().length) {
-                <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
-                  <h3 class="text-sm font-medium text-on-surface">Datei-Checks</h3>
-                  <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    @for (item of fileCheckDetails(); track item.label) {
-                      <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3">
-                        <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ item.label }}</p>
-                        <p class="mt-2 text-sm font-medium" [class]="detailToneClass(item.tone)">{{ item.value }}</p>
-                      </div>
-                    }
-                  </div>
-                </div>
-              }
-
-              <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
-                <h3 class="text-sm font-medium text-on-surface">Performance</h3>
-
-                @if (hasPerformanceData()) {
-                  @if (performanceDetails().length) {
-                    <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                      @for (item of performanceDetails(); track item.label) {
-                        <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3">
-                          <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ item.label }}</p>
-                          <p class="mt-2 text-sm font-medium" [class]="detailToneClass(item.tone)">{{ item.value }}</p>
-                        </div>
-                      }
-                    </div>
-                  }
-
-                  @if (performanceIssues().length) {
-                    <div class="mt-4 space-y-2">
-                      @for (issue of performanceIssues(); track issue) {
-                        <div class="flex gap-3 rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3 text-sm text-on-surface-variant">
-                          <span class="text-outline">•</span>
-                          <span>{{ issue }}</span>
-                        </div>
-                      }
-                    </div>
-                  }
-                } @else {
-                  <div class="mt-4 rounded-2xl border border-dashed border-outline-variant/20 bg-surface-container-high/20 px-4 py-6 text-center">
-                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-container-high text-on-surface-variant">
-                      <span class="material-symbols-outlined text-2xl">speed</span>
-                    </div>
-                    <p class="mt-4 text-sm font-medium text-on-surface">Keine Performance-Daten verfügbar</p>
-                    <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">
-                      Für diesen Report wurden keine verwertbaren Core-Web-Vitals- oder Performance-Metriken geliefert.
-                    </p>
-                  </div>
-                }
-              </div>
 
               @if (hasBotAccessibilityData()) {
               <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">

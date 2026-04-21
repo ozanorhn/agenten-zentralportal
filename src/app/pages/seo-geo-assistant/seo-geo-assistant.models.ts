@@ -141,6 +141,22 @@ export interface QuickWin {
   scoreImpact?: string;
 }
 
+export interface SecondaryQuickWinsMeta {
+  focus?: string;
+  count?: number;
+}
+
+export interface SecondaryQuickWinsDebug {
+  startedAt?: string;
+  completedAt?: string;
+  requestSource?: string;
+  responseStatus?: number;
+  responseShape?: string;
+  recognizedCount?: number;
+  error?: string | null;
+  topLevelKeys?: string[];
+}
+
 export interface ReportCategory {
   score?: number;
   status?: string[];
@@ -267,6 +283,12 @@ export interface GeoWebhookResult {
     issues?: string[];
   };
   aiLiveTests?: AiLiveTests;
+  secondaryQuickWins?: QuickWin[];
+  secondaryQuickWinsMeta?: SecondaryQuickWinsMeta;
+  secondaryQuickWinsDebug?: SecondaryQuickWinsDebug;
+  secondaryQuickWinsLoading?: boolean;
+  secondaryQuickWinsRequested?: boolean;
+  secondaryQuickWinsRequestBody?: unknown;
   fileChecks?: {
     securityTxt?: FilePresenceCheck;
     llmsFullTxt?: FilePresenceCheck;
@@ -366,6 +388,8 @@ export interface StoredSeoGeoReport {
   payload: GeoWebhookResult;
 }
 
+export const SEO_GEO_REPORT_UPDATED_EVENT = 'seo-geo-report-updated';
+
 export function extractGeoWebhookResult(data: unknown): GeoWebhookResult | null {
   let parsed = data;
 
@@ -404,6 +428,26 @@ export function saveSeoGeoReport(record: StoredSeoGeoReport): void {
   const filtered = reports.filter((entry) => entry.id !== record.id);
   const updated = [record, ...filtered].slice(0, 10);
   sessionStorage.setItem(SEO_GEO_REPORT_SESSION_KEY, JSON.stringify(updated));
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(SEO_GEO_REPORT_UPDATED_EVENT, {
+      detail: { id: record.id },
+    }));
+  }
+}
+
+export function updateSeoGeoReport(
+  id: string,
+  updater: (record: StoredSeoGeoReport) => StoredSeoGeoReport,
+): StoredSeoGeoReport | null {
+  const existing = findSeoGeoReport(id);
+  if (!existing) {
+    return null;
+  }
+
+  const updated = updater(existing);
+  saveSeoGeoReport(updated);
+  return updated;
 }
 
 export function findSeoGeoReport(id: string | null): StoredSeoGeoReport | null {

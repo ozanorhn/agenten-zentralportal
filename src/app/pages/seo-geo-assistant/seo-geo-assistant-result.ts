@@ -11,9 +11,13 @@ import {
   GeoBreakdownGroup,
   GeoAnalysisJobState,
   GeoAnalysisJobStatusResponse,
+  GeoWebhookInput,
   GeoWebhookResult,
   QuickWin,
   ReportCategory,
+  SecondaryQuickWinsDebug,
+  SecondaryQuickWinsMeta,
+  SEO_GEO_REPORT_UPDATED_EVENT,
   saveSeoGeoReport,
   StoredSeoGeoReport,
 } from './seo-geo-assistant.models';
@@ -22,6 +26,16 @@ type SeoGeoTabKey = 'onpage' | 'technik' | 'offpage' | 'geo';
 type StatusRequestErrorCode = 'network' | 'api';
 
 const STATUS_POLL_INTERVAL_MS = 2_000;
+const SECONDARY_QUICK_WINS_TIMEOUT_MS = 60_000;
+const SECONDARY_QUICK_WINS_PROGRESS_ADVANCE_MS = 900;
+const SECONDARY_QUICK_WINS_PROGRESS_STOPS = [12, 27, 43, 61, 78, 92] as const;
+const SECONDARY_QUICK_WINS_LOADING_STEPS = [
+  'Prioritäten werden aus dem zweiten Webhook abgerufen.',
+  'Aufwand und Score-Impact werden gewichtet.',
+  'Konkrete Maßnahmen und Titel werden aufbereitet.',
+  'Beispiele und Umsetzungsschritte werden ergänzt.',
+  'Quick Wins werden für die Anzeige finalisiert.',
+] as const;
 const LEGACY_DIMENSION_ORDER = ['brand', 'citation', 'eeat', 'technical', 'schema', 'content'] as const;
 type LegacyDimensionKey = typeof LEGACY_DIMENSION_ORDER[number];
 
@@ -81,6 +95,17 @@ interface MetricListItem {
   tone: 'ok' | 'warn' | 'bad' | 'neutral';
 }
 
+interface SecondaryQuickWinsResponse {
+  quickWins: QuickWin[];
+  meta: SecondaryQuickWinsMeta | null;
+  debug: Partial<SecondaryQuickWinsDebug>;
+}
+
+interface SecondaryQuickWinsRequestResolution {
+  body: GeoWebhookInput | null;
+  source: string;
+}
+
 interface ArtifactCard {
   key: string;
   title: string;
@@ -117,6 +142,21 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private pollTimeoutId: number | null = null;
+  private quickWinsProgressTimerId: number | null = null;
+  private secondaryQuickWinsRequestStarted = false;
+  private readonly reportUpdatedListener = ((event: Event) => {
+    const updatedId = (event as CustomEvent<{ id?: string }>).detail?.id;
+    const currentId = this._record()?.id ?? this.reportId;
+    if (updatedId && currentId && updatedId !== currentId) {
+      return;
+    }
+
+    const refreshed = findSeoGeoReport(this.reportId);
+    if (refreshed) {
+      this._record.set(refreshed);
+      this.maybeLoadSecondaryQuickWins();
+    }
+  }) as EventListener;
 
   readonly agentId = (this.route.snapshot.data['agentId'] as string | undefined) ?? 'seo-geo-analyse-assistent';
   readonly agentMeta = AGENTS_MAP[this.agentId];
@@ -137,6 +177,18 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   readonly record = this._record.asReadonly();
   readonly jobStatus = this._jobStatus.asReadonly();
   readonly output = computed<GeoWebhookResult | null>(() => this._record()?.payload ?? null);
+  readonly isSecondaryQuickWinsLoading = computed<boolean>(() => !!this.output()?.secondaryQuickWinsLoading);
+  readonly secondaryQuickWinsMeta = computed<SecondaryQuickWinsMeta | null>(() =>
+    this.output()?.secondaryQuickWinsMeta ?? null,
+  );
+  readonly secondaryQuickWinsDebug = computed<SecondaryQuickWinsDebug | null>(() =>
+    this.output()?.secondaryQuickWinsDebug ?? null,
+  );
+  readonly secondaryQuickWinsProgress = signal(0);
+  readonly secondaryQuickWinsLoadingStepIndex = signal(0);
+  readonly secondaryQuickWinsLoadingLabel = computed<string>(() =>
+    SECONDARY_QUICK_WINS_LOADING_STEPS[this.secondaryQuickWinsLoadingStepIndex()] ?? 'Quick Wins werden geladen.',
+  );
   readonly isPolling = signal(false);
   readonly statusErrorMessage = signal('');
   readonly pendingState = computed<boolean>(() =>
@@ -306,12 +358,13 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     ].filter((item): item is string => !!item);
   });
   readonly technicalDetails = computed<MetricListItem[]>(() => {
+    const fileChecks = this.output()?.fileChecks;
     const technical = this.output()?.technical;
     if (!technical) {
       return [];
     }
 
-    return [
+    const items: MetricListItem[] = [
       {
         label: 'HTTPS',
         value: technical.https ? 'Aktiv' : 'Nicht erkannt',
@@ -338,6 +391,83 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
         tone: technical.hasCanonical ? 'ok' : 'bad',
       },
     ];
+
+    if (technical.hasLlmsFullTxt !== undefined || fileChecks?.llmsFullTxt?.exists !== undefined) {
+      const exists = fileChecks?.llmsFullTxt?.exists ?? technical.hasLlmsFullTxt ?? false;
+      items.push({
+        label: 'llms-full.txt',
+        value: exists ? `${fileChecks?.llmsFullTxt?.wordCount ?? 0} Wörter` : 'Fehlt',
+        tone: exists ? 'ok' : 'warn',
+      });
+    }
+
+    if (technical.hasSecurityTxt !== undefined || fileChecks?.securityTxt?.exists !== undefined) {
+      const exists = fileChecks?.securityTxt?.exists ?? technical.hasSecurityTxt ?? false;
+      items.push({
+        label: 'security.txt',
+        value: exists
+          ? [
+              fileChecks?.securityTxt?.hasContact ? 'Contact' : null,
+              fileChecks?.securityTxt?.hasExpiry ? 'Expiry' : null,
+            ].filter(Boolean).join(' · ') || 'Vorhanden'
+          : 'Fehlt',
+        tone: exists ? 'ok' : 'warn',
+      });
+    }
+
+    if (technical.hasAiPlugin !== undefined || fileChecks?.aiPlugin?.exists !== undefined) {
+      const exists = fileChecks?.aiPlugin?.exists ?? technical.hasAiPlugin ?? false;
+      items.push({
+        label: 'ai-plugin.json',
+        value: exists
+          ? (fileChecks?.aiPlugin?.hasSchema ? 'Schema erkannt' : 'Vorhanden')
+          : 'Fehlt',
+        tone: exists ? 'ok' : 'warn',
+      });
+    }
+
+    if (technical.hasSitemapFile !== undefined) {
+      items.push({
+        label: 'sitemap.xml',
+        value: technical.hasSitemapFile ? 'Vorhanden' : 'Fehlt',
+        tone: technical.hasSitemapFile ? 'ok' : 'bad',
+      });
+    }
+
+    if (technical.urlInSitemap !== undefined) {
+      items.push({
+        label: 'URL in Sitemap',
+        value: technical.urlInSitemap ? 'Ja' : 'Nein',
+        tone: technical.urlInSitemap ? 'ok' : 'bad',
+      });
+    }
+
+    const robots = technical.robotsTxt;
+    if (robots?.exists !== undefined) {
+      items.push({
+        label: 'robots.txt',
+        value: robots.exists ? `Vorhanden (${robots.statusCode ?? '200'})` : 'Fehlt',
+        tone: robots.exists ? 'ok' : 'bad',
+      });
+    }
+
+    if (robots?.hasSitemapHint !== undefined) {
+      items.push({
+        label: 'Sitemap-Hinweis',
+        value: robots.hasSitemapHint ? 'In robots.txt' : 'Fehlt',
+        tone: robots.hasSitemapHint ? 'ok' : 'warn',
+      });
+    }
+
+    if (robots?.blockedBots?.length) {
+      items.push({
+        label: 'Blockierte Bots (robots.txt)',
+        value: robots.blockedBots.join(', '),
+        tone: 'bad',
+      });
+    }
+
+    return items;
   });
   readonly contentDetails = computed<MetricListItem[]>(() => {
     const content = this.output()?.content;
@@ -535,185 +665,6 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
 
     return items;
   });
-  readonly performanceDetails = computed<MetricListItem[]>(() => {
-    const performance = this.output()?.performance;
-    if (!performance) {
-      return [];
-    }
-
-    const items: MetricListItem[] = [];
-
-    if (performance.score !== null && performance.score !== undefined) {
-      items.push({
-        label: 'Performance Score',
-        value: `${performance.score}/100`,
-        tone: performance.score >= 90 ? 'ok' : performance.score >= 70 ? 'warn' : 'bad',
-      });
-    }
-
-    if (performance.cwvCategory) {
-      items.push({
-        label: 'CWV Kategorie',
-        value: performance.cwvCategory,
-        tone: performance.passesCore ? 'ok' : 'warn',
-      });
-    } else if (performance.passesCore !== undefined) {
-      items.push({
-        label: 'Core Web Vitals',
-        value: performance.passesCore ? 'Bestanden' : 'Nicht bestanden',
-        tone: performance.passesCore ? 'ok' : 'bad',
-      });
-    }
-
-    if (performance.lcp !== null && performance.lcp !== undefined) {
-      items.push({
-        label: 'LCP',
-        value: `${performance.lcp}`,
-        tone: performance.lcp <= 2500 ? 'ok' : performance.lcp <= 4000 ? 'warn' : 'bad',
-      });
-    }
-
-    if (performance.cls !== null && performance.cls !== undefined) {
-      items.push({
-        label: 'CLS',
-        value: `${performance.cls}`,
-        tone: performance.cls <= 0.1 ? 'ok' : performance.cls <= 0.25 ? 'warn' : 'bad',
-      });
-    }
-
-    if (performance.tbt !== null && performance.tbt !== undefined) {
-      items.push({
-        label: 'TBT',
-        value: `${performance.tbt}`,
-        tone: performance.tbt <= 200 ? 'ok' : performance.tbt <= 600 ? 'warn' : 'bad',
-      });
-    }
-
-    if (performance.fcp !== null && performance.fcp !== undefined) {
-      items.push({
-        label: 'FCP',
-        value: `${performance.fcp}`,
-        tone: performance.fcp <= 1800 ? 'ok' : performance.fcp <= 3000 ? 'warn' : 'bad',
-      });
-    }
-
-    if (performance.ttfb !== null && performance.ttfb !== undefined) {
-      items.push({
-        label: 'TTFB',
-        value: `${performance.ttfb}`,
-        tone: performance.ttfb <= 800 ? 'ok' : performance.ttfb <= 1800 ? 'warn' : 'bad',
-      });
-    }
-
-    return items;
-  });
-  readonly performanceIssues = computed(() => this.output()?.performance?.issues ?? []);
-  readonly hasPerformanceData = computed(() => {
-    const performance = this.output()?.performance;
-    if (!performance) {
-      return false;
-    }
-
-    return (
-      this.performanceDetails().length > 0 ||
-      this.performanceIssues().length > 0 ||
-      (!!performance.label && performance.label.trim().length > 0)
-    );
-  });
-  readonly fileCheckDetails = computed<MetricListItem[]>(() => {
-    const fileChecks = this.output()?.fileChecks;
-    const technical = this.output()?.technical;
-    const items: MetricListItem[] = [];
-
-    if (technical?.hasLlmsTxt !== undefined) {
-      items.push({
-        label: 'llms.txt',
-        value: technical.hasLlmsTxt ? 'Vorhanden' : 'Fehlt',
-        tone: technical.hasLlmsTxt ? 'ok' : 'bad',
-      });
-    }
-
-    if (technical?.hasLlmsFullTxt !== undefined || fileChecks?.llmsFullTxt?.exists !== undefined) {
-      const exists = fileChecks?.llmsFullTxt?.exists ?? technical?.hasLlmsFullTxt ?? false;
-      items.push({
-        label: 'llms-full.txt',
-        value: exists
-          ? `${fileChecks?.llmsFullTxt?.wordCount ?? 0} Wörter`
-          : 'Fehlt',
-        tone: exists ? 'ok' : 'warn',
-      });
-    }
-
-    if (technical?.hasSecurityTxt !== undefined || fileChecks?.securityTxt?.exists !== undefined) {
-      const exists = fileChecks?.securityTxt?.exists ?? technical?.hasSecurityTxt ?? false;
-      items.push({
-        label: 'security.txt',
-        value: exists
-          ? [
-              fileChecks?.securityTxt?.hasContact ? 'Contact' : null,
-              fileChecks?.securityTxt?.hasExpiry ? 'Expiry' : null,
-            ].filter(Boolean).join(' · ') || 'Vorhanden'
-          : 'Fehlt',
-        tone: exists ? 'ok' : 'warn',
-      });
-    }
-
-    if (technical?.hasAiPlugin !== undefined || fileChecks?.aiPlugin?.exists !== undefined) {
-      const exists = fileChecks?.aiPlugin?.exists ?? technical?.hasAiPlugin ?? false;
-      items.push({
-        label: 'ai-plugin.json',
-        value: exists
-          ? (fileChecks?.aiPlugin?.hasSchema ? 'Schema erkannt' : 'Vorhanden')
-          : 'Fehlt',
-        tone: exists ? 'ok' : 'warn',
-      });
-    }
-
-    if (technical?.hasSitemapFile !== undefined) {
-      items.push({
-        label: 'sitemap.xml',
-        value: technical.hasSitemapFile ? 'Vorhanden' : 'Fehlt',
-        tone: technical.hasSitemapFile ? 'ok' : 'bad',
-      });
-    }
-
-    if (technical?.urlInSitemap !== undefined) {
-      items.push({
-        label: 'URL in Sitemap',
-        value: technical.urlInSitemap ? 'Ja' : 'Nein',
-        tone: technical.urlInSitemap ? 'ok' : 'bad',
-      });
-    }
-
-    const robots = technical?.robotsTxt;
-    if (robots?.exists !== undefined) {
-      items.push({
-        label: 'robots.txt',
-        value: robots.exists
-          ? `Vorhanden (${robots.statusCode ?? '200'})`
-          : 'Fehlt',
-        tone: robots.exists ? 'ok' : 'bad',
-      });
-    }
-
-    if (robots?.hasSitemapHint !== undefined) {
-      items.push({
-        label: 'Sitemap-Hinweis',
-        value: robots.hasSitemapHint ? 'In robots.txt' : 'Fehlt',
-        tone: robots.hasSitemapHint ? 'ok' : 'warn',
-      });
-    }
-
-    if (robots?.blockedBots?.length) {
-      items.push({
-        label: 'Blockierte Bots (robots.txt)',
-        value: robots.blockedBots.join(', '),
-        tone: 'bad',
-      });
-    }
-
-    return items;
-  });
 
   readonly eeatSummary = computed(() => this.output()?.eeat ?? null);
   readonly eeatPresent = computed<string[]>(() => this.output()?.eeat?.present ?? []);
@@ -876,6 +827,9 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   readonly freshnessStatuses = computed(() => this.buildStatusItems(this.output()?.report?.freshness));
 
   constructor() {
+    window.addEventListener(SEO_GEO_REPORT_UPDATED_EVENT, this.reportUpdatedListener);
+    this.maybeLoadSecondaryQuickWins();
+
     if (!this._record() && this.jobId) {
       void this.pollJobStatus();
     }
@@ -883,6 +837,8 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.clearPollTimeout();
+    this.resetSecondaryQuickWinsProgress();
+    window.removeEventListener(SEO_GEO_REPORT_UPDATED_EVENT, this.reportUpdatedListener);
   }
 
   setActiveTab(tab: SeoGeoTabKey): void {
@@ -1076,6 +1032,32 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     }
   }
 
+  detailToneLabel(tone: MetricListItem['tone']): string {
+    switch (tone) {
+      case 'ok':
+        return 'Gut';
+      case 'warn':
+        return 'Hinweis';
+      case 'bad':
+        return 'Kritisch';
+      default:
+        return 'Info';
+    }
+  }
+
+  detailToneBadgeClass(tone: MetricListItem['tone']): string {
+    switch (tone) {
+      case 'ok':
+        return 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-300';
+      case 'warn':
+        return 'border border-amber-500/20 bg-amber-500/10 text-amber-300';
+      case 'bad':
+        return 'border border-red-500/20 bg-red-500/10 text-red-300';
+      default:
+        return 'border border-outline-variant/20 bg-surface-container-high text-on-surface-variant';
+    }
+  }
+
   factIcon(fact: string): string {
     if (this.isNegativeFact(fact)) return 'close';
     if (this.isWarningFact(fact)) return 'priority_high';
@@ -1131,6 +1113,11 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   }
 
   currentQuickWins(): QuickWin[] {
+    const secondaryQuickWins = this.output()?.secondaryQuickWins;
+    if (secondaryQuickWins?.length) {
+      return secondaryQuickWins;
+    }
+
     return this.currentReport()?.quickWins ?? [];
   }
 
@@ -1685,6 +1672,7 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
         saveSeoGeoReport(record);
         this._record.set(record);
         this.isPolling.set(false);
+        this.maybeLoadSecondaryQuickWins();
 
         void this.router.navigate([], {
           relativeTo: this.route,
@@ -1753,6 +1741,344 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     }
 
     return parsed as GeoAnalysisJobStatusResponse;
+  }
+
+  private maybeLoadSecondaryQuickWins(): void {
+    const record = this._record();
+    if (!record || this.secondaryQuickWinsRequestStarted || this.agentId !== 'seo-geo-analyse-assistent-nollm') {
+      return;
+    }
+
+    if (record.payload.secondaryQuickWins?.length) {
+      return;
+    }
+
+    const request = this.resolveSecondaryQuickWinsRequest(record);
+    if (!request.body) {
+      return;
+    }
+
+    this.secondaryQuickWinsRequestStarted = true;
+    const loadingRecord: StoredSeoGeoReport = {
+      ...record,
+      payload: {
+        ...record.payload,
+        secondaryQuickWinsLoading: true,
+        secondaryQuickWinsRequested: true,
+        secondaryQuickWinsRequestBody: request.body,
+        secondaryQuickWinsDebug: {
+          ...record.payload.secondaryQuickWinsDebug,
+          startedAt: new Date().toISOString(),
+          completedAt: undefined,
+          requestSource: request.source,
+          error: null,
+        },
+      },
+    };
+
+    saveSeoGeoReport(loadingRecord);
+    this._record.set(loadingRecord);
+    this.startSecondaryQuickWinsProgress();
+    void this.loadSecondaryQuickWins(loadingRecord);
+  }
+
+  private async loadSecondaryQuickWins(record: StoredSeoGeoReport): Promise<void> {
+    const targetUrl = environment.geoAnalysisNoLlmForwardWebhookUrl;
+    const request = this.resolveSecondaryQuickWinsRequest(record);
+    const requestBody = request.body;
+
+    if (!targetUrl || !requestBody) {
+      this.finishSecondaryQuickWins(record, [], true, null, {
+        requestSource: request.source,
+        error: !targetUrl ? 'Quick-Wins-Webhook URL fehlt.' : 'Kein gültiges Request-Payload gefunden.',
+      });
+      return;
+    }
+
+    try {
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), SECONDARY_QUICK_WINS_TIMEOUT_MS);
+
+      let response: Response;
+      try {
+        response = await fetch(targetUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+          signal: controller.signal,
+        });
+      } finally {
+        window.clearTimeout(timeout);
+      }
+
+      if (!response.ok) {
+        const responseBody = await response.text().catch(() => '');
+        console.error('Geo analysis quick wins webhook error', {
+          status: response.status,
+          url: targetUrl,
+          responseBody,
+        });
+        this.finishSecondaryQuickWins(record, [], false, null, {
+          requestSource: request.source,
+          responseStatus: response.status,
+          error: responseBody || `HTTP ${response.status}`,
+        });
+        return;
+      }
+
+      const raw = await response.text().catch(() => '');
+      const parsedQuickWinsResponse = this.extractSecondaryQuickWinsResponse(this.parseJson(raw));
+      this.finishSecondaryQuickWins(
+        record,
+        parsedQuickWinsResponse.quickWins,
+        true,
+        parsedQuickWinsResponse.meta,
+        {
+          ...parsedQuickWinsResponse.debug,
+          requestSource: request.source,
+          responseStatus: response.status,
+          error: null,
+        },
+      );
+    } catch (error) {
+      console.error('Geo analysis quick wins webhook request failed', {
+        url: targetUrl,
+        error,
+      });
+      this.finishSecondaryQuickWins(record, [], false, null, {
+        requestSource: request.source,
+        error: this.describeSecondaryQuickWinsError(error),
+      });
+    }
+  }
+
+  private finishSecondaryQuickWins(
+    record: StoredSeoGeoReport,
+    quickWins: QuickWin[],
+    requestCompleted: boolean,
+    meta: SecondaryQuickWinsMeta | null = null,
+    debug: Partial<SecondaryQuickWinsDebug> = {},
+  ): void {
+    this.finishSecondaryQuickWinsProgress();
+
+    const updatedRecord: StoredSeoGeoReport = {
+      ...record,
+      payload: {
+        ...record.payload,
+        secondaryQuickWins: quickWins.length ? quickWins : record.payload.secondaryQuickWins,
+        secondaryQuickWinsMeta: meta ?? record.payload.secondaryQuickWinsMeta,
+        secondaryQuickWinsDebug: {
+          ...record.payload.secondaryQuickWinsDebug,
+          ...debug,
+          recognizedCount: quickWins.length,
+          completedAt: new Date().toISOString(),
+        },
+        secondaryQuickWinsLoading: false,
+        secondaryQuickWinsRequested: requestCompleted,
+        secondaryQuickWinsRequestBody: undefined,
+      },
+    };
+
+    saveSeoGeoReport(updatedRecord);
+    this._record.set(updatedRecord);
+  }
+
+  private startSecondaryQuickWinsProgress(): void {
+    this.clearSecondaryQuickWinsProgressTimer();
+    this.secondaryQuickWinsLoadingStepIndex.set(0);
+    this.secondaryQuickWinsProgress.set(SECONDARY_QUICK_WINS_PROGRESS_STOPS[0] ?? 12);
+    this.scheduleNextSecondaryQuickWinsProgress();
+  }
+
+  private scheduleNextSecondaryQuickWinsProgress(): void {
+    this.clearSecondaryQuickWinsProgressTimer();
+
+    this.quickWinsProgressTimerId = window.setTimeout(() => {
+      if (!this.isSecondaryQuickWinsLoading()) {
+        this.clearSecondaryQuickWinsProgressTimer();
+        return;
+      }
+
+      const currentStep = this.secondaryQuickWinsLoadingStepIndex();
+      const lastStepIndex = SECONDARY_QUICK_WINS_PROGRESS_STOPS.length - 1;
+      if (currentStep >= lastStepIndex) {
+        this.secondaryQuickWinsProgress.set(SECONDARY_QUICK_WINS_PROGRESS_STOPS[lastStepIndex] ?? 92);
+        this.clearSecondaryQuickWinsProgressTimer();
+        return;
+      }
+
+      const nextStep = currentStep + 1;
+      this.secondaryQuickWinsLoadingStepIndex.set(nextStep);
+      this.secondaryQuickWinsProgress.set(SECONDARY_QUICK_WINS_PROGRESS_STOPS[nextStep] ?? 92);
+
+      if (nextStep < lastStepIndex) {
+        this.scheduleNextSecondaryQuickWinsProgress();
+      } else {
+        this.clearSecondaryQuickWinsProgressTimer();
+      }
+    }, SECONDARY_QUICK_WINS_PROGRESS_ADVANCE_MS);
+  }
+
+  private finishSecondaryQuickWinsProgress(): void {
+    this.clearSecondaryQuickWinsProgressTimer();
+    this.secondaryQuickWinsLoadingStepIndex.set(SECONDARY_QUICK_WINS_LOADING_STEPS.length - 1);
+    this.secondaryQuickWinsProgress.set(100);
+  }
+
+  private resetSecondaryQuickWinsProgress(): void {
+    this.clearSecondaryQuickWinsProgressTimer();
+    this.secondaryQuickWinsLoadingStepIndex.set(0);
+    this.secondaryQuickWinsProgress.set(0);
+  }
+
+  private clearSecondaryQuickWinsProgressTimer(): void {
+    if (this.quickWinsProgressTimerId !== null) {
+      window.clearTimeout(this.quickWinsProgressTimerId);
+      this.quickWinsProgressTimerId = null;
+    }
+  }
+
+  private extractSecondaryQuickWinsResponse(data: unknown): SecondaryQuickWinsResponse {
+    const parsed = Array.isArray(data) ? (data[0] ?? null) : data;
+    if (!parsed || typeof parsed !== 'object') {
+      return {
+        quickWins: [],
+        meta: null,
+        debug: {
+          responseShape: 'invalid',
+          topLevelKeys: [],
+        },
+      };
+    }
+
+    const payload = parsed as {
+      quickWins?: unknown;
+      quick_wins?: unknown;
+      analysis_meta?: unknown;
+    };
+    const hasCamelCase = Array.isArray(payload.quickWins);
+    const hasSnakeCase = Array.isArray(payload.quick_wins);
+    const quickWinsSource: unknown[] = hasCamelCase
+      ? payload.quickWins as unknown[]
+      : hasSnakeCase
+        ? payload.quick_wins as unknown[]
+        : [];
+    const quickWins = quickWinsSource
+      .map((item: unknown) => this.normalizeQuickWin(item))
+      .filter((item: QuickWin | null): item is QuickWin => item !== null);
+
+    return {
+      quickWins,
+      meta: this.extractSecondaryQuickWinsMeta(payload.analysis_meta),
+      debug: {
+        responseShape: hasCamelCase ? 'quickWins' : hasSnakeCase ? 'quick_wins' : 'unknown',
+        topLevelKeys: Object.keys(payload),
+      },
+    };
+  }
+
+  private normalizeQuickWin(item: unknown): QuickWin | null {
+    if (!item || typeof item !== 'object') {
+      return null;
+    }
+
+    const raw = item as {
+      titel?: unknown;
+      loesung?: unknown;
+      beispiel?: unknown;
+      aufwand?: unknown;
+      scoreImpact?: unknown;
+      score_impact?: unknown;
+    };
+
+    return {
+      titel: typeof raw.titel === 'string' ? raw.titel : undefined,
+      loesung: Array.isArray(raw.loesung) ? raw.loesung.filter((entry): entry is string => typeof entry === 'string') : undefined,
+      beispiel: typeof raw.beispiel === 'string' ? raw.beispiel : undefined,
+      aufwand: typeof raw.aufwand === 'string' ? raw.aufwand : undefined,
+      scoreImpact: typeof raw.scoreImpact === 'string'
+        ? raw.scoreImpact
+        : typeof raw.score_impact === 'string'
+          ? raw.score_impact
+          : undefined,
+    };
+  }
+
+  private extractSecondaryQuickWinsMeta(value: unknown): SecondaryQuickWinsMeta | null {
+    if (!value || typeof value !== 'object') {
+      return null;
+    }
+
+    const meta = value as { focus?: unknown; count?: unknown };
+    return {
+      focus: typeof meta.focus === 'string' ? meta.focus : undefined,
+      count: typeof meta.count === 'number' ? meta.count : undefined,
+    };
+  }
+
+  private resolveSecondaryQuickWinsRequest(record: StoredSeoGeoReport): SecondaryQuickWinsRequestResolution {
+    const storedRequest = this.extractSecondaryQuickWinsInput(record.payload.secondaryQuickWinsRequestBody);
+    if (storedRequest) {
+      return {
+        body: storedRequest,
+        source: 'secondaryQuickWinsRequestBody',
+      };
+    }
+
+    const payloadInput = this.extractSecondaryQuickWinsInput(record.payload.input);
+    if (payloadInput) {
+      return {
+        body: payloadInput,
+        source: 'payload.input',
+      };
+    }
+
+    return {
+      body: null,
+      source: 'unavailable',
+    };
+  }
+
+  private extractSecondaryQuickWinsInput(value: unknown): GeoWebhookInput | null {
+    const candidate = Array.isArray(value) ? (value[0] ?? null) : value;
+    if (!candidate || typeof candidate !== 'object') {
+      return null;
+    }
+
+    const nestedInput = (candidate as { input?: unknown }).input;
+    if (nestedInput) {
+      const extractedNested = this.extractSecondaryQuickWinsInput(nestedInput);
+      if (extractedNested) {
+        return extractedNested;
+      }
+    }
+
+    const { url, brand, industry, location } = candidate as GeoWebhookInput;
+    if (![url, brand, industry, location].some((entry) => typeof entry === 'string' && entry.trim().length > 0)) {
+      return null;
+    }
+
+    return {
+      url: typeof url === 'string' ? url : undefined,
+      brand: typeof brand === 'string' ? brand : undefined,
+      industry: typeof industry === 'string' ? industry : undefined,
+      location: typeof location === 'string' ? location : undefined,
+    };
+  }
+
+  private describeSecondaryQuickWinsError(error: unknown): string {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return 'Request wurde wegen Timeout abgebrochen.';
+    }
+
+    if (error instanceof Error && error.message) {
+      return error.message;
+    }
+
+    return 'Unbekannter Fehler beim Laden der Quick Wins.';
   }
 
   private parseJson(raw: string): unknown {
