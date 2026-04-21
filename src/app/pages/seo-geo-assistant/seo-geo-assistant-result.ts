@@ -60,6 +60,7 @@ interface DimensionCard {
   indicator: string;
   statusLabel: string;
   icon: string;
+  infoNote: string | null;
   facts: DimensionFact[];
 }
 
@@ -122,6 +123,7 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   readonly reportId = this.route.snapshot.queryParamMap.get('reportId');
   readonly jobId = this.route.snapshot.queryParamMap.get('jobId');
   readonly activeTab = signal<SeoGeoTabKey>('onpage');
+  readonly openDimensionNoteKey = signal<string | null>(null);
   readonly tabs: TabDefinition[] = [
     { key: 'onpage', label: 'Content & Onpage' },
     { key: 'technik', label: 'Technische Basis' },
@@ -1086,6 +1088,14 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     return 'text-emerald-300';
   }
 
+  toggleDimensionNote(key: string): void {
+    this.openDimensionNoteKey.set(this.openDimensionNoteKey() === key ? null : key);
+  }
+
+  isDimensionNoteOpen(key: string): boolean {
+    return this.openDimensionNoteKey() === key;
+  }
+
   currentTabLabel(): string {
     return this.tabs.find((tab) => tab.key === this.activeTab())?.label ?? 'Report';
   }
@@ -1202,6 +1212,7 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
           indicator: this.scoreIndicator(dimension.score),
           statusLabel: this.scoreStatus(dimension.score),
           icon: this.dimensionIcon(key),
+          infoNote: this.dimensionImportanceNote(key, 'Marken-Erkennung'),
           facts: this.dimensionFacts(dimension),
         };
       }
@@ -1263,6 +1274,7 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
       indicator: this.scoreIndicator(score),
       statusLabel: this.scoreStatus(score),
       icon: this.dimensionIcon(legacyKey),
+      infoNote: this.dimensionImportanceNote(legacyKey, label),
       facts,
     };
   }
@@ -1460,8 +1472,44 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
       indicator: dimension.indicator ?? this.scoreIndicator(dimension.score),
       statusLabel: dimension.status ?? dimension.label_text ?? this.scoreStatus(dimension.score),
       icon: this.dimensionIcon(dimension.key),
+      infoNote: this.dimensionImportanceNote(dimension.key, dimension.label),
       facts: this.dimensionFacts(dimension),
     };
+  }
+
+  private dimensionImportanceNote(key?: string | null, label?: string | null): string | null {
+    const normalizedKey = (key ?? '').trim().toLowerCase();
+    const normalizedLabel = (label ?? '').trim().toLowerCase();
+
+    if (
+      normalizedKey === 'brand' ||
+      normalizedKey === 'brandretrieval' ||
+      normalizedLabel === 'marken-erkennung'
+    ) {
+      return 'Eine klare Marken-Erkennung hilft KI-Systemen, Ihr Unternehmen eindeutig derselben Entitaet zuzuordnen - ueber Website, Erwahnungen, Profile und Quellen hinweg. Wenn Name, Marke und Signale inkonsistent oder zu schwach sind, wird Ihre Marke seltener korrekt erkannt, verwechselt oder in Antworten gar nicht erst beruecksichtigt.';
+    }
+
+    if (normalizedKey === 'schema' || normalizedLabel === 'strukturierte daten') {
+      return 'Strukturierte Daten (Schema.org / JSON-LD) sind die maschinenlesbare Grundlage fuer KI-Systeme und Suchmaschinen. Sie helfen dabei, Inhalte eindeutig zuzuordnen, zum Beispiel Unternehmen, Artikel, FAQ oder Produkte. Ohne diese Markierungen muss die KI Inhalte selbst interpretieren - was oft zu Fehlinterpretationen oder fehlender Zitierung fuehrt.';
+    }
+
+    if (normalizedKey === 'citation' || normalizedLabel === 'zitierfaehigkeit') {
+      return 'KI-Suchsysteme bevorzugen klar abgegrenzte, faktenreiche und modular aufgebaute Inhalte. Besonders Inhalte mit Frage-Antwort-Struktur werden haeufiger zitiert. Wenn Inhalte nicht klar formuliert oder zu verschachtelt sind, werden sie oft umgeschrieben oder gar nicht als Quelle verwendet.';
+    }
+
+    if (normalizedKey === 'eeat' || normalizedLabel === 'expertise & e-e-a-t') {
+      return 'E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness) ist ein Signal fuer Vertrauenswuerdigkeit. KI-Systeme bevorzugen Inhalte mit klar erkennbarem Autor, Veroeffentlichungsdatum und externen Quellen. Ohne diese Signale wirkt eine Seite weniger glaubwuerdig und wird seltener als Referenz genutzt.';
+    }
+
+    if (normalizedKey === 'technical' || normalizedLabel === 'technische basis') {
+      return 'Technische Faktoren wie Ladegeschwindigkeit, Serverantwortzeit (TTFB) und Crawler-Zugaenglichkeit entscheiden darueber, ob KI-Systeme Inhalte ueberhaupt lesen koennen. Wenn Bots blockiert werden oder die Seite zu langsam ist, bleibt der Inhalt fuer KI-Suchmaschinen praktisch unsichtbar.';
+    }
+
+    if (normalizedKey === 'content' || normalizedLabel === 'content-struktur') {
+      return 'Eine klare Struktur mit H1, H2, Absaetzen, Alt-Texten und Meta-Tags hilft KI-Systemen, Inhalte korrekt zu verstehen und zu segmentieren. Unstrukturierte oder zu kurze Inhalte werden schlechter verarbeitet und seltener vollstaendig in Antworten integriert.';
+    }
+
+    return null;
   }
 
   private breakdownFacts(group?: GeoBreakdownGroup): DimensionFact[] {
