@@ -44,6 +44,7 @@ export interface ScoreSummary {
   median?: number;
   improvementPotential?: number;
   diffToMedian?: number;
+  criticalIssues?: number;
 }
 
 export interface DimensionScore {
@@ -152,6 +153,7 @@ export interface GeoArtifacts {
   breadcrumbSchema?: string;
   websiteSchema?: string;
   llmsTxt?: string;
+  sitemapEntry?: string;
   schemaAnalysis?: GeoSchemaAnalysis;
 }
 
@@ -160,8 +162,40 @@ export interface GeoReport {
   onpage?: ReportCategory;
   technik?: ReportCategory;
   offpage?: ReportCategory;
+  freshness?: ReportCategory;
   geo?: GeoReportSection;
   artifacts?: GeoArtifacts;
+}
+
+export interface FilePresenceCheck {
+  exists?: boolean;
+  hasContact?: boolean;
+  hasExpiry?: boolean;
+  wordCount?: number;
+  hasContext?: boolean;
+  hasSchema?: boolean;
+}
+
+export interface AiLiveTestResult {
+  mentioned?: boolean;
+  rank?: number | null;
+  text?: string;
+  citations?: string[];
+  intent?: string;
+}
+
+export interface AiLiveTests {
+  summary?: {
+    totalTests?: number;
+    mentionedIn?: number;
+    visibilityScore?: number;
+    visibilityLabel?: string;
+  };
+  perplexityInformational?: AiLiveTestResult;
+  perplexityCommercial?: AiLiveTestResult;
+  perplexityComparison?: AiLiveTestResult;
+  chatGPT?: AiLiveTestResult;
+  gemini?: AiLiveTestResult;
 }
 
 export interface GeoWebhookResult {
@@ -175,12 +209,35 @@ export interface GeoWebhookResult {
   dimensions?: DimensionScore[];
   aiPlatforms?: AiPlatformScore[];
   botAccessibilityCheck?: BotAccessibilityCheck;
+  performance?: {
+    score?: number | null;
+    label?: string | null;
+    lcp?: number | null;
+    cls?: number | null;
+    tbt?: number | null;
+    fcp?: number | null;
+    ttfb?: number | null;
+    cwvCategory?: string | null;
+    passesCore?: boolean;
+    issues?: string[];
+  };
+  aiLiveTests?: AiLiveTests;
+  fileChecks?: {
+    securityTxt?: FilePresenceCheck;
+    llmsFullTxt?: FilePresenceCheck;
+    aiPlugin?: FilePresenceCheck;
+  };
   technical?: {
     aiBotsAllowed?: boolean;
     hasLlmsTxt?: boolean;
+    hasLlmsFullTxt?: boolean;
+    hasSecurityTxt?: boolean;
+    hasAiPlugin?: boolean;
     isSSR?: boolean;
     hasCanonical?: boolean;
     https?: boolean;
+    hasSitemapFile?: boolean;
+    urlInSitemap?: boolean;
   };
   content?: {
     wordCount?: number;
@@ -188,6 +245,16 @@ export interface GeoWebhookResult {
     h2QuestionCount?: number;
     hasVisibleAuthor?: boolean;
     semanticDensity?: number;
+    internalLinkCount?: number;
+    hasMultimedia?: boolean;
+    multimediaList?: string[];
+  };
+  freshness?: {
+    days?: number;
+    dateModified?: string;
+    datePublished?: string;
+    urlInSitemap?: boolean;
+    score?: number;
   };
   authority?: {
     hasWikidata?: boolean;
@@ -197,6 +264,7 @@ export interface GeoWebhookResult {
     refDomains?: number;
     socialPlatforms?: string[];
     validatedSocialLinks?: number;
+    sameAsCount?: number;
   };
   report?: GeoReport;
 }

@@ -1,0 +1,130 @@
+<h2>Radar Chart: Welche Richtung passt zu eurem Frontend?</h2>
+<p class="subtitle">Ziel: bessere Lesbarkeit, kein fremder heller Kasten, klarer KI/GEO-Look im Stil der bestehenden Result-Seite.</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">A · Bestehendes Bild neu gerahmt</div>
+        <div class="mockup-body">
+          <div style="padding:18px;border-radius:22px;background:linear-gradient(180deg,#111827,#0f172a);color:#fff;border:1px solid rgba(148,163,184,.18);">
+            <div style="display:flex;justify-content:space-between;align-items:start;gap:12px;">
+              <div>
+                <div class="label" style="color:#93c5fd;">Radar Chart</div>
+                <div style="font-weight:800;font-size:20px;line-height:1.1;margin-top:8px;">Bestehende Grafik, aber besser eingebettet</div>
+              </div>
+              <div style="padding:8px 10px;border-radius:999px;background:rgba(0,112,255,.14);color:#bfdbfe;font-size:12px;font-weight:700;">Quick Win</div>
+            </div>
+            <div style="margin-top:16px;padding:14px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,184,.14);">
+              <div style="height:150px;border-radius:16px;background:#d9d9d9;display:flex;align-items:center;justify-content:center;color:#666;font-size:12px;">Backend Radar Image</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+              <div style="padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);font-size:12px;">dunklere Karte</div>
+              <div style="padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);font-size:12px;">bessere Einfassung</div>
+              <div style="padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);font-size:12px;">gleiche Datenquelle</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Bild behalten</h3>
+      <p>Schnellste Lösung. Verbessert die Karte, löst aber nicht das Grundproblem der blassen weißen Grafik.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">B · Frontend-nativer Radar Chart</div>
+        <div class="mockup-body">
+          <div style="padding:18px;border-radius:22px;background:radial-gradient(circle at top,#12396f 0%,#0a1830 45%,#09111f 100%);color:#fff;border:1px solid rgba(96,165,250,.22);box-shadow:0 0 0 1px rgba(125,211,252,.08),0 20px 50px rgba(0,0,0,.35);">
+            <div style="display:flex;justify-content:space-between;align-items:start;gap:12px;">
+              <div>
+                <div class="label" style="color:#7dd3fc;">GEO Signal Map</div>
+                <div style="font-weight:800;font-size:20px;line-height:1.1;margin-top:8px;">Radar direkt im Stil eurer UI</div>
+              </div>
+              <div style="padding:8px 10px;border-radius:999px;background:rgba(34,197,94,.14);color:#bbf7d0;font-size:12px;font-weight:700;">Empfohlen</div>
+            </div>
+            <div style="margin-top:18px;display:flex;justify-content:center;">
+              <div style="position:relative;width:200px;height:200px;">
+                <svg viewBox="0 0 200 200" style="width:100%;height:100%;">
+                  <polygon points="100,22 165,60 165,138 100,178 35,138 35,60" fill="none" stroke="rgba(148,163,184,.32)" stroke-width="1.5"/>
+                  <polygon points="100,42 147,70 147,130 100,158 53,130 53,70" fill="none" stroke="rgba(148,163,184,.24)" stroke-width="1.5"/>
+                  <polygon points="100,60 134,81 134,119 100,140 66,119 66,81" fill="none" stroke="rgba(148,163,184,.18)" stroke-width="1.5"/>
+                  <line x1="100" y1="22" x2="100" y2="178" stroke="rgba(148,163,184,.22)" />
+                  <line x1="35" y1="60" x2="165" y2="138" stroke="rgba(148,163,184,.22)" />
+                  <line x1="35" y1="138" x2="165" y2="60" stroke="rgba(148,163,184,.22)" />
+                  <polygon points="100,55 148,74 144,120 100,145 62,126 66,78" fill="rgba(53,194,255,.24)" stroke="#35c2ff" stroke-width="3"/>
+                </svg>
+                <div style="position:absolute;left:50%;top:-4px;transform:translateX(-50%);font-size:11px;color:#cbd5e1;">Brand</div>
+                <div style="position:absolute;right:-2px;top:46px;font-size:11px;color:#cbd5e1;">Zuverlässigkeit</div>
+                <div style="position:absolute;right:4px;bottom:48px;font-size:11px;color:#cbd5e1;">E-E-A-T</div>
+                <div style="position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);font-size:11px;color:#cbd5e1;">Technik</div>
+                <div style="position:absolute;left:6px;bottom:48px;font-size:11px;color:#cbd5e1;">Schema</div>
+                <div style="position:absolute;left:-4px;top:46px;font-size:11px;color:#cbd5e1;">Content</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:16px;">
+              <div style="padding:8px 10px;border-radius:14px;background:rgba(255,255,255,.06);font-size:12px;">Brand 54</div>
+              <div style="padding:8px 10px;border-radius:14px;background:rgba(255,255,255,.06);font-size:12px;">E-E-A-T 72</div>
+              <div style="padding:8px 10px;border-radius:14px;background:rgba(255,255,255,.06);font-size:12px;">Schema 46</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Neu im Frontend zeichnen</h3>
+      <p>Stärkste Lösung. Der Chart wirkt wie Teil des Produkts und wird deutlich besser lesbar auf dunklem Untergrund.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">C · Radar plus Metrik-Schiene</div>
+        <div class="mockup-body">
+          <div style="padding:18px;border-radius:22px;background:linear-gradient(180deg,#0b1323,#111827);color:#fff;border:1px solid rgba(148,163,184,.18);">
+            <div class="label" style="color:#93c5fd;">Insight Panel</div>
+            <div style="font-weight:800;font-size:20px;line-height:1.1;margin-top:8px;">Chart mit klaren Scores daneben</div>
+            <div style="display:grid;grid-template-columns:1fr 120px;gap:14px;align-items:center;margin-top:16px;">
+              <div style="height:180px;border-radius:18px;background:radial-gradient(circle at center,rgba(0,112,255,.18),rgba(255,255,255,.02));border:1px solid rgba(96,165,250,.18);display:flex;align-items:center;justify-content:center;">
+                <div style="width:122px;height:122px;border-radius:999px;border:2px solid #35c2ff;box-shadow:0 0 0 24px rgba(53,194,255,.07),0 0 0 48px rgba(53,194,255,.04);"></div>
+              </div>
+              <div style="display:grid;gap:8px;">
+                <div style="padding:9px 10px;border-radius:14px;background:rgba(255,255,255,.06);font-size:12px;">Brand 54</div>
+                <div style="padding:9px 10px;border-radius:14px;background:rgba(255,255,255,.06);font-size:12px;">Content 68</div>
+                <div style="padding:9px 10px;border-radius:14px;background:rgba(255,255,255,.06);font-size:12px;">E-E-A-T 72</div>
+                <div style="padding:9px 10px;border-radius:14px;background:rgba(255,255,255,.06);font-size:12px;">Technik 64</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Chart plus Zahlenrail</h3>
+      <p>Am erklärendsten, aber auch dichter. Gut, wenn der Block eher “Analyse-Panel” als reine Visualisierung sein soll.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>Empfehlung</h4>
+      <ul>
+        <li><strong>B</strong> löst den Stilbruch am saubersten.</li>
+        <li>Wir könnten den Chart direkt aus den vorhandenen `dimensions` rendern und wären nicht mehr vom blassen Bild-Look abhängig.</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>Wichtiger Tradeoff</h4>
+      <ul>
+        <li><strong>A</strong> ist schneller, bleibt aber visuell halbherzig.</li>
+        <li><strong>B/C</strong> sind etwas mehr Frontend-Arbeit, zahlen aber spürbar auf Produktqualität ein.</li>
+      </ul>
+    </div>
+  </div>
+</div>

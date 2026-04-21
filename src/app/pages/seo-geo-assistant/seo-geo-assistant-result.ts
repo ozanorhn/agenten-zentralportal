@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AGENTS_MAP } from '../../data/agents.data';
 import {
+  AiLiveTestResult,
   BotCategoryItem,
   DimensionScore,
   extractGeoWebhookResult,
@@ -16,7 +17,7 @@ import {
   StoredSeoGeoReport,
 } from './seo-geo-assistant.models';
 
-type SeoGeoTabKey = 'onpage' | 'technik' | 'offpage' | 'geo';
+type SeoGeoTabKey = 'onpage' | 'technik' | 'offpage' | 'freshness' | 'geo';
 type StatusRequestErrorCode = 'network' | 'api';
 
 const STATUS_POLL_INTERVAL_MS = 2_000;
@@ -72,6 +73,16 @@ interface ArtifactCard {
   content: string;
 }
 
+interface AiLiveTestCard {
+  key: string;
+  title: string;
+  mentioned: boolean;
+  rank: number | null;
+  intent: string;
+  excerpt: string;
+  citations: string[];
+}
+
 class StatusRequestError extends Error {
   constructor(
     public readonly code: StatusRequestErrorCode,
@@ -101,6 +112,7 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     { key: 'onpage', label: 'Content & Onpage' },
     { key: 'technik', label: 'Technische Basis' },
     { key: 'offpage', label: 'Autorität & Offpage' },
+    { key: 'freshness', label: 'Freshness' },
     { key: 'geo', label: 'AI' },
   ];
 
@@ -124,8 +136,6 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   readonly currentJobStatusLabel = computed<string>(() =>
     this.toStatusLabel(this.jobStatus()?.status),
   );
-  readonly executiveSummary = computed(() => this.output()?.report?.executiveSummary ?? []);
-  readonly radarChartUrl = computed(() => this.output()?.visuals?.radarChart ?? null);
 
   readonly scoreBoxes = computed<ScoreBox[]>(() => {
     const out = this.output();
@@ -334,6 +344,30 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
       });
     }
 
+    if (content.internalLinkCount !== undefined) {
+      items.push({
+        label: 'Interne Links',
+        value: `${content.internalLinkCount}`,
+        tone: content.internalLinkCount >= 20 ? 'ok' : content.internalLinkCount >= 8 ? 'warn' : 'bad',
+      });
+    }
+
+    if (content.hasMultimedia !== undefined) {
+      items.push({
+        label: 'Multimedia',
+        value: content.hasMultimedia ? 'Vorhanden' : 'Nicht erkannt',
+        tone: content.hasMultimedia ? 'ok' : 'warn',
+      });
+    }
+
+    if (content.multimediaList?.length) {
+      items.push({
+        label: 'Medien',
+        value: content.multimediaList.join(', '),
+        tone: 'neutral',
+      });
+    }
+
     return items;
   });
   readonly authorityDetails = computed<MetricListItem[]>(() => {
@@ -373,11 +407,12 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
       });
     }
 
-    if (authority.validatedSocialLinks !== undefined) {
+    const sameAsCount = authority.sameAsCount ?? authority.validatedSocialLinks;
+    if (sameAsCount !== undefined) {
       items.push({
-        label: 'Validierte Social Links',
-        value: `${authority.validatedSocialLinks}`,
-        tone: authority.validatedSocialLinks >= 5 ? 'ok' : 'warn',
+        label: 'sameAs Links',
+        value: `${sameAsCount}`,
+        tone: sameAsCount >= 5 ? 'ok' : 'warn',
       });
     }
 
@@ -390,6 +425,280 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     }
 
     return items;
+  });
+  readonly freshnessDetails = computed<MetricListItem[]>(() => {
+    const freshness = this.output()?.freshness;
+    if (!freshness) {
+      return [];
+    }
+
+    const items: MetricListItem[] = [];
+
+    if (freshness.score !== undefined) {
+      items.push({
+        label: 'Freshness Score',
+        value: `${freshness.score}/100`,
+        tone: freshness.score >= 80 ? 'ok' : freshness.score >= 60 ? 'warn' : 'bad',
+      });
+    }
+
+    if (freshness.days !== undefined) {
+      items.push({
+        label: 'Letztes Update',
+        value: `${freshness.days} Tage`,
+        tone: freshness.days <= 45 ? 'ok' : freshness.days <= 180 ? 'warn' : 'bad',
+      });
+    }
+
+    if (freshness.dateModified) {
+      items.push({
+        label: 'dateModified',
+        value: freshness.dateModified,
+        tone: 'neutral',
+      });
+    }
+
+    if (freshness.datePublished) {
+      items.push({
+        label: 'datePublished',
+        value: freshness.datePublished,
+        tone: 'neutral',
+      });
+    }
+
+    if (freshness.urlInSitemap !== undefined) {
+      items.push({
+        label: 'In Sitemap',
+        value: freshness.urlInSitemap ? 'Ja' : 'Nein',
+        tone: freshness.urlInSitemap ? 'ok' : 'bad',
+      });
+    }
+
+    return items;
+  });
+  readonly performanceDetails = computed<MetricListItem[]>(() => {
+    const performance = this.output()?.performance;
+    if (!performance) {
+      return [];
+    }
+
+    const items: MetricListItem[] = [];
+
+    if (performance.score !== null && performance.score !== undefined) {
+      items.push({
+        label: 'Performance Score',
+        value: `${performance.score}/100`,
+        tone: performance.score >= 90 ? 'ok' : performance.score >= 70 ? 'warn' : 'bad',
+      });
+    }
+
+    if (performance.cwvCategory) {
+      items.push({
+        label: 'CWV Kategorie',
+        value: performance.cwvCategory,
+        tone: performance.passesCore ? 'ok' : 'warn',
+      });
+    } else if (performance.passesCore !== undefined) {
+      items.push({
+        label: 'Core Web Vitals',
+        value: performance.passesCore ? 'Bestanden' : 'Nicht bestanden',
+        tone: performance.passesCore ? 'ok' : 'bad',
+      });
+    }
+
+    if (performance.lcp !== null && performance.lcp !== undefined) {
+      items.push({
+        label: 'LCP',
+        value: `${performance.lcp}`,
+        tone: performance.lcp <= 2500 ? 'ok' : performance.lcp <= 4000 ? 'warn' : 'bad',
+      });
+    }
+
+    if (performance.cls !== null && performance.cls !== undefined) {
+      items.push({
+        label: 'CLS',
+        value: `${performance.cls}`,
+        tone: performance.cls <= 0.1 ? 'ok' : performance.cls <= 0.25 ? 'warn' : 'bad',
+      });
+    }
+
+    if (performance.tbt !== null && performance.tbt !== undefined) {
+      items.push({
+        label: 'TBT',
+        value: `${performance.tbt}`,
+        tone: performance.tbt <= 200 ? 'ok' : performance.tbt <= 600 ? 'warn' : 'bad',
+      });
+    }
+
+    if (performance.fcp !== null && performance.fcp !== undefined) {
+      items.push({
+        label: 'FCP',
+        value: `${performance.fcp}`,
+        tone: performance.fcp <= 1800 ? 'ok' : performance.fcp <= 3000 ? 'warn' : 'bad',
+      });
+    }
+
+    if (performance.ttfb !== null && performance.ttfb !== undefined) {
+      items.push({
+        label: 'TTFB',
+        value: `${performance.ttfb}`,
+        tone: performance.ttfb <= 800 ? 'ok' : performance.ttfb <= 1800 ? 'warn' : 'bad',
+      });
+    }
+
+    return items;
+  });
+  readonly performanceIssues = computed(() => this.output()?.performance?.issues ?? []);
+  readonly hasPerformanceData = computed(() => {
+    const performance = this.output()?.performance;
+    if (!performance) {
+      return false;
+    }
+
+    return (
+      this.performanceDetails().length > 0 ||
+      this.performanceIssues().length > 0 ||
+      (!!performance.label && performance.label.trim().length > 0)
+    );
+  });
+  readonly fileCheckDetails = computed<MetricListItem[]>(() => {
+    const fileChecks = this.output()?.fileChecks;
+    const technical = this.output()?.technical;
+    const items: MetricListItem[] = [];
+
+    if (technical?.hasLlmsTxt !== undefined) {
+      items.push({
+        label: 'llms.txt',
+        value: technical.hasLlmsTxt ? 'Vorhanden' : 'Fehlt',
+        tone: technical.hasLlmsTxt ? 'ok' : 'bad',
+      });
+    }
+
+    if (technical?.hasLlmsFullTxt !== undefined || fileChecks?.llmsFullTxt?.exists !== undefined) {
+      const exists = fileChecks?.llmsFullTxt?.exists ?? technical?.hasLlmsFullTxt ?? false;
+      items.push({
+        label: 'llms-full.txt',
+        value: exists
+          ? `${fileChecks?.llmsFullTxt?.wordCount ?? 0} Wörter`
+          : 'Fehlt',
+        tone: exists ? 'ok' : 'warn',
+      });
+    }
+
+    if (technical?.hasSecurityTxt !== undefined || fileChecks?.securityTxt?.exists !== undefined) {
+      const exists = fileChecks?.securityTxt?.exists ?? technical?.hasSecurityTxt ?? false;
+      items.push({
+        label: 'security.txt',
+        value: exists
+          ? [
+              fileChecks?.securityTxt?.hasContact ? 'Contact' : null,
+              fileChecks?.securityTxt?.hasExpiry ? 'Expiry' : null,
+            ].filter(Boolean).join(' · ') || 'Vorhanden'
+          : 'Fehlt',
+        tone: exists ? 'ok' : 'warn',
+      });
+    }
+
+    if (technical?.hasAiPlugin !== undefined || fileChecks?.aiPlugin?.exists !== undefined) {
+      const exists = fileChecks?.aiPlugin?.exists ?? technical?.hasAiPlugin ?? false;
+      items.push({
+        label: 'ai-plugin.json',
+        value: exists
+          ? (fileChecks?.aiPlugin?.hasSchema ? 'Schema erkannt' : 'Vorhanden')
+          : 'Fehlt',
+        tone: exists ? 'ok' : 'warn',
+      });
+    }
+
+    if (technical?.hasSitemapFile !== undefined) {
+      items.push({
+        label: 'sitemap.xml',
+        value: technical.hasSitemapFile ? 'Vorhanden' : 'Fehlt',
+        tone: technical.hasSitemapFile ? 'ok' : 'bad',
+      });
+    }
+
+    if (technical?.urlInSitemap !== undefined) {
+      items.push({
+        label: 'URL in Sitemap',
+        value: technical.urlInSitemap ? 'Ja' : 'Nein',
+        tone: technical.urlInSitemap ? 'ok' : 'bad',
+      });
+    }
+
+    return items;
+  });
+  readonly aiLiveSummaryItems = computed<MetricListItem[]>(() => {
+    const summary = this.output()?.aiLiveTests?.summary;
+    if (!summary) {
+      return [];
+    }
+
+    const items: MetricListItem[] = [];
+
+    if (summary.totalTests !== undefined) {
+      items.push({
+        label: 'Tests',
+        value: `${summary.totalTests}`,
+        tone: 'neutral',
+      });
+    }
+
+    if (summary.mentionedIn !== undefined && summary.totalTests !== undefined) {
+      items.push({
+        label: 'Erwähnungen',
+        value: `${summary.mentionedIn}/${summary.totalTests}`,
+        tone: summary.mentionedIn >= Math.ceil(summary.totalTests / 2) ? 'ok' : 'warn',
+      });
+    }
+
+    if (summary.visibilityScore !== undefined) {
+      items.push({
+        label: 'Visibility Score',
+        value: `${summary.visibilityScore}/100`,
+        tone: summary.visibilityScore >= 70 ? 'ok' : summary.visibilityScore >= 40 ? 'warn' : 'bad',
+      });
+    }
+
+    if (summary.visibilityLabel) {
+      items.push({
+        label: 'Bewertung',
+        value: summary.visibilityLabel,
+        tone: 'neutral',
+      });
+    }
+
+    return items;
+  });
+  readonly aiLiveTestCards = computed<AiLiveTestCard[]>(() => {
+    const tests = this.output()?.aiLiveTests;
+    if (!tests) {
+      return [];
+    }
+
+    return [
+      this.toAiLiveTestCard('perplexity-info', 'Perplexity Informational', tests.perplexityInformational),
+      this.toAiLiveTestCard('perplexity-commercial', 'Perplexity Commercial', tests.perplexityCommercial),
+      this.toAiLiveTestCard('perplexity-comparison', 'Perplexity Comparison', tests.perplexityComparison),
+      this.toAiLiveTestCard('chatgpt', 'ChatGPT', tests.chatGPT),
+      this.toAiLiveTestCard('gemini', 'Gemini', tests.gemini),
+    ].filter((card): card is AiLiveTestCard => !!card);
+  });
+  readonly hasAiLiveTestData = computed(() => {
+    const summary = this.output()?.aiLiveTests?.summary;
+    if (this.aiLiveTestCards().length > 0) {
+      return true;
+    }
+
+    if (!summary) {
+      return false;
+    }
+
+    return (
+      (summary.totalTests ?? 0) > 0 ||
+      (summary.mentionedIn ?? 0) > 0 ||
+      (summary.visibilityScore ?? 0) > 0
+    );
   });
   readonly schemaAnalysis = computed(() => this.output()?.report?.artifacts?.schemaAnalysis ?? null);
   readonly artifactCards = computed<ArtifactCard[]>(() => {
@@ -429,12 +738,19 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
         description: 'Vorschlag für die KI-lesbare Übersichtsdatei der Website.',
         content: artifacts.llmsTxt ?? '',
       },
+      {
+        key: 'sitemap-entry',
+        title: 'Sitemap Entry',
+        description: 'Empfohlener Eintrag für die sitemap.xml.',
+        content: artifacts.sitemapEntry ?? '',
+      },
     ].filter((artifact) => artifact.content.trim().length > 0);
   });
 
   readonly onpageStatuses = computed(() => this.buildStatusItems(this.output()?.report?.onpage));
   readonly technikStatuses = computed(() => this.buildStatusItems(this.output()?.report?.technik));
   readonly offpageStatuses = computed(() => this.buildStatusItems(this.output()?.report?.offpage));
+  readonly freshnessStatuses = computed(() => this.buildStatusItems(this.output()?.report?.freshness));
 
   constructor() {
     if (!this._record() && this.jobId) {
@@ -661,6 +977,8 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
         return this.output()?.report?.technik ?? null;
       case 'offpage':
         return this.output()?.report?.offpage ?? null;
+      case 'freshness':
+        return this.output()?.report?.freshness ?? null;
       default:
         return null;
     }
@@ -674,6 +992,8 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
         return this.technikStatuses();
       case 'offpage':
         return this.offpageStatuses();
+      case 'freshness':
+        return this.freshnessStatuses();
       default:
         return [];
     }
@@ -701,9 +1021,55 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
         return 'account_tree';
       case 'content':
         return 'article';
+      case 'freshness':
+        return 'schedule';
       default:
         return 'analytics';
     }
+  }
+
+  private toAiLiveTestCard(
+    key: string,
+    title: string,
+    test?: AiLiveTestResult,
+  ): AiLiveTestCard | null {
+    if (!test) {
+      return null;
+    }
+
+    const hasMeaningfulContent = !!(
+      test.mentioned ||
+      test.rank !== null && test.rank !== undefined ||
+      (test.text && test.text.trim().length > 0) ||
+      (test.citations?.length ?? 0) > 0
+    );
+
+    if (!hasMeaningfulContent) {
+      return null;
+    }
+
+    return {
+      key,
+      title,
+      mentioned: !!test.mentioned,
+      rank: test.rank ?? null,
+      intent: test.intent ?? '–',
+      excerpt: this.truncateText(test.text ?? '', 320),
+      citations: test.citations ?? [],
+    };
+  }
+
+  private truncateText(value: string, maxLength: number): string {
+    const normalized = value.replace(/\s+/g, ' ').trim();
+    if (!normalized) {
+      return '';
+    }
+
+    if (normalized.length <= maxLength) {
+      return normalized;
+    }
+
+    return `${normalized.slice(0, maxLength - 1).trimEnd()}…`;
   }
 
   private dimensionFacts(dimension: DimensionScore): string[] {

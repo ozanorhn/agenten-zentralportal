@@ -55,39 +55,6 @@
         </div>
       </section>
 
-      @if (executiveSummary().length || radarChartUrl()) {
-        <section class="mt-4 rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
-          <div class="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_320px]">
-            <div>
-              <h2 class="text-base font-medium text-on-surface">Executive Summary</h2>
-              <div class="mt-4 space-y-2">
-                @for (item of executiveSummary(); track item) {
-                  <div class="flex gap-3 rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3 text-sm text-on-surface-variant">
-                    <span class="text-outline">•</span>
-                    <span>{{ item }}</span>
-                  </div>
-                } @empty {
-                  <p class="text-sm text-on-surface-variant">Keine Executive Summary im Report vorhanden.</p>
-                }
-              </div>
-            </div>
-
-            @if (radarChartUrl(); as radarChart) {
-              <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 p-4">
-                <p class="text-sm font-medium text-on-surface">Radar Chart</p>
-                <p class="mt-1 text-xs text-on-surface-variant">Visualisierte GEO-Performance über alle Kerndimensionen.</p>
-                <img
-                  [src]="radarChart"
-                  alt="GEO Radar Chart"
-                  loading="lazy"
-                  class="mt-4 w-full rounded-2xl bg-white/60"
-                />
-              </div>
-            }
-          </div>
-        </section>
-      }
-
       <section class="mt-4 rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -217,6 +184,20 @@
               </div>
             }
 
+            @if (activeTab() === 'freshness' && freshnessDetails().length) {
+              <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+                <h3 class="text-sm font-medium text-on-surface">Freshness Details</h3>
+                <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  @for (item of freshnessDetails(); track item.label) {
+                    <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3">
+                      <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ item.label }}</p>
+                      <p class="mt-2 text-sm font-medium" [class]="detailToneClass(item.tone)">{{ item.value }}</p>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
             <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
               <h3 class="text-sm font-medium text-on-surface">Quick Wins</h3>
               <div class="mt-4 space-y-3">
@@ -263,6 +244,58 @@
                   </div>
                 </div>
               }
+
+              @if (fileCheckDetails().length) {
+                <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+                  <h3 class="text-sm font-medium text-on-surface">Datei-Checks</h3>
+                  <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    @for (item of fileCheckDetails(); track item.label) {
+                      <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3">
+                        <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ item.label }}</p>
+                        <p class="mt-2 text-sm font-medium" [class]="detailToneClass(item.tone)">{{ item.value }}</p>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+                <h3 class="text-sm font-medium text-on-surface">Performance</h3>
+
+                @if (hasPerformanceData()) {
+                  @if (performanceDetails().length) {
+                    <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      @for (item of performanceDetails(); track item.label) {
+                        <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3">
+                          <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ item.label }}</p>
+                          <p class="mt-2 text-sm font-medium" [class]="detailToneClass(item.tone)">{{ item.value }}</p>
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  @if (performanceIssues().length) {
+                    <div class="mt-4 space-y-2">
+                      @for (issue of performanceIssues(); track issue) {
+                        <div class="flex gap-3 rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3 text-sm text-on-surface-variant">
+                          <span class="text-outline">•</span>
+                          <span>{{ issue }}</span>
+                        </div>
+                      }
+                    </div>
+                  }
+                } @else {
+                  <div class="mt-4 rounded-2xl border border-dashed border-outline-variant/20 bg-surface-container-high/20 px-4 py-6 text-center">
+                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-container-high text-on-surface-variant">
+                      <span class="material-symbols-outlined text-2xl">speed</span>
+                    </div>
+                    <p class="mt-4 text-sm font-medium text-on-surface">Keine Performance-Daten verfügbar</p>
+                    <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">
+                      Für diesen Report wurden keine verwertbaren Core-Web-Vitals- oder Performance-Metriken geliefert.
+                    </p>
+                  </div>
+                }
+              </div>
 
               <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
                 <h3 class="text-sm font-medium text-on-surface">Bot Accessibility</h3>
@@ -357,6 +390,75 @@
               </div>
             </div>
           }
+
+          <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+            <h3 class="text-sm font-medium text-on-surface">AI Live Tests</h3>
+
+            @if (hasAiLiveTestData()) {
+              @if (aiLiveSummaryItems().length) {
+                <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  @for (item of aiLiveSummaryItems(); track item.label) {
+                    <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3">
+                      <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ item.label }}</p>
+                      <p class="mt-2 text-sm font-medium" [class]="detailToneClass(item.tone)">{{ item.value }}</p>
+                    </div>
+                  }
+                </div>
+              }
+
+              <div class="mt-4 space-y-3">
+                @for (test of aiLiveTestCards(); track test.key) {
+                  <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
+                    <div class="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p class="text-sm font-medium text-on-surface">{{ test.title }}</p>
+                        <p class="mt-1 text-xs text-on-surface-variant">{{ test.intent }}</p>
+                      </div>
+                      <div class="flex flex-wrap gap-2">
+                        <span
+                          class="rounded-full px-3 py-1 text-xs font-medium"
+                          [class]="test.mentioned ? 'bg-emerald-500/10 text-emerald-300' : 'bg-amber-500/10 text-amber-300'"
+                        >
+                          {{ test.mentioned ? 'Erwähnt' : 'Nicht erwähnt' }}
+                        </span>
+                        @if (test.rank !== null) {
+                          <span class="rounded-full bg-surface-container-lowest/70 px-3 py-1 text-xs text-on-surface-variant">
+                            Rank {{ test.rank }}
+                          </span>
+                        }
+                      </div>
+                    </div>
+
+                    @if (test.excerpt) {
+                      <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">{{ test.excerpt }}</p>
+                    }
+
+                    @if (test.citations.length) {
+                      <div class="mt-3 flex flex-wrap gap-2">
+                        @for (citation of test.citations; track citation) {
+                          <span class="rounded-full bg-surface-container-lowest/70 px-3 py-1 text-xs text-on-surface-variant">
+                            {{ citation }}
+                          </span>
+                        }
+                      </div>
+                    }
+                  </div>
+                } @empty {
+                  <p class="text-sm text-on-surface-variant">Keine AI Live Tests im Report vorhanden.</p>
+                }
+              </div>
+            } @else {
+              <div class="mt-4 rounded-2xl border border-dashed border-outline-variant/20 bg-surface-container-high/20 px-4 py-6 text-center">
+                <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-container-high text-on-surface-variant">
+                  <span class="material-symbols-outlined text-2xl">travel_explore</span>
+                </div>
+                <p class="mt-4 text-sm font-medium text-on-surface">Keine AI Live Tests vorhanden</p>
+                <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">
+                  Für diesen Report wurden noch keine verwertbaren Live-Test-Ergebnisse aus Such- und KI-Plattformen geliefert.
+                </p>
+              </div>
+            }
+          </div>
 
           <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
             <h3 class="text-sm font-medium text-on-surface">AI Platforms</h3>

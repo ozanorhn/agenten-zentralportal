@@ -1,0 +1,110 @@
+<h2>NoLLM Analyse: Welche Ladebalken-Variante passt am besten?</h2>
+<p class="subtitle">Alle Varianten nutzen dieselben 5 Schritte, unterscheiden sich aber in Platzierung und Gewichtung.</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">A · Inline im Formular</div>
+        <div class="mockup-body">
+          <div class="label">Form bleibt sichtbar</div>
+          <div style="margin:12px 0 10px;height:12px;border-radius:999px;background:#dbeafe;overflow:hidden;">
+            <div style="width:48%;height:100%;background:linear-gradient(90deg,#0070FF,#35c2ff);"></div>
+          </div>
+          <div style="display:grid;gap:8px;">
+            <div style="padding:8px 10px;border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe;">1. Website-Struktur und Crawler-Zugriff</div>
+            <div style="padding:8px 10px;border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe;">2. Marken-Autorität und E-E-A-T</div>
+            <div style="padding:8px 10px;border-radius:12px;background:#ffffff;border:1px solid #dbeafe;opacity:.65;">3. Strukturierte Daten und FAQs</div>
+            <div style="padding:8px 10px;border-radius:12px;background:#ffffff;border:1px solid #dbeafe;opacity:.65;">4. GEO-Score für KI-Plattformen</div>
+            <div style="padding:8px 10px;border-radius:12px;background:#ffffff;border:1px solid #dbeafe;opacity:.65;">5. Finaler Optimierungs-Bericht</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Inline Progress Card</h3>
+      <p>Der Ladebalken erscheint direkt unter dem Formular-CTA. Ruhig, klar und nah an der Aktion.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">B · Fokus-Overlay</div>
+        <div class="mockup-body">
+          <div style="padding:18px;border-radius:18px;background:linear-gradient(180deg,#06152c,#0c274f);color:#fff;">
+            <div class="label" style="color:#93c5fd;">Analyse laeuft</div>
+            <div style="margin:12px 0 16px;height:14px;border-radius:999px;background:rgba(255,255,255,.12);overflow:hidden;">
+              <div style="width:66%;height:100%;background:linear-gradient(90deg,#35c2ff,#ffffff);"></div>
+            </div>
+            <div style="display:grid;gap:8px;">
+              <div style="padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(147,197,253,.35);">✓ Website-Struktur und Crawler-Zugriff</div>
+              <div style="padding:10px 12px;border-radius:12px;background:rgba(0,112,255,.18);border:1px solid rgba(147,197,253,.55);">• Marken-Autorität und E-E-A-T</div>
+              <div style="padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);opacity:.72;">Strukturierte Daten und FAQs</div>
+              <div style="padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);opacity:.72;">GEO-Score für KI-Plattformen</div>
+              <div style="padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);opacity:.72;">Finaler Optimierungs-Bericht</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Fokus-Overlay</h3>
+      <p>Nach dem Start wird die Seite visuell in einen klaren Analyse-Modus gesetzt. Wirkt wertiger und "agentischer".</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">C · Sidebar Pipeline</div>
+        <div class="mockup-body">
+          <div class="split">
+            <div style="padding-right:8px;">
+              <div class="mock-input">https://example.com</div>
+              <div class="mock-input">Brand</div>
+              <div class="mock-input">Branche</div>
+              <div class="mock-button" style="margin-top:8px;">Analyse laeuft...</div>
+            </div>
+            <div style="padding-left:8px;border-left:1px solid #dbeafe;">
+              <div class="label">Live Pipeline</div>
+              <div style="margin:10px 0 12px;height:10px;border-radius:999px;background:#dbeafe;overflow:hidden;">
+                <div style="width:32%;height:100%;background:#0070FF;"></div>
+              </div>
+              <div style="display:grid;gap:6px;font-size:13px;">
+                <div>✓ Website-Struktur und Crawler-Zugriff</div>
+                <div style="color:#0070FF;font-weight:700;">→ Marken-Autorität und E-E-A-T</div>
+                <div style="opacity:.65;">Strukturierte Daten und FAQs</div>
+                <div style="opacity:.65;">GEO-Score für KI-Plattformen</div>
+                <div style="opacity:.65;">Finaler Optimierungs-Bericht</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Sidebar Pipeline</h3>
+      <p>Das Formular bleibt links, der Fortschritt lebt rechts als permanente Analyse-Spur. Am ehesten nah am bestehenden Layout.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>Empfehlung</h4>
+      <ul>
+        <li><strong>C</strong> passt am besten zur vorhandenen Zwei-Spalten-Struktur.</li>
+        <li>Die Analyse wirkt sichtbarer als bei A, ohne den Flow so hart zu unterbrechen wie B.</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>Zu entscheiden</h4>
+      <ul>
+        <li>Soll der Nutzer waehrend der Analyse noch Eingaben sehen koennen?</li>
+        <li>Oder soll der Fokus komplett auf dem Fortschritt liegen?</li>
+      </ul>
+    </div>
+  </div>
+</div>

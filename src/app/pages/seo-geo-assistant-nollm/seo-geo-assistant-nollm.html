@@ -34,6 +34,7 @@
             <div class="relative">
               <input
                 [(ngModel)]="websiteUrl"
+                [disabled]="isSubmitting()"
                 type="url"
                 placeholder="https://..."
                 class="w-full rounded-2xl border-0 bg-surface-container-highest px-4 py-4 pl-12 text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]"
@@ -50,6 +51,7 @@
               <div class="relative">
                 <input
                   [(ngModel)]="brand"
+                  [disabled]="isSubmitting()"
                   type="text"
                   placeholder="z. B. Effektiv Online-Marketing"
                   class="w-full rounded-2xl border-0 bg-surface-container-highest px-4 py-4 pl-12 text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]"
@@ -65,6 +67,7 @@
               <div class="relative">
                 <input
                   [(ngModel)]="industry"
+                  [disabled]="isSubmitting()"
                   type="text"
                   placeholder="z. B. online Marketing"
                   class="w-full rounded-2xl border-0 bg-surface-container-highest px-4 py-4 pl-12 text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]"
@@ -81,6 +84,7 @@
             <div class="relative">
               <input
                 [(ngModel)]="location"
+                [disabled]="isSubmitting()"
                 type="text"
                 placeholder="Deutschland"
                 class="w-full rounded-2xl border-0 bg-surface-container-highest px-4 py-4 pl-12 text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]"
@@ -114,6 +118,7 @@
             <button
               type="button"
               (click)="fillExample()"
+              [disabled]="isSubmitting()"
               class="inline-flex items-center justify-center gap-2 rounded-2xl border border-outline-variant/20 bg-surface-container-high px-6 py-4 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest"
             >
               Beispiel einsetzen
@@ -207,3 +212,115 @@
     </div>
   </div>
 </div>
+
+@if (showLoadingOverlay()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-[#041226]/78 px-4 backdrop-blur-md"
+    role="status"
+    aria-live="polite"
+    aria-busy="true"
+  >
+    <div class="relative w-full max-w-2xl overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(4,18,38,0.98),rgba(10,34,67,0.96))] p-6 shadow-[0_24px_100px_rgba(0,0,0,0.45)] md:p-8">
+      <div class="pointer-events-none absolute inset-x-10 top-0 h-32 rounded-full bg-[#0070FF]/20 blur-3xl"></div>
+
+      <div class="relative">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-[0.26em] text-[#93c5fd]">
+              NoLLM Analyse läuft
+            </p>
+            <h2 class="mt-3 text-3xl font-black leading-tight tracking-tight text-white font-headline md:text-4xl">
+              SEO/GEO Analyse wird erstellt
+            </h2>
+            <p class="mt-3 max-w-xl text-sm leading-relaxed text-blue-100/70 md:text-base">
+              Der Report öffnet sich automatisch, sobald alle Prüfschritte abgeschlossen sind.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-right">
+            <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-blue-100/55">Fortschritt</p>
+            <p class="mt-2 text-2xl font-black text-white">{{ overlayProgress() }}%</p>
+          </div>
+        </div>
+
+        <div class="mt-8">
+          <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-[0.2em] text-blue-100/55">
+            <span>Analyse Pipeline</span>
+            <span>
+              @if (overlayCompleted()) {
+                5 / {{ analysisSteps.length }}
+              } @else {
+                {{ activeStepIndex() + 1 }} / {{ analysisSteps.length }}
+              }
+            </span>
+          </div>
+
+          <div class="mt-3 h-3 overflow-hidden rounded-full bg-white/10">
+            <div
+              class="h-full rounded-full bg-[linear-gradient(90deg,#35c2ff_0%,#0070FF_55%,#7dd3fc_100%)] transition-[width] duration-[1200ms] ease-out"
+              [style.width.%]="overlayProgress()"
+            ></div>
+          </div>
+        </div>
+
+        <div class="mt-8 space-y-3">
+          @for (step of analysisSteps; track step) {
+            <div
+              class="flex items-start gap-4 rounded-2xl border px-4 py-4 transition-all duration-500"
+              [ngClass]="{
+                'border-[#93c5fd]/45 bg-[#0d3f84]/28': $index < activeStepIndex() || overlayCompleted(),
+                'border-[#7dd3fc]/60 bg-[#0b4ea8]/28 shadow-[0_0_0_1px_rgba(125,211,252,0.12),0_0_24px_rgba(0,112,255,0.16)]': $index === activeStepIndex() && !overlayCompleted(),
+                'border-white/10 bg-white/5': $index > activeStepIndex() && !overlayCompleted()
+              }"
+            >
+              <span
+                class="mt-0.5 inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl border text-sm font-black"
+                [ngClass]="{
+                  'border-[#93c5fd]/50 bg-[#35c2ff]/15 text-[#dbeafe]': $index < activeStepIndex() || overlayCompleted(),
+                  'border-[#7dd3fc]/65 bg-[#0070FF]/25 text-white': $index === activeStepIndex() && !overlayCompleted(),
+                  'border-white/10 bg-white/5 text-blue-100/55': $index > activeStepIndex() && !overlayCompleted()
+                }"
+              >
+                @if ($index < activeStepIndex() || overlayCompleted()) {
+                  <span class="material-symbols-outlined text-lg" style="font-variation-settings:'FILL' 1;">check</span>
+                } @else if ($index === activeStepIndex()) {
+                  <span class="material-symbols-outlined animate-spin text-lg">progress_activity</span>
+                } @else {
+                  {{ $index + 1 }}
+                }
+              </span>
+
+              <div class="min-w-0">
+                <p
+                  class="text-sm font-semibold leading-relaxed md:text-[15px]"
+                  [ngClass]="{
+                    'text-white': $index <= activeStepIndex() || overlayCompleted(),
+                    'text-blue-100/55': $index > activeStepIndex() && !overlayCompleted()
+                  }"
+                >
+                  {{ step }}
+                </p>
+
+                <p
+                  class="mt-1 text-xs leading-relaxed"
+                  [ngClass]="{
+                    'text-blue-100/65': $index <= activeStepIndex() || overlayCompleted(),
+                    'text-blue-100/40': $index > activeStepIndex() && !overlayCompleted()
+                  }"
+                >
+                  @if ($index < activeStepIndex() || overlayCompleted()) {
+                    Schritt abgeschlossen.
+                  } @else if ($index === activeStepIndex()) {
+                    Dieser Prüfschritt wird gerade verarbeitet.
+                  } @else {
+                    Wartet auf den vorherigen Analyseschritt.
+                  }
+                </p>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

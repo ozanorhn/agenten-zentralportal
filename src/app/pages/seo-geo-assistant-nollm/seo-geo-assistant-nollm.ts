@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { NgClass } from '@angular/common';
+import { Component, OnDestroy, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
@@ -21,17 +22,29 @@ class RequestError extends Error {
 }
 
 const WEBHOOK_TIMEOUT_MS = 90_000;
+const OVERLAY_STEP_ADVANCE_MS = 1_400;
+const OVERLAY_COMPLETE_DELAY_MS = 300;
+const OVERLAY_PROGRESS_STOPS = [18, 36, 58, 78, 92] as const;
+const ANALYSIS_STEPS = [
+  'Analysiere Website-Struktur und Crawler-Zugriff...',
+  'Prüfe Marken-Autorität und E-E-A-T Signale...',
+  'Extrahiere strukturierte Daten und FAQ-Sektionen...',
+  'Berechne GEO-Score für KI-Plattformen...',
+  'Generiere finalen Optimierungs-Bericht...',
+] as const;
 
 @Component({
   selector: 'app-seo-geo-assistant-nollm',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, NgClass],
   templateUrl: './seo-geo-assistant-nollm.html',
 })
-export class SeoGeoAssistantNoLlmComponent {
+export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
   private readonly router = inject(Router);
+  private overlayStepTimerId: number | null = null;
 
   readonly environment = environment;
+  readonly analysisSteps = ANALYSIS_STEPS;
 
   websiteUrl = '';
   brand = '';
@@ -40,6 +53,14 @@ export class SeoGeoAssistantNoLlmComponent {
 
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal('');
+  readonly showLoadingOverlay = signal(false);
+  readonly overlayCompleted = signal(false);
+  readonly activeStepIndex = signal(0);
+  readonly overlayProgress = signal(0);
+
+  ngOnDestroy(): void {
+    this.resetLoadingOverlay();
+  }
 
   async submit(): Promise<void> {
     if (this.isSubmitting()) {
@@ -55,6 +76,9 @@ export class SeoGeoAssistantNoLlmComponent {
     this.websiteUrl = normalizedUrl;
     this.errorMessage.set('');
     this.isSubmitting.set(true);
+    this.startLoadingOverlay();
+
+    let navigationSucceeded = false;
 
     try {
       const requestBody = {
@@ -95,6 +119,8 @@ export class SeoGeoAssistantNoLlmComponent {
         throw new RequestError('empty', response.status, rawResponse);
       }
 
+      await this.completeLoadingOverlay();
+
       const record: StoredSeoGeoReport = {
         id: `seo-geo-nollm-${Date.now()}`,
         createdAt: Date.now(),
@@ -103,13 +129,21 @@ export class SeoGeoAssistantNoLlmComponent {
 
       saveSeoGeoReport(record);
 
-      await this.router.navigate(['/agents', 'seo-geo-analyse-assistent-nollm', 'result'], {
+      navigationSucceeded = await this.router.navigate(['/agents', 'seo-geo-analyse-assistent-nollm', 'result'], {
         queryParams: { reportId: record.id },
       });
+
+      if (!navigationSucceeded) {
+        throw new Error('navigation_failed');
+      }
     } catch (error) {
+      this.resetLoadingOverlay();
       this.errorMessage.set(this.toFriendlyErrorMessage(error));
       console.error('SEO/GEO NoLLM form request failed', error);
     } finally {
+      if (!navigationSucceeded) {
+        this.resetLoadingOverlay();
+      }
       this.isSubmitting.set(false);
     }
   }
@@ -119,6 +153,73 @@ export class SeoGeoAssistantNoLlmComponent {
     this.brand = 'Effektiv Online-Marketing';
     this.industry = 'online Marketing';
     this.location = 'Hannover, DE';
+  }
+
+  private startLoadingOverlay(): void {
+    this.clearOverlayTimer();
+    this.showLoadingOverlay.set(true);
+    this.overlayCompleted.set(false);
+    this.activeStepIndex.set(0);
+    this.overlayProgress.set(OVERLAY_PROGRESS_STOPS[0]);
+    this.scheduleNextOverlayStep();
+  }
+
+  private scheduleNextOverlayStep(): void {
+    this.clearOverlayTimer();
+
+    this.overlayStepTimerId = window.setTimeout(() => {
+      if (!this.isSubmitting()) {
+        this.clearOverlayTimer();
+        return;
+      }
+
+      const currentStep = this.activeStepIndex();
+      const lastStepIndex = this.analysisSteps.length - 1;
+      if (currentStep >= lastStepIndex) {
+        this.overlayProgress.set(OVERLAY_PROGRESS_STOPS[lastStepIndex] ?? 92);
+        this.clearOverlayTimer();
+        return;
+      }
+
+      const nextStep = currentStep + 1;
+      this.activeStepIndex.set(nextStep);
+      this.overlayProgress.set(OVERLAY_PROGRESS_STOPS[nextStep] ?? 92);
+
+      if (nextStep < lastStepIndex) {
+        this.scheduleNextOverlayStep();
+      } else {
+        this.clearOverlayTimer();
+      }
+    }, OVERLAY_STEP_ADVANCE_MS);
+  }
+
+  private async completeLoadingOverlay(): Promise<void> {
+    this.clearOverlayTimer();
+    this.overlayCompleted.set(true);
+    this.activeStepIndex.set(this.analysisSteps.length - 1);
+    this.overlayProgress.set(100);
+    await this.delay(OVERLAY_COMPLETE_DELAY_MS);
+  }
+
+  private resetLoadingOverlay(): void {
+    this.clearOverlayTimer();
+    this.showLoadingOverlay.set(false);
+    this.overlayCompleted.set(false);
+    this.activeStepIndex.set(0);
+    this.overlayProgress.set(0);
+  }
+
+  private clearOverlayTimer(): void {
+    if (this.overlayStepTimerId !== null) {
+      window.clearTimeout(this.overlayStepTimerId);
+      this.overlayStepTimerId = null;
+    }
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise((resolve) => {
+      window.setTimeout(resolve, ms);
+    });
   }
 
   private async fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
