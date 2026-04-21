@@ -96,10 +96,10 @@
               </div>
 
               <div class="mt-3 space-y-1.5">
-                @for (fact of dimension.facts; track fact) {
+                @for (fact of dimension.facts; track fact.raw) {
                   <div class="flex items-start gap-2 text-[12px] leading-4 text-on-surface-variant">
-                    <span class="material-symbols-outlined mt-[-1px] text-sm leading-none" [class]="factClass(fact)">{{ factIcon(fact) }}</span>
-                    <span>{{ fact }}</span>
+                    <span class="material-symbols-outlined mt-[-1px] text-sm leading-none" [class]="factClass(fact.raw)">{{ factIcon(fact.raw) }}</span>
+                    <span>{{ fact.text }}</span>
                   </div>
                 } @empty {
                   <p class="text-[12px] leading-4 text-on-surface-variant">Keine Fakten vom Webhook erhalten.</p>
@@ -175,20 +175,6 @@
                 <h3 class="text-sm font-medium text-on-surface">Autoritätsdaten</h3>
                 <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   @for (item of authorityDetails(); track item.label) {
-                    <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3">
-                      <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ item.label }}</p>
-                      <p class="mt-2 text-sm font-medium" [class]="detailToneClass(item.tone)">{{ item.value }}</p>
-                    </div>
-                  }
-                </div>
-              </div>
-            }
-
-            @if (activeTab() === 'freshness' && freshnessDetails().length) {
-              <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
-                <h3 class="text-sm font-medium text-on-surface">Freshness Details</h3>
-                <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  @for (item of freshnessDetails(); track item.label) {
                     <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3">
                       <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ item.label }}</p>
                       <p class="mt-2 text-sm font-medium" [class]="detailToneClass(item.tone)">{{ item.value }}</p>
@@ -356,26 +342,42 @@
 
       @if (activeTab() === 'geo') {
         <section class="mt-4 space-y-3">
-          <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
-            <h2 class="text-base font-medium text-on-surface">AI</h2>
-            <div class="mt-4 space-y-5">
-              @for (entry of geoDimensionEntries(); track entry[0]) {
-                <div>
-                  <p class="mb-2 text-xs font-medium uppercase tracking-[0.05em] text-on-surface-variant">{{ entry[0] }}</p>
-                  <div class="space-y-2">
-                    @for (item of entry[1]; track item) {
-                      <div class="flex gap-3 rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3 text-sm text-on-surface-variant">
-                        <span class="text-outline">•</span>
-                        <span>{{ item }}</span>
-                      </div>
-                    }
+          @if (executiveSummary().length) {
+            <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+              <h2 class="text-base font-medium text-on-surface">Executive Summary</h2>
+              <div class="mt-4 space-y-2">
+                @for (item of executiveSummary(); track item) {
+                  <div class="flex gap-3 rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3 text-sm text-on-surface-variant">
+                    <span class="text-outline">•</span>
+                    <span>{{ item }}</span>
                   </div>
-                </div>
-              } @empty {
-                <p class="text-sm text-on-surface-variant">Keine GEO-Dimension-Analyse im Report vorhanden.</p>
-              }
+                }
+              </div>
             </div>
-          </div>
+          }
+
+          @if (geoDimensionEntries().length) {
+            <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+              <h2 class="text-base font-medium text-on-surface">AI</h2>
+              <div class="mt-4 space-y-5">
+                @for (entry of geoDimensionEntries(); track entry.key) {
+                  <div>
+                    <p class="mb-2 text-xs font-medium uppercase tracking-[0.05em] text-on-surface-variant">{{ entry.label }}</p>
+                    <div class="space-y-2">
+                      @for (item of entry.items; track item) {
+                        <div class="flex gap-3 rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3 text-sm text-on-surface-variant">
+                          <span class="text-outline">•</span>
+                          <span>{{ item }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                } @empty {
+                  <p class="text-sm text-on-surface-variant">Keine GEO-Dimension-Analyse im Report vorhanden.</p>
+                }
+              </div>
+            </div>
+          }
 
           @if (geoAiMode().length) {
             <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
@@ -594,6 +596,7 @@
           }
         </section>
       }
+
     } @else if (pendingState()) {
       <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-6 md:px-6">
         <div class="flex flex-wrap items-start justify-between gap-4">

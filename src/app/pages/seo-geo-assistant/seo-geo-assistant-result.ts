@@ -8,6 +8,7 @@ import {
   DimensionScore,
   extractGeoWebhookResult,
   findSeoGeoReport,
+  GeoBreakdownGroup,
   GeoAnalysisJobState,
   GeoAnalysisJobStatusResponse,
   GeoWebhookResult,
@@ -17,10 +18,12 @@ import {
   StoredSeoGeoReport,
 } from './seo-geo-assistant.models';
 
-type SeoGeoTabKey = 'onpage' | 'technik' | 'offpage' | 'freshness' | 'geo';
+type SeoGeoTabKey = 'onpage' | 'technik' | 'offpage' | 'geo';
 type StatusRequestErrorCode = 'network' | 'api';
 
 const STATUS_POLL_INTERVAL_MS = 2_000;
+const LEGACY_DIMENSION_ORDER = ['brand', 'citation', 'eeat', 'technical', 'schema', 'content'] as const;
+type LegacyDimensionKey = typeof LEGACY_DIMENSION_ORDER[number];
 
 interface ScoreBox {
   label: string;
@@ -57,7 +60,18 @@ interface DimensionCard {
   indicator: string;
   statusLabel: string;
   icon: string;
-  facts: string[];
+  facts: DimensionFact[];
+}
+
+interface DimensionFact {
+  raw: string;
+  text: string;
+}
+
+interface GeoDimensionEntry {
+  key: string;
+  label: string;
+  items: string[];
 }
 
 interface MetricListItem {
@@ -112,7 +126,6 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     { key: 'onpage', label: 'Content & Onpage' },
     { key: 'technik', label: 'Technische Basis' },
     { key: 'offpage', label: 'Autorität & Offpage' },
-    { key: 'freshness', label: 'Freshness' },
     { key: 'geo', label: 'AI' },
   ];
 
@@ -178,23 +191,22 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   });
 
   readonly dimensionCards = computed<DimensionCard[]>(() =>
-    (this.output()?.dimensions ?? []).map((dimension) => ({
-      key: dimension.key ?? 'dimension',
-      label: dimension.label ?? 'Dimension',
-      score: dimension.score ?? null,
-      indicator: dimension.indicator ?? '',
-      statusLabel: dimension.status ?? dimension.label_text ?? '–',
-      icon: this.dimensionIcon(dimension.key),
-      facts: this.dimensionFacts(dimension),
-    })),
+    this.resolveDimensionCards(),
   );
 
   readonly aiPlatforms = computed(() => this.output()?.aiPlatforms ?? []);
-  readonly geoDimensionEntries = computed(() =>
-    Object.entries(this.output()?.report?.geo?.dimensionAnalysis ?? {}),
+  readonly geoDimensionEntries = computed<GeoDimensionEntry[]>(() =>
+    Object.entries(this.output()?.report?.geo?.dimensionAnalysis ?? {})
+      .map(([key, value]) => ({
+        key,
+        label: this.geoDimensionLabel(key),
+        items: this.normalizeGeoDimensionItems(value),
+      }))
+      .filter((entry) => entry.items.length > 0),
   );
   readonly geoAiMode = computed(() => this.output()?.report?.geo?.aiMode ?? []);
   readonly strategicActions = computed(() => this.output()?.report?.geo?.strategicActions ?? []);
+  readonly executiveSummary = computed(() => this.output()?.report?.executiveSummary ?? []);
 
   readonly techniqueBotCards = computed<BotCard[]>(() =>
     (this.output()?.botAccessibilityCheck?.categories?.['AI Search']?.bots ?? [])
@@ -391,11 +403,11 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
       },
     ];
 
-    if (authority.domainRating !== undefined) {
+    if (authority.domainRating !== undefined && authority.domainRating !== null && authority.domainRating > 0) {
       items.push({
         label: 'Domain Rating',
         value: `${authority.domainRating}`,
-        tone: authority.domainRating > 0 ? 'warn' : 'bad',
+        tone: 'warn',
       });
     }
 
@@ -407,7 +419,23 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
       });
     }
 
-    const sameAsCount = authority.sameAsCount ?? authority.validatedSocialLinks;
+    if (authority.organicKeywords !== undefined) {
+      items.push({
+        label: 'Organische Keywords',
+        value: `${authority.organicKeywords}`,
+        tone: authority.organicKeywords > 0 ? 'warn' : 'bad',
+      });
+    }
+
+    if (authority.organicTraffic !== undefined) {
+      items.push({
+        label: 'Organischer Traffic',
+        value: `${authority.organicTraffic}`,
+        tone: authority.organicTraffic > 0 ? 'warn' : 'bad',
+      });
+    }
+
+    const sameAsCount = authority.sameAsCount ?? authority.validatedSocialLinks ?? authority.sameAsLinks?.length;
     if (sameAsCount !== undefined) {
       items.push({
         label: 'sameAs Links',
@@ -721,6 +749,12 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
         content: artifacts.faqPageSchema ?? '',
       },
       {
+        key: 'faqpage-note',
+        title: 'FAQPage Hinweis',
+        description: 'Webhook-Hinweis, wenn noch keine ausreichenden FAQ-Fragen erkannt wurden.',
+        content: artifacts.faqPageSchemaNote ?? '',
+      },
+      {
         key: 'breadcrumb-schema',
         title: 'BreadcrumbList Schema',
         description: 'Breadcrumb-Markup für die Navigationshierarchie.',
@@ -731,6 +765,12 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
         title: 'WebSite Schema',
         description: 'Website-Markup inklusive SearchAction.',
         content: artifacts.websiteSchema ?? '',
+      },
+      {
+        key: 'article-schema',
+        title: 'Article Schema',
+        description: 'Artikel-Markup für Titel, Autor, Publisher und Datumsfelder.',
+        content: artifacts.articleSchema ?? '',
       },
       {
         key: 'llms-txt',
@@ -977,8 +1017,6 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
         return this.output()?.report?.technik ?? null;
       case 'offpage':
         return this.output()?.report?.offpage ?? null;
-      case 'freshness':
-        return this.output()?.report?.freshness ?? null;
       default:
         return null;
     }
@@ -992,8 +1030,6 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
         return this.technikStatuses();
       case 'offpage':
         return this.offpageStatuses();
-      case 'freshness':
-        return this.freshnessStatuses();
       default:
         return [];
     }
@@ -1010,6 +1046,7 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   private dimensionIcon(key?: string): string {
     switch (key) {
       case 'brand':
+      case 'brandRetrieval':
         return 'branding_watermark';
       case 'citation':
         return 'format_quote';
@@ -1020,12 +1057,186 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
       case 'schema':
         return 'account_tree';
       case 'content':
+      case 'pageGeoReadiness':
         return 'article';
       case 'freshness':
         return 'schedule';
       default:
         return 'analytics';
     }
+  }
+
+  private dimensionByKey(key: string): DimensionScore | null {
+    return this.output()?.dimensions?.find((dimension) => dimension.key === key) ?? null;
+  }
+
+  private resolveDimensionCards(): DimensionCard[] {
+    const dimensions = this.output()?.dimensions ?? [];
+    const hasLegacyDimensions = dimensions.some((dimension) =>
+      LEGACY_DIMENSION_ORDER.includes((dimension.key ?? '') as LegacyDimensionKey),
+    );
+
+    if (hasLegacyDimensions) {
+      return LEGACY_DIMENSION_ORDER
+        .map((key) => dimensions.find((dimension) => dimension.key === key))
+        .filter((dimension): dimension is DimensionScore => !!dimension)
+        .map((dimension) => this.toDimensionCard(dimension));
+    }
+
+    const synthesized = this.buildLegacyCompatibilityCards();
+    if (synthesized.length > 0) {
+      return synthesized;
+    }
+
+    return dimensions
+      .filter((dimension) => dimension.key !== 'freshness')
+      .map((dimension) => this.toDimensionCard(dimension));
+  }
+
+  private buildLegacyCompatibilityCards(): DimensionCard[] {
+    const cards: Array<DimensionCard | null> = [
+      this.buildSyntheticLegacyCard('brand'),
+      this.buildSyntheticLegacyCard('citation'),
+      this.buildSyntheticLegacyCard('eeat'),
+      this.buildSyntheticLegacyCard('technical'),
+      this.buildSyntheticLegacyCard('schema'),
+      this.buildSyntheticLegacyCard('content'),
+    ];
+
+    return cards.filter((card): card is DimensionCard => !!card);
+  }
+
+  private buildSyntheticLegacyCard(key: LegacyDimensionKey): DimensionCard | null {
+    switch (key) {
+      case 'brand': {
+        const dimension = this.dimensionByKey('brandRetrieval');
+        if (!dimension) {
+          return null;
+        }
+
+        return {
+          key,
+          label: 'Marken-Erkennung',
+          score: dimension.score ?? null,
+          indicator: this.scoreIndicator(dimension.score),
+          statusLabel: this.scoreStatus(dimension.score),
+          icon: this.dimensionIcon(key),
+          facts: this.dimensionFacts(dimension),
+        };
+      }
+      case 'citation':
+        return this.buildSyntheticBreakdownCard(
+          key,
+          'Zitierfähigkeit',
+          'pageGeoReadiness',
+          'answerabilitySignals',
+        );
+      case 'eeat':
+        return this.buildSyntheticBreakdownCard(
+          key,
+          'Expertise & E-E-A-T',
+          'brandRetrieval',
+          'authoritySignals',
+        );
+      case 'technical':
+        return this.buildSyntheticBreakdownCard(
+          key,
+          'Technische Basis',
+          'pageGeoReadiness',
+          'technicalAccessSignals',
+        );
+      case 'schema':
+        return this.buildSyntheticBreakdownCard(
+          key,
+          'Strukturierte Daten',
+          'pageGeoReadiness',
+          'structuredClaritySignals',
+        );
+      case 'content':
+        return this.buildSyntheticBreakdownCard(
+          key,
+          'Content-Struktur',
+          'pageGeoReadiness',
+          'contentPackagingSignals',
+        );
+      default:
+        return null;
+    }
+  }
+
+  private buildSyntheticBreakdownCard(
+    legacyKey: LegacyDimensionKey,
+    label: string,
+    dimensionKey: string,
+    breakdownKey: string,
+  ): DimensionCard | null {
+    const dimension = this.dimensionByKey(dimensionKey);
+    const group = dimension?.breakdown?.[breakdownKey];
+
+    if (!group && !dimension) {
+      return null;
+    }
+
+    const score = this.normalizedBreakdownScore(group, dimension?.score ?? null);
+    const facts = this.breakdownFacts(group);
+
+    return {
+      key: legacyKey,
+      label,
+      score,
+      indicator: this.scoreIndicator(score),
+      statusLabel: this.scoreStatus(score),
+      icon: this.dimensionIcon(legacyKey),
+      facts,
+    };
+  }
+
+  private geoDimensionLabel(key: string): string {
+    return this.dimensionByKey(key)?.label ?? this.humanizeKey(key);
+  }
+
+  private normalizeGeoDimensionItems(value: unknown): string[] {
+    if (Array.isArray(value)) {
+      return value
+        .filter((item): item is string => typeof item === 'string')
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0);
+    }
+
+    if (!value || typeof value !== 'object') {
+      return [];
+    }
+
+    const entry = value as Record<string, unknown>;
+    const score = typeof entry['score'] === 'string' || typeof entry['score'] === 'number'
+      ? `Score: ${entry['score']}`
+      : null;
+    const status = typeof entry['status'] === 'string'
+      ? `Status: ${entry['status']}`
+      : null;
+    const summary = typeof entry['summary'] === 'string'
+      ? entry['summary']
+      : null;
+    const reasonSource = typeof entry['begruendung'] === 'string'
+      ? entry['begruendung']
+      : typeof entry['explanation'] === 'string'
+        ? entry['explanation']
+        : null;
+    const reason = reasonSource && reasonSource !== summary ? reasonSource : null;
+
+    return [score, status, summary, reason]
+      .filter((item): item is string => !!item)
+      .map((item) => item.trim())
+      .filter((item, index, items) => item.length > 0 && items.indexOf(item) === index);
+  }
+
+  private humanizeKey(value: string): string {
+    return value
+      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+      .replace(/[_-]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/^./, (letter) => letter.toUpperCase());
   }
 
   private toAiLiveTestCard(
@@ -1072,9 +1283,20 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     return `${normalized.slice(0, maxLength - 1).trimEnd()}…`;
   }
 
-  private dimensionFacts(dimension: DimensionScore): string[] {
+  private dimensionFacts(dimension: DimensionScore): DimensionFact[] {
+    const webhookFacts = [...(dimension.present ?? []), ...(dimension.missing ?? [])]
+      .map((fact) => fact.trim())
+      .filter((fact) => fact.length > 0);
+
+    if (webhookFacts.length) {
+      return webhookFacts.map((fact) => this.toDimensionFact(fact));
+    }
+
     if (dimension.facts?.length) {
-      return dimension.facts;
+      return dimension.facts
+        .map((fact) => fact.trim())
+        .filter((fact) => fact.length > 0)
+        .map((fact) => this.toDimensionFact(fact));
     }
 
     if (dimension.key !== 'brand') {
@@ -1100,12 +1322,8 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
       facts.push(`Social Media: ${authority.socialPlatforms.join(', ')}`);
     }
 
-    if (authority?.domainRating !== undefined) {
-      facts.push(
-        authority.domainRating === 0
-          ? 'DR 0 - keine externe Autorität'
-          : `DR ${authority.domainRating}`,
-      );
+    if (authority?.domainRating !== undefined && authority.domainRating !== null && authority.domainRating > 0) {
+      facts.push(`DR ${authority.domainRating}`);
     }
 
     if (authority?.refDomains !== undefined) {
@@ -1116,7 +1334,118 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
       );
     }
 
-    return facts;
+    return facts.map((fact) => this.toDimensionFact(fact));
+  }
+
+  private toDimensionFact(raw: string): DimensionFact {
+    return {
+      raw,
+      text: raw.replace(/^(✅|❌|ⓘ|✓|✗|✕|!|⚠️|⚠)\s*/u, '').trim(),
+    };
+  }
+
+  private toDimensionCard(dimension: DimensionScore): DimensionCard {
+    return {
+      key: dimension.key ?? 'dimension',
+      label: dimension.label ?? 'Dimension',
+      score: dimension.score ?? null,
+      indicator: dimension.indicator ?? this.scoreIndicator(dimension.score),
+      statusLabel: dimension.status ?? dimension.label_text ?? this.scoreStatus(dimension.score),
+      icon: this.dimensionIcon(dimension.key),
+      facts: this.dimensionFacts(dimension),
+    };
+  }
+
+  private breakdownFacts(group?: GeoBreakdownGroup): DimensionFact[] {
+    if (!group) {
+      return [];
+    }
+
+    const presentFacts = (group.present ?? [])
+      .map((fact) => fact.trim())
+      .filter((fact) => fact.length > 0)
+      .map((fact) => this.toDimensionFact(this.ensureFactPrefix(fact, 'present')));
+
+    const missingFacts = (group.missing ?? [])
+      .map((fact) => fact.trim())
+      .filter((fact) => fact.length > 0)
+      .map((fact) => this.toDimensionFact(this.ensureFactPrefix(fact, 'missing')));
+
+    return [...presentFacts, ...missingFacts];
+  }
+
+  private ensureFactPrefix(fact: string, source?: 'present' | 'missing'): string {
+    const trimmed = fact.trim();
+    if (/^(✅|❌|ⓘ|✓|✗|✕|!|⚠️|⚠)\s*/u.test(trimmed)) {
+      return trimmed;
+    }
+
+    if (source === 'present') {
+      return `✅ ${trimmed}`;
+    }
+
+    if (source === 'missing') {
+      return `❌ ${trimmed}`;
+    }
+
+    if (/(fehlt|fehlend|nicht|schwach|zu kurz|zu wenig|inkonsistent|blockiert|kein|keine)/i.test(trimmed)) {
+      return `❌ ${trimmed}`;
+    }
+
+    return `✅ ${trimmed}`;
+  }
+
+  private normalizedBreakdownScore(group?: GeoBreakdownGroup, fallback?: number | null): number | null {
+    if (group?.score !== undefined && group?.score !== null && group?.max) {
+      const value = Math.round((group.score / group.max) * 100);
+      return Number.isFinite(value) ? value : fallback ?? null;
+    }
+
+    if (group?.score !== undefined && group?.score !== null) {
+      return group.score;
+    }
+
+    return fallback ?? null;
+  }
+
+  private scoreIndicator(score?: number | null): string {
+    if (score === null || score === undefined) {
+      return '';
+    }
+
+    if (score >= 65) {
+      return '✓';
+    }
+
+    if (score >= 50) {
+      return 'ⓘ';
+    }
+
+    return '✗';
+  }
+
+  private scoreStatus(score?: number | null): string {
+    if (score === null || score === undefined) {
+      return '–';
+    }
+
+    if (score >= 85) {
+      return 'Sehr gut';
+    }
+
+    if (score >= 65) {
+      return 'Gut';
+    }
+
+    if (score >= 50) {
+      return 'Durchschnitt';
+    }
+
+    if (score >= 35) {
+      return 'Ausbaufähig';
+    }
+
+    return 'Kritisch';
   }
 
   private buildStatusItems(section?: ReportCategory | null): StatusItem[] {
@@ -1154,11 +1483,11 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   }
 
   private isNegativeFact(text: string): boolean {
-    return /^(kein|keine|0\s)/i.test(text.trim());
+    return /^(❌|✗|✕|kein|keine|0\s)/i.test(text.trim());
   }
 
   private isWarningFact(text: string): boolean {
-    return /^[!ⓘ]|–\s*(zu kurz|zu wenig|niedrig|gering|mäßig)|ausbaufähig/i.test(text.trim());
+    return /^(ⓘ|!|⚠️|⚠)|–\s*(zu kurz|zu wenig|niedrig|gering|mäßig)|ausbaufähig/i.test(text.trim());
   }
 
   private toBotCard(bot: BotCategoryItem): BotCard {

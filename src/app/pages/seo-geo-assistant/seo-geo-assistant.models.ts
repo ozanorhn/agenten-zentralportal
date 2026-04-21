@@ -45,6 +45,21 @@ export interface ScoreSummary {
   improvementPotential?: number;
   diffToMedian?: number;
   criticalIssues?: number;
+  brandRetrieval?: number;
+  pageGeoReadiness?: number;
+  balancedGeoScore?: number;
+  guardrailApplied?: boolean;
+  guardrailReason?: string | null;
+}
+
+export interface GeoBreakdownGroup {
+  key?: string;
+  label?: string;
+  max?: number;
+  score?: number;
+  present?: string[];
+  missing?: string[];
+  rationale?: string;
 }
 
 export interface DimensionScore {
@@ -54,6 +69,13 @@ export interface DimensionScore {
   indicator?: string;
   status?: string;
   label_text?: string;
+  presentCount?: number;
+  missingCount?: number;
+  present?: string[];
+  missing?: string[];
+  rationale?: string;
+  explanation?: string;
+  breakdown?: Record<string, GeoBreakdownGroup>;
   facts?: string[];
 }
 
@@ -135,9 +157,28 @@ export interface StrategicAction {
 
 export interface GeoReportSection {
   score?: number;
-  dimensionAnalysis?: Record<string, string[]>;
+  balancedGeoScore?: number;
+  brandRetrievalScore?: number;
+  pageGeoReadinessScore?: number;
+  guardrailApplied?: boolean;
+  guardrailReason?: string | null;
+  dimensionAnalysis?: Record<string, unknown>;
+  subscores?: Record<string, Record<string, GeoBreakdownGroup>>;
   aiMode?: string[];
   strategicActions?: StrategicAction[];
+}
+
+export interface GeoReportDimensionSummary {
+  score?: string | number;
+  status?: string;
+  summary?: string;
+  begruendung?: string;
+  explanation?: string;
+  fakten?: {
+    vorhanden?: string[];
+    fehlt?: string[];
+  };
+  breakdown?: Record<string, GeoBreakdownGroup>;
 }
 
 export interface GeoSchemaAnalysis {
@@ -150,8 +191,10 @@ export interface GeoSchemaAnalysis {
 export interface GeoArtifacts {
   organizationSchema?: string;
   faqPageSchema?: string;
+  faqPageSchemaNote?: string;
   breadcrumbSchema?: string;
   websiteSchema?: string;
+  articleSchema?: string;
   llmsTxt?: string;
   sitemapEntry?: string;
   schemaAnalysis?: GeoSchemaAnalysis;
@@ -163,6 +206,8 @@ export interface GeoReport {
   technik?: ReportCategory;
   offpage?: ReportCategory;
   freshness?: ReportCategory;
+  brandRetrieval?: GeoReportDimensionSummary;
+  pageGeoReadiness?: GeoReportDimensionSummary;
   geo?: GeoReportSection;
   artifacts?: GeoArtifacts;
 }
@@ -262,10 +307,14 @@ export interface GeoWebhookResult {
     hasWikipedia?: boolean;
     domainRating?: number;
     refDomains?: number;
+    organicKeywords?: number;
+    organicTraffic?: number;
     socialPlatforms?: string[];
     validatedSocialLinks?: number;
     sameAsCount?: number;
+    sameAsLinks?: string[];
   };
+  subscores?: Record<string, Record<string, GeoBreakdownGroup>>;
   report?: GeoReport;
 }
 
