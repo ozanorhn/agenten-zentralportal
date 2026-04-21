@@ -283,16 +283,34 @@ export interface GeoWebhookResult {
     https?: boolean;
     hasSitemapFile?: boolean;
     urlInSitemap?: boolean;
+    robotsTxt?: {
+      exists?: boolean;
+      statusCode?: number;
+      url?: string;
+      hasSitemapHint?: boolean;
+      blockedBots?: string[];
+    };
   };
   content?: {
     wordCount?: number;
     avgParagraphWords?: number;
     h2QuestionCount?: number;
+    hasFaqSchema?: boolean;
     hasVisibleAuthor?: boolean;
     semanticDensity?: number;
     internalLinkCount?: number;
     hasMultimedia?: boolean;
     multimediaList?: string[];
+  };
+  eeat?: {
+    score?: number;
+    max?: number;
+    scoreNormalized?: number;
+    label?: string;
+    indicator?: string;
+    present?: string[];
+    missing?: string[];
+    signals?: Record<string, boolean | number | string | null>;
   };
   freshness?: {
     days?: number;

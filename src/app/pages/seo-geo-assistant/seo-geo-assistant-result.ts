@@ -168,26 +168,34 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
         tone: 'neutral',
         showMax: true,
       },
-      {
-        label: 'Vorsprung',
-        value: out?.score?.diffToMedian ?? null,
-        max: 100,
-        tone: 'metric',
-        hint: 'gegenüber Median',
-        signed: true,
-        unit: 'P',
-        showMax: false,
-      },
-      {
-        label: 'Potenzial',
-        value: out?.score?.improvementPotential ?? null,
-        max: 100,
-        tone: 'neutral',
-        hint: 'bis 100 Punkte',
-        unit: 'P',
-        showMax: false,
-      },
+      
+      
     ];
+  });
+
+  readonly balancedScoreBoxes = computed<ScoreBox[]>(() => {
+    const score = this.output()?.score;
+    if (!score) {
+      return [];
+    }
+
+    const items: ScoreBox[] = [];
+
+    
+
+    
+
+    return items;
+  });
+
+  readonly radarChartUrl = computed<string | null>(() => this.output()?.visuals?.radarChart ?? null);
+
+  readonly guardrailNotice = computed<string | null>(() => {
+    const score = this.output()?.score;
+    if (!score?.guardrailApplied) {
+      return null;
+    }
+    return score.guardrailReason ?? 'Guardrail wurde angewendet.';
   });
 
   readonly dimensionCards = computed<DimensionCard[]>(() =>
@@ -208,12 +216,33 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   readonly strategicActions = computed(() => this.output()?.report?.geo?.strategicActions ?? []);
   readonly executiveSummary = computed(() => this.output()?.report?.executiveSummary ?? []);
 
-  readonly techniqueBotCards = computed<BotCard[]>(() =>
-    (this.output()?.botAccessibilityCheck?.categories?.['AI Search']?.bots ?? [])
-      .concat(this.output()?.botAccessibilityCheck?.categories?.['AI Training']?.bots ?? [])
-      .concat(this.output()?.botAccessibilityCheck?.categories?.['AI Assistant']?.bots ?? [])
-      .map((bot) => this.toBotCard(bot)),
-  );
+  readonly techniqueBotCards = computed<BotCard[]>(() => {
+    const check = this.output()?.botAccessibilityCheck;
+    const fromCategories = (check?.categories?.['AI Search']?.bots ?? [])
+      .concat(check?.categories?.['AI Training']?.bots ?? [])
+      .concat(check?.categories?.['AI Assistant']?.bots ?? [])
+      .map((bot) => this.toBotCard(bot));
+
+    if (fromCategories.length) {
+      return fromCategories;
+    }
+
+    const blocked = new Set([
+      ...(check?.assessment?.blockedBots ?? []),
+      ...(check?.criticalBlocking ?? []),
+    ]);
+
+    if (!check?.summary || blocked.size === 0) {
+      return [];
+    }
+
+    return Array.from(blocked).map<BotCard>((name) => ({
+      name,
+      provider: 'Blockiert',
+      statusCode: null,
+      blocked: true,
+    }));
+  });
 
   readonly blockedBots = computed(() => this.output()?.botAccessibilityCheck?.assessment?.blockedBots ?? []);
   readonly criticalBlockingBots = computed(() =>
@@ -654,7 +683,59 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
       });
     }
 
+    const robots = technical?.robotsTxt;
+    if (robots?.exists !== undefined) {
+      items.push({
+        label: 'robots.txt',
+        value: robots.exists
+          ? `Vorhanden (${robots.statusCode ?? '200'})`
+          : 'Fehlt',
+        tone: robots.exists ? 'ok' : 'bad',
+      });
+    }
+
+    if (robots?.hasSitemapHint !== undefined) {
+      items.push({
+        label: 'Sitemap-Hinweis',
+        value: robots.hasSitemapHint ? 'In robots.txt' : 'Fehlt',
+        tone: robots.hasSitemapHint ? 'ok' : 'warn',
+      });
+    }
+
+    if (robots?.blockedBots?.length) {
+      items.push({
+        label: 'Blockierte Bots (robots.txt)',
+        value: robots.blockedBots.join(', '),
+        tone: 'bad',
+      });
+    }
+
     return items;
+  });
+
+  readonly eeatSummary = computed(() => this.output()?.eeat ?? null);
+  readonly eeatPresent = computed<string[]>(() => this.output()?.eeat?.present ?? []);
+  readonly eeatMissing = computed<string[]>(() => this.output()?.eeat?.missing ?? []);
+  readonly hasEeatData = computed(() => {
+    const eeat = this.output()?.eeat;
+    if (!eeat) return false;
+    return (
+      eeat.score !== undefined ||
+      (eeat.present?.length ?? 0) > 0 ||
+      (eeat.missing?.length ?? 0) > 0
+    );
+  });
+
+  readonly hasBotAccessibilityData = computed(() => {
+    const check = this.output()?.botAccessibilityCheck;
+    if (!check) return false;
+    return (
+      this.botSummaryItems().length > 0 ||
+      this.botAssessmentFacts().length > 0 ||
+      this.techniqueBotCards().length > 0 ||
+      this.criticalBlockingBots().length > 0 ||
+      !!check.assessment?.recommendation
+    );
   });
   readonly aiLiveSummaryItems = computed<MetricListItem[]>(() => {
     const summary = this.output()?.aiLiveTests?.summary;
@@ -1132,12 +1213,7 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
           'answerabilitySignals',
         );
       case 'eeat':
-        return this.buildSyntheticBreakdownCard(
-          key,
-          'Expertise & E-E-A-T',
-          'brandRetrieval',
-          'authoritySignals',
-        );
+        return this.buildSyntheticEeatCard();
       case 'technical':
         return this.buildSyntheticBreakdownCard(
           key,
@@ -1188,6 +1264,38 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
       statusLabel: this.scoreStatus(score),
       icon: this.dimensionIcon(legacyKey),
       facts,
+    };
+  }
+
+  private buildSyntheticEeatCard(): DimensionCard | null {
+    const card = this.buildSyntheticBreakdownCard(
+      'eeat',
+      'Expertise & E-E-A-T',
+      'brandRetrieval',
+      'authoritySignals',
+    );
+
+    if (!card) {
+      return null;
+    }
+
+    const hasVisibleAuthor = this.output()?.content?.hasVisibleAuthor;
+    if (hasVisibleAuthor === undefined) {
+      return card;
+    }
+
+    const authorFact = this.toDimensionFact(
+      hasVisibleAuthor ? '✅ Autor sichtbar' : '❌ Autor nicht sichtbar',
+    );
+
+    const alreadyListed = card.facts.some((fact) => /autor sichtbar|autor nicht sichtbar/i.test(fact.text));
+    if (alreadyListed) {
+      return card;
+    }
+
+    return {
+      ...card,
+      facts: [authorFact, ...card.facts],
     };
   }
 
