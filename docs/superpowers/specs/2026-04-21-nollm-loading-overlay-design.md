@@ -69,6 +69,9 @@ Use these exact UI labels in the overlay:
 ### Success Flow
 
 - once the fetch resolves successfully and a valid payload is extracted, the UI should briefly show the overlay in its finished state
+- if the webhook returns almost immediately, the overlay should still remain visible long enough to feel intentional instead of flickering
+- enforce a minimum total overlay visibility of `1000ms` for successful requests only
+- calculate the remaining time from the moment the overlay opens, then wait only for the missing remainder before moving into the finished state
 - the finished state should be short and intentional, roughly `200ms` to `400ms`, so users can register completion without adding noticeable delay
 - immediately after that, the current storage-and-navigation flow continues unchanged
 - the user should still land on `/agents/seo-geo-analyse-assistent-nollm/result?reportId=...`
@@ -96,6 +99,7 @@ Recommended timing behavior:
 - show step 1 immediately
 - advance through steps every `1200ms` to `1800ms`
 - cap the automatic progress below `100` while the request is still pending
+- if a successful response arrives before `1000ms` total overlay time has elapsed, wait only for the remaining time
 - reserve the final jump to `100` for the moment the webhook response is confirmed usable
 
 This allows the overlay to feel alive during slower requests while avoiding a misleading "100%" state before the real result exists.
@@ -110,6 +114,7 @@ Add state for:
 - `analysisSteps`
 - `activeStepIndex`
 - `overlayProgress`
+- `overlayStartedAtMs`
 - timer IDs used to advance the staged progress
 
 The existing `isSubmitting` signal should remain the source of truth for request in-flight behavior.
@@ -117,8 +122,10 @@ The existing `isSubmitting` signal should remain the source of truth for request
 ### Lifecycle Rules
 
 - starting a submit clears any previous overlay timers
+- starting a submit records the overlay start timestamp
 - success clears timers before navigation
 - failure clears timers and resets overlay state
+- failure does not wait for the minimum visibility duration
 - component teardown should also clear timers if Angular destroys the page mid-request
 
 ### Template Structure
@@ -151,6 +158,7 @@ The current button-level spinner can stay minimal or be visually secondary once 
 
 - verify invalid URLs still block submission without opening the overlay
 - verify clicking `Report erstellen` opens the overlay immediately
+- verify fast successful responses still keep the overlay visible for at least `1000ms` before the completed state
 - verify the active step and progress bar advance while waiting for the webhook
 - verify successful responses still save the report and navigate to the existing result route
 - verify timeout, network, API, and empty-response failures close the overlay and surface the correct existing error message
