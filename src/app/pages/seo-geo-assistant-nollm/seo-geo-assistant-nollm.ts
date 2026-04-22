@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import {
   extractGeoWebhookResult,
+  sanitizeNoLlmGeoWebhookResult,
   saveSeoGeoReport,
   StoredSeoGeoReport,
 } from '../seo-geo-assistant/seo-geo-assistant.models';
@@ -22,7 +23,8 @@ class RequestError extends Error {
 }
 
 const WEBHOOK_TIMEOUT_MS = 90_000;
-const OVERLAY_STEP_ADVANCE_MS = 1_400;
+const OVERLAY_STEP_ADVANCE_MS = 4_000;
+const OVERLAY_SUCCESS_HOLD_MS = 320;
 const OVERLAY_PROGRESS_STOPS = [18, 36, 58, 78, 92] as const;
 const ANALYSIS_STEPS = [
   'Analysiere Website-Struktur und Crawler-Zugriff...',
@@ -44,11 +46,13 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
 
   readonly environment = environment;
   readonly analysisSteps = ANALYSIS_STEPS;
+  readonly websiteTypes = ['Produktseite', 'Landingpage', 'Blog'] as const;
 
   websiteUrl = '';
   brand = '';
   industry = '';
   location = 'Deutschland';
+  websiteType = '';
 
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal('');
@@ -72,6 +76,11 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
       return;
     }
 
+    if (!this.websiteType.trim()) {
+      this.errorMessage.set('Bitte wähle einen Webseitentyp aus.');
+      return;
+    }
+
     this.websiteUrl = normalizedUrl;
     this.errorMessage.set('');
     this.isSubmitting.set(true);
@@ -85,6 +94,7 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
         brand: this.brand.trim(),
         industry: this.industry.trim(),
         location: this.location.trim() || 'Deutschland',
+        websiteType: this.websiteType.trim(),
       };
 
       const response = await this.fetchWithTimeout(
@@ -114,7 +124,7 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
         throw new RequestError('api', response.status, rawResponse);
       }
 
-      const payload = extractGeoWebhookResult(parsedResponse);
+      const payload = sanitizeNoLlmGeoWebhookResult(extractGeoWebhookResult(parsedResponse));
       if (!payload) {
         throw new RequestError('empty', response.status, rawResponse);
       }
@@ -131,6 +141,7 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
       };
 
       saveSeoGeoReport(record);
+      await this.showOverlayCompletedState();
 
       navigationSucceeded = await this.router.navigate(['/agents', 'seo-geo-analyse-assistent-nollm', 'result'], {
         queryParams: { reportId: record.id },
@@ -156,6 +167,7 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
     this.brand = 'Effektiv Online-Marketing';
     this.industry = 'online Marketing';
     this.location = 'Hannover, DE';
+    this.websiteType = 'Landingpage';
   }
 
   private startLoadingOverlay(): void {
@@ -211,6 +223,14 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
     }
   }
 
+  private async showOverlayCompletedState(): Promise<void> {
+    this.clearOverlayTimer();
+    this.overlayCompleted.set(true);
+    this.activeStepIndex.set(this.analysisSteps.length - 1);
+    this.overlayProgress.set(100);
+    await this.wait(OVERLAY_SUCCESS_HOLD_MS);
+  }
+
   private async fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
@@ -258,6 +278,10 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
     } catch {
       return '';
     }
+  }
+
+  private wait(durationMs: number): Promise<void> {
+    return new Promise((resolve) => window.setTimeout(resolve, durationMs));
   }
 
   private toFriendlyErrorMessage(error: unknown): string {

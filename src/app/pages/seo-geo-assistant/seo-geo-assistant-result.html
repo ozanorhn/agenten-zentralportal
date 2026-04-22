@@ -27,6 +27,141 @@
 
   <div class="mx-auto max-w-[900px] px-4 py-6 md:px-6">
     @if (output(); as analysis) {
+      @if (isEnvelopeOnlyResult()) {
+        <section class="overflow-hidden rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 shadow-[0_18px_48px_rgba(0,0,0,0.12)] md:px-6">
+          <div class="relative">
+            <div class="pointer-events-none absolute inset-x-0 top-[-3.5rem] h-32 rounded-full bg-[#0070FF]/12 blur-3xl"></div>
+
+            <div class="relative">
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-[#0A66FF]">NoLLM Envelope</p>
+              <h1 class="mt-3 text-2xl font-black tracking-tight text-on-surface md:text-4xl">
+                {{ displayReportTitle() }}
+              </h1>
+              <p class="mt-3 max-w-3xl text-sm leading-relaxed text-on-surface-variant md:text-base">
+                {{ primaryInput()?.brand || '–' }} · {{ primaryInput()?.industry || '–' }} · {{ primaryInput()?.location || '–' }} · eingegangen {{ formatDate(displayReportTimestamp()) }}
+              </p>
+
+              <div class="mt-5 flex flex-wrap gap-2">
+                <span class="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300">
+                  <span class="material-symbols-outlined text-sm">mark_email_read</span>
+                  Request erhalten
+                </span>
+                <span class="inline-flex items-center gap-2 rounded-full border border-[#0070FF]/20 bg-[#0070FF]/10 px-3 py-1 text-xs font-semibold text-[#0A66FF]">
+                  <span class="material-symbols-outlined text-sm">webhook</span>
+                  NoLLM Webhook beantwortet
+                </span>
+                @if (analysis.executionMode) {
+                  <span class="inline-flex items-center gap-2 rounded-full border border-outline-variant/20 bg-surface-container-high/40 px-3 py-1 text-xs font-semibold text-on-surface-variant">
+                    <span class="material-symbols-outlined text-sm">deployed_code</span>
+                    {{ analysis.executionMode }}
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="mt-4 grid gap-4 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+          <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+            <div class="flex items-start gap-3">
+              <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0A66FF]">
+                <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">task_alt</span>
+              </div>
+              <div>
+                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-outline">Status</p>
+                <h2 class="mt-2 text-base font-semibold text-on-surface">Request erfolgreich empfangen</h2>
+                <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">
+                  Aktuell wurde ein Request-Envelope empfangen. Analysemetriken sind in dieser Antwort noch nicht enthalten.
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-5 space-y-3">
+              <div class="flex items-start gap-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3">
+                <span class="material-symbols-outlined text-emerald-300">check_circle</span>
+                <div>
+                  <p class="text-sm font-medium text-on-surface">Webhook-Transport ok</p>
+                  <p class="mt-1 text-sm text-on-surface-variant">Die Anfrage wurde von n8n angenommen und als NoLLM-Envelope zurückgegeben.</p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3 rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 px-4 py-3">
+                <span class="material-symbols-outlined text-on-surface-variant">analytics</span>
+                <div>
+                  <p class="text-sm font-medium text-on-surface">Noch kein Analysekern</p>
+                  <p class="mt-1 text-sm text-on-surface-variant">Score-, Dimensions- und Report-Felder fehlen in diesem Payload und werden deshalb bewusst nicht als leere Report-Karten angezeigt.</p>
+                </div>
+              </div>
+
+              @if (analysis.executionMode) {
+                <div class="flex items-start gap-3 rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 px-4 py-3">
+                  <span class="material-symbols-outlined text-on-surface-variant">deployed_code</span>
+                  <div>
+                    <p class="text-sm font-medium text-on-surface">Execution Mode</p>
+                    <p class="mt-1 text-sm text-on-surface-variant">{{ analysis.executionMode }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+
+          <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+            <div class="flex items-start gap-3">
+              <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0A66FF]">
+                <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">inventory_2</span>
+              </div>
+              <div>
+                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-outline">Input Snapshot</p>
+                <h2 class="mt-2 text-base font-semibold text-on-surface">Übergebene Eingabedaten</h2>
+                <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">
+                  Diese Werte wurden an den NoLLM-Webhook übermittelt und sind die Grundlage für den nächsten Verarbeitungsschritt.
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-2">
+              @for (item of envelopeInputItems(); track item.label) {
+                <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
+                  <p class="text-[11px] uppercase tracking-[0.08em] text-on-surface-variant">{{ item.label }}</p>
+                  <p class="mt-2 break-words text-sm font-medium text-on-surface">{{ item.value }}</p>
+                </div>
+              } @empty {
+                <div class="rounded-2xl border border-dashed border-outline-variant/20 bg-surface-container-high/20 px-4 py-5 sm:col-span-2">
+                  <p class="text-sm text-on-surface-variant">Keine verwertbaren Eingabedaten im Envelope gefunden.</p>
+                </div>
+              }
+            </div>
+          </section>
+        </div>
+
+        <section class="mt-4 rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+          <div class="flex items-start gap-3">
+            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0A66FF]">
+              <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">lan</span>
+            </div>
+            <div>
+              <p class="text-[10px] font-black uppercase tracking-[0.2em] text-outline">Transport Diagnostics</p>
+              <h2 class="mt-2 text-base font-semibold text-on-surface">Webhook- und Request-Signale</h2>
+              <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">
+                Kuratierte Request-Metadaten für die technische Einordnung des empfangenen NoLLM-Outputs.
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-5 grid gap-3 sm:grid-cols-2">
+            @for (item of envelopeDiagnosticItems(); track item.label) {
+              <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
+                <p class="text-[11px] uppercase tracking-[0.08em] text-on-surface-variant">{{ item.label }}</p>
+                <p class="mt-2 break-words text-sm text-on-surface">{{ item.value }}</p>
+              </div>
+            } @empty {
+              <div class="rounded-2xl border border-dashed border-outline-variant/20 bg-surface-container-high/20 px-4 py-5 sm:col-span-2">
+                <p class="text-sm text-on-surface-variant">Keine technischen Envelope-Details im Payload gefunden.</p>
+              </div>
+            }
+          </div>
+        </section>
+      } @else {
       <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -170,9 +305,9 @@
         }
       </div>
 
-      @if (activeTab() !== 'geo') {
-        @if (currentReport(); as report) {
-          <section class="mt-4 space-y-3">
+      @if (true) {
+        <section class="mt-4 space-y-3">
+          @if (currentReport()) {
             <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
               <h2 class="text-base font-medium text-on-surface">{{ currentTabLabel() }}</h2>
               <div class="mt-4 space-y-2">
@@ -202,6 +337,156 @@
                 }
               </div>
             </div>
+          }
+
+          @if (activeTab() === 'technik' && hasBotAccessibilityData()) {
+            <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h3 class="text-sm font-medium text-on-surface">Bot Accessibility</h3>
+                  <p class="mt-1 text-sm text-on-surface-variant">
+                    Saubere Übersicht zu Erreichbarkeit, OAP-Bots und blockierten Zugriffen.
+                  </p>
+                </div>
+              </div>
+
+              @if (botSummaryItems().length) {
+                <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  @for (item of botSummaryItems(); track item.label) {
+                    <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3">
+                      <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ item.label }}</p>
+                      <p class="mt-2 text-sm font-medium" [class]="detailToneClass(item.tone)">{{ item.value }}</p>
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (botAssessmentItems().length) {
+                <div class="mt-5">
+                  <p class="text-[11px] uppercase tracking-[0.08em] text-on-surface-variant">Reichweite nach Bot-Typ</p>
+                  <div class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    @for (item of botAssessmentItems(); track item.label) {
+                      <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
+                        <p class="text-[11px] uppercase tracking-[0.08em] text-on-surface-variant">{{ item.label }}</p>
+                        <p class="mt-2 text-sm font-medium" [class]="detailToneClass(item.tone)">{{ item.value }}</p>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              @if (oapBotCategory(); as oapCategory) {
+                <div class="mt-5 rounded-[1.5rem] border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
+                  <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p class="text-[11px] uppercase tracking-[0.08em] text-on-surface-variant">OAP Bots</p>
+                      @if (oapCategory.description) {
+                        <p class="mt-2 max-w-2xl text-sm leading-relaxed text-on-surface-variant">{{ oapCategory.description }}</p>
+                      }
+                    </div>
+                    @if (oapCategory.summary) {
+                      <span class="rounded-full bg-surface-container-lowest/70 px-3 py-1 text-xs text-on-surface-variant">
+                        {{ oapCategory.summary }}
+                      </span>
+                    }
+                  </div>
+
+                  <div class="mt-4 flex flex-wrap gap-2">
+                    @for (bot of oapCategory.bots; track bot.name + bot.provider) {
+                      <span class="rounded-full px-3 py-1 text-xs font-medium" [class]="botCategoryChipClass(bot)">
+                        {{ bot.name }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              }
+
+              @if (nonOapBotCategory(); as otherCategory) {
+                <div class="mt-5 rounded-[1.5rem] border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
+                  <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p class="text-[11px] uppercase tracking-[0.08em] text-on-surface-variant">{{ otherCategory.label }}</p>
+                      @if (otherCategory.description) {
+                        <p class="mt-2 max-w-2xl text-sm leading-relaxed text-on-surface-variant">{{ otherCategory.description }}</p>
+                      }
+                    </div>
+                    @if (otherCategory.summary) {
+                      <span class="rounded-full bg-surface-container-lowest/70 px-3 py-1 text-xs text-on-surface-variant">
+                        {{ otherCategory.summary }}
+                      </span>
+                    }
+                  </div>
+
+                  <div class="mt-4 flex flex-wrap gap-2">
+                    @for (bot of otherCategory.bots; track bot.name + bot.provider) {
+                      <span class="rounded-full px-3 py-1 text-xs font-medium" [class]="botCategoryChipClass(bot)">
+                        {{ bot.name }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              }
+
+              @if (nonOapBotCategory(); as otherCategory) {
+                <div class="mt-5 rounded-[1.5rem] border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
+                  <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p class="text-[11px] uppercase tracking-[0.08em] text-on-surface-variant">{{ otherCategory.label }}</p>
+                      @if (otherCategory.description) {
+                        <p class="mt-2 max-w-2xl text-sm leading-relaxed text-on-surface-variant">{{ otherCategory.description }}</p>
+                      }
+                    </div>
+                    @if (otherCategory.summary) {
+                      <span class="rounded-full bg-surface-container-lowest/70 px-3 py-1 text-xs text-on-surface-variant">
+                        {{ otherCategory.summary }}
+                      </span>
+                    }
+                  </div>
+
+                  <div class="mt-4 flex flex-wrap gap-2">
+                    @for (bot of otherCategory.bots; track bot.name + bot.provider) {
+                      <span class="rounded-full px-3 py-1 text-xs font-medium" [class]="botCategoryChipClass(bot)">
+                        {{ bot.name }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              }
+
+              @if (botRecommendation()) {
+                <div class="mt-5 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                  {{ botRecommendation() }}
+                </div>
+              }
+
+              @if (blockedBotCards().length) {
+                <div class="mt-5">
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <p class="text-[11px] uppercase tracking-[0.08em] text-on-surface-variant">Blockierte Bots</p>
+                    @if (criticalBlockingBots().length) {
+                      <div class="flex flex-wrap gap-2">
+                        @for (bot of criticalBlockingBots(); track bot) {
+                          <span class="rounded-full bg-red-500/10 px-3 py-1 text-xs font-medium text-red-300">{{ bot }}</span>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <div class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    @for (bot of blockedBotCards(); track bot.name + bot.provider) {
+                      <div class="rounded-2xl border px-4 py-4" [class]="botCardClass(bot)">
+                        <p class="text-sm font-medium text-on-surface">{{ bot.name }}</p>
+                        <p class="mt-1 text-xs text-on-surface-variant">{{ bot.provider }} · {{ bot.statusLabel ?? 'Blockiert' }}</p>
+                        @if (bot.description) {
+                          <p class="mt-2 text-xs leading-relaxed text-on-surface-variant">{{ bot.description }}</p>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
 
             @if (activeTab() === 'onpage' && contentDetails().length) {
               <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
@@ -233,6 +518,7 @@
               </div>
             }
 
+            @if (shouldShowQuickWinsCard()) {
             <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
               <h3 class="text-sm font-medium text-on-surface">Quick Wins</h3>
               <div class="mt-4 space-y-3">
@@ -306,56 +592,9 @@
                   <p class="text-sm text-on-surface-variant">Keine Quick Wins im Report vorhanden.</p>
                 }
 
-                @if (agentId === 'seo-geo-analyse-assistent-nollm' && secondaryQuickWinsDebug(); as debug) {
-                  <div class="rounded-2xl border border-amber-500/20 bg-amber-500/5 px-4 py-4">
-                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-amber-300">Debug Quick Wins</p>
-                    <div class="mt-3 grid gap-2 sm:grid-cols-2">
-                      <div class="rounded-xl border border-outline-variant/15 bg-surface-container-high/20 px-3 py-3">
-                        <p class="text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">Request Quelle</p>
-                        <p class="mt-1 text-sm text-on-surface">{{ debug.requestSource || '–' }}</p>
-                      </div>
-                      <div class="rounded-xl border border-outline-variant/15 bg-surface-container-high/20 px-3 py-3">
-                        <p class="text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">HTTP Status</p>
-                        <p class="mt-1 text-sm text-on-surface">{{ debug.responseStatus ?? '–' }}</p>
-                      </div>
-                      <div class="rounded-xl border border-outline-variant/15 bg-surface-container-high/20 px-3 py-3">
-                        <p class="text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">Antwortformat</p>
-                        <p class="mt-1 text-sm text-on-surface">{{ debug.responseShape || '–' }}</p>
-                      </div>
-                      <div class="rounded-xl border border-outline-variant/15 bg-surface-container-high/20 px-3 py-3">
-                        <p class="text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">Erkannte Quick Wins</p>
-                        <p class="mt-1 text-sm text-on-surface">{{ debug.recognizedCount ?? 0 }}</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-3 grid gap-2 sm:grid-cols-2">
-                      <div class="rounded-xl border border-outline-variant/15 bg-surface-container-high/20 px-3 py-3">
-                        <p class="text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">Gestartet</p>
-                        <p class="mt-1 text-sm text-on-surface">{{ debug.startedAt || '–' }}</p>
-                      </div>
-                      <div class="rounded-xl border border-outline-variant/15 bg-surface-container-high/20 px-3 py-3">
-                        <p class="text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">Abgeschlossen</p>
-                        <p class="mt-1 text-sm text-on-surface">{{ debug.completedAt || '–' }}</p>
-                      </div>
-                    </div>
-
-                    @if (debug.topLevelKeys?.length) {
-                      <div class="mt-3 rounded-xl border border-outline-variant/15 bg-surface-container-high/20 px-3 py-3">
-                        <p class="text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">Top-Level Keys</p>
-                        <p class="mt-1 break-words text-sm text-on-surface">{{ debug.topLevelKeys?.join(', ') }}</p>
-                      </div>
-                    }
-
-                    @if (debug.error) {
-                      <div class="mt-3 rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-3">
-                        <p class="text-[10px] uppercase tracking-[0.08em] text-red-200">Fehler</p>
-                        <p class="mt-1 break-words text-sm text-red-100">{{ debug.error }}</p>
-                      </div>
-                    }
-                  </div>
-                }
               </div>
             </div>
+            }
 
             @if (activeTab() === 'technik') {
               @if (technicalDetails().length) {
@@ -392,66 +631,11 @@
                 </div>
               }
 
-              @if (hasBotAccessibilityData()) {
-              <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
-                <h3 class="text-sm font-medium text-on-surface">Bot Accessibility</h3>
-                @if (botSummaryItems().length) {
-                  <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    @for (item of botSummaryItems(); track item.label) {
-                      <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3">
-                        <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ item.label }}</p>
-                        <p class="mt-2 text-sm font-medium" [class]="detailToneClass(item.tone)">{{ item.value }}</p>
-                      </div>
-                    }
-                  </div>
-                }
-
-                @if (botAssessmentFacts().length) {
-                  <div class="mt-4 space-y-2">
-                    @for (item of botAssessmentFacts(); track item) {
-                      <div class="flex gap-3 rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-3 text-sm text-on-surface-variant">
-                        <span class="text-outline">•</span>
-                        <span>{{ item }}</span>
-                      </div>
-                    }
-                  </div>
-                }
-
-                @if (techniqueBotCards().length) {
-                  <div class="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                    @for (bot of techniqueBotCards(); track bot.name + bot.provider) {
-                      <div class="rounded-2xl border px-4 py-3" [class]="botCardClass(bot)">
-                        <p class="text-sm font-medium text-on-surface">{{ bot.name }}</p>
-                        <p class="mt-1 text-xs text-on-surface-variant">{{ bot.provider }} · {{ bot.statusCode ?? '–' }}</p>
-                      </div>
-                    }
-                  </div>
-                }
-
-                @if (analysis.botAccessibilityCheck?.assessment?.recommendation) {
-                  <div class="mt-4 rounded-2xl bg-red-500/10 px-4 py-3 text-sm text-red-300">
-                    {{ analysis.botAccessibilityCheck?.assessment?.recommendation }}
-                  </div>
-                }
-
-                @if (criticalBlockingBots().length) {
-                  <div class="mt-4">
-                    <p class="text-xs font-medium uppercase tracking-[0.05em] text-on-surface-variant">Kritisch blockiert</p>
-                    <div class="mt-2 flex flex-wrap gap-2">
-                      @for (bot of criticalBlockingBots(); track bot) {
-                        <span class="rounded-full bg-red-500/10 px-3 py-1 text-xs font-medium text-red-300">{{ bot }}</span>
-                      }
-                    </div>
-                  </div>
-                }
-              </div>
-              }
             }
-          </section>
-        }
+        </section>
       }
 
-      @if (activeTab() === 'geo') {
+      @if (false) {
         <section class="mt-4 space-y-3">
           @if (executiveSummary().length) {
             <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
@@ -640,7 +824,7 @@
                   <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
                     <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">Vorhanden</p>
                     <div class="mt-3 space-y-1.5">
-                      @for (item of schema.present ?? []; track item) {
+                      @for (item of schema?.present ?? []; track item) {
                         <div class="flex items-start gap-2 text-[12px] leading-4 text-on-surface-variant">
                           <span class="material-symbols-outlined mt-[-1px] text-sm leading-none text-emerald-300">check</span>
                           <span>{{ item }}</span>
@@ -654,7 +838,7 @@
                   <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
                     <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">Fehlend</p>
                     <div class="mt-3 space-y-1.5">
-                      @for (item of schema.missing ?? []; track item) {
+                      @for (item of schema?.missing ?? []; track item) {
                         <div class="flex items-start gap-2 text-[12px] leading-4 text-on-surface-variant">
                           <span class="material-symbols-outlined mt-[-1px] text-sm leading-none text-red-300">close</span>
                           <span>{{ item }}</span>
@@ -668,7 +852,7 @@
                   <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
                     <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">Gefundene H2 Fragen</p>
                     <div class="mt-3 space-y-1.5">
-                      @for (item of schema.h2QuestionsFound ?? []; track item) {
+                      @for (item of schema?.h2QuestionsFound ?? []; track item) {
                         <div class="flex items-start gap-2 text-[12px] leading-4 text-on-surface-variant">
                           <span class="material-symbols-outlined mt-[-1px] text-sm leading-none text-amber-300">help</span>
                           <span>{{ item }}</span>
@@ -680,10 +864,10 @@
                   </div>
                 </div>
 
-                @if (schema.deployInstructions) {
+                @if (schema?.deployInstructions) {
                   <div class="mt-4 rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
                     <p class="text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">Deploy Hinweise</p>
-                    <p class="mt-2 text-sm text-on-surface-variant">{{ schema.deployInstructions }}</p>
+                    <p class="mt-2 text-sm text-on-surface-variant">{{ schema?.deployInstructions }}</p>
                   </div>
                 }
               }
@@ -706,6 +890,7 @@
             </div>
           }
         </section>
+      }
       }
 
     } @else if (pendingState()) {

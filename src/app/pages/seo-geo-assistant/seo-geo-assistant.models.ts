@@ -7,6 +7,20 @@ export interface GeoWebhookInput {
   brand?: string;
   industry?: string;
   location?: string;
+  websiteType?: string;
+}
+
+export type GeoWebhookEnvelopeScalar = string | number | boolean | null;
+export type GeoWebhookEnvelopeHeaders = Record<string, string>;
+export type GeoWebhookEnvelopeParams = Record<string, GeoWebhookEnvelopeScalar>;
+
+export interface GeoWebhookEnvelope {
+  headers?: GeoWebhookEnvelopeHeaders;
+  params?: GeoWebhookEnvelopeParams;
+  query?: GeoWebhookEnvelopeParams;
+  body?: GeoWebhookInput;
+  webhookUrl?: string;
+  executionMode?: string;
 }
 
 export interface SeoBreakdownItem {
@@ -95,15 +109,27 @@ export interface BotSummary {
 export interface BotCategoryItem {
   name?: string;
   provider?: string;
+  category?: string;
+  isOAP?: boolean;
   statusCode?: number;
   accessible?: boolean;
   blocked?: boolean;
+  status?: string;
+  statusLabel?: string;
+  description?: string;
 }
 
 export interface BotCategorySnapshot {
   total?: number;
   accessible?: number;
   blocked?: number;
+  bots?: BotCategoryItem[];
+}
+
+export interface BotCategorySummary {
+  category?: string;
+  description?: string;
+  summary?: string;
   bots?: BotCategoryItem[];
 }
 
@@ -120,6 +146,11 @@ export interface BotAssessment {
 
 export interface BotAccessibilityCheck {
   categories?: Record<string, BotCategorySnapshot>;
+  categorySummaries?: BotCategorySummary[];
+  allBotsTested?: BotCategoryItem[];
+  successfulBots?: BotCategoryItem[];
+  blockedBotsDetailed?: BotCategoryItem[];
+  errorBots?: BotCategoryItem[];
   summary?: {
     allBots?: BotSummary;
     oapBots?: BotSummary;
@@ -222,6 +253,14 @@ export interface GeoReport {
   technik?: ReportCategory;
   offpage?: ReportCategory;
   freshness?: ReportCategory;
+  botAccessibility?: {
+    categories?: BotCategorySummary[];
+    summary?: {
+      text?: string;
+      oapText?: string;
+      recommendation?: string;
+    };
+  };
   brandRetrieval?: GeoReportDimensionSummary;
   pageGeoReadiness?: GeoReportDimensionSummary;
   geo?: GeoReportSection;
@@ -259,7 +298,7 @@ export interface AiLiveTests {
   gemini?: AiLiveTestResult;
 }
 
-export interface GeoWebhookResult {
+export interface GeoWebhookResult extends GeoWebhookEnvelope {
   analysedAt?: string;
   visuals?: {
     radarChart?: string;
@@ -407,6 +446,20 @@ export function extractGeoWebhookResult(data: unknown): GeoWebhookResult | null 
   }
 
   return payload as GeoWebhookResult;
+}
+
+export function sanitizeNoLlmGeoWebhookResult(payload: GeoWebhookResult | null): GeoWebhookResult | null {
+  if (!payload?.authority) {
+    return payload;
+  }
+
+  const { refDomains, organicKeywords, organicTraffic, ...authority } = payload.authority;
+  const hasAuthorityValues = Object.values(authority).some((value) => value !== undefined && value !== null);
+
+  return {
+    ...payload,
+    authority: hasAuthorityValues ? authority : undefined,
+  };
 }
 
 export function loadSeoGeoReports(): StoredSeoGeoReport[] {

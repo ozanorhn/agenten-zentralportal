@@ -8,7 +8,7 @@
         SEO/GEO Analyse <span class="text-[#0070FF]">Assistent NoLLM</span>
       </h1>
       <p class="max-w-3xl text-lg font-light leading-relaxed text-on-surface-variant md:text-xl">
-        Felder ausfüllen, den NoLLM-Webhook direkt anstoßen und den fertigen Report danach auf einer eigenen Ergebnisseite ansehen.
+        Felder ausfüllen, Analyse starten und den fertigen Report direkt im Portal ansehen.
       </p>
     </div>
 
@@ -21,7 +21,7 @@
             </div>
             <div>
               <p class="text-sm font-bold text-on-surface">Analyse starten</p>
-              <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Webhook Formular</p>
+              <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Analyse Formular</p>
             </div>
           </div>
         </div>
@@ -80,19 +80,41 @@
             </div>
           </div>
 
-          <div class="space-y-2">
-            <label class="block text-[10px] font-bold uppercase tracking-[0.22em] text-outline">
-              Standort
-            </label>
-            <div class="relative">
-              <input
-                [(ngModel)]="location"
-                [disabled]="isSubmitting()"
-                type="text"
-                placeholder="Deutschland"
-                class="w-full rounded-2xl border-0 bg-surface-container-highest px-4 py-4 pl-12 text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]"
-              />
-              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">location_on</span>
+          <div class="grid gap-6 md:grid-cols-2">
+            <div class="space-y-2">
+              <label class="block text-[10px] font-bold uppercase tracking-[0.22em] text-outline">
+                Webseitentyp
+              </label>
+              <div class="relative">
+                <select
+                  [(ngModel)]="websiteType"
+                  [disabled]="isSubmitting()"
+                  class="w-full appearance-none rounded-2xl border-0 bg-surface-container-highest px-4 py-4 pl-12 pr-12 text-sm text-on-surface focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]"
+                >
+                  <option value="">Bitte auswählen</option>
+                  @for (type of websiteTypes; track type) {
+                    <option [value]="type">{{ type }}</option>
+                  }
+                </select>
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">web</span>
+                <span class="material-symbols-outlined pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">expand_more</span>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label class="block text-[10px] font-bold uppercase tracking-[0.22em] text-outline">
+                Standort
+              </label>
+              <div class="relative">
+                <input
+                  [(ngModel)]="location"
+                  [disabled]="isSubmitting()"
+                  type="text"
+                  placeholder="Deutschland"
+                  class="w-full rounded-2xl border-0 bg-surface-container-highest px-4 py-4 pl-12 text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]"
+                />
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">location_on</span>
+              </div>
             </div>
           </div>
 
@@ -131,36 +153,6 @@
       </section>
 
       <aside class="space-y-6">
-        <section class="glass-panel kinetic-border rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
-          <div class="flex items-start gap-4">
-            <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
-              <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">webhook</span>
-            </div>
-            <div>
-              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Webhook</p>
-              <p class="mt-2 text-lg font-black text-on-surface font-headline">Endpunkt</p>
-              <p class="mt-3 break-all text-sm leading-relaxed text-on-surface-variant">
-                {{ environment.geoAnalysisNoLlmWebhookUrl }}
-              </p>
-            </div>
-          </div>
-
-          <div class="mt-6 space-y-4">
-            @for (step of [
-              'Formular absenden',
-              'JSON vom Webhook empfangen',
-              'Automatisch zur eigenen Report-Seite springen'
-            ]; track step) {
-              <div class="flex gap-3">
-                <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#0070FF]/10 text-[11px] font-black text-[#0070FF]">
-                  {{ $index + 1 }}
-                </span>
-                <p class="text-sm leading-relaxed text-on-surface-variant">{{ step }}</p>
-              </div>
-            }
-          </div>
-        </section>
-
         <section class="glass-panel kinetic-border rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
           <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Report Struktur</p>
           <div class="mt-4 space-y-3">

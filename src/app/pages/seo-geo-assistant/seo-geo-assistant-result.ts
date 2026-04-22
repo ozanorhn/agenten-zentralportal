@@ -5,6 +5,7 @@ import { AGENTS_MAP } from '../../data/agents.data';
 import {
   AiLiveTestResult,
   BotCategoryItem,
+  BotCategorySummary,
   DimensionScore,
   extractGeoWebhookResult,
   findSeoGeoReport,
@@ -15,6 +16,7 @@ import {
   GeoWebhookResult,
   QuickWin,
   ReportCategory,
+  sanitizeNoLlmGeoWebhookResult,
   SecondaryQuickWinsDebug,
   SecondaryQuickWinsMeta,
   SEO_GEO_REPORT_UPDATED_EVENT,
@@ -22,7 +24,7 @@ import {
   StoredSeoGeoReport,
 } from './seo-geo-assistant.models';
 
-type SeoGeoTabKey = 'onpage' | 'technik' | 'offpage' | 'geo';
+type SeoGeoTabKey = 'onpage' | 'technik' | 'offpage';
 type StatusRequestErrorCode = 'network' | 'api';
 
 const STATUS_POLL_INTERVAL_MS = 2_000;
@@ -65,6 +67,22 @@ interface BotCard {
   provider: string;
   statusCode: number | null;
   blocked: boolean;
+  statusLabel: string | null;
+  description: string | null;
+}
+
+interface BotAssessmentItem {
+  label: string;
+  value: string;
+  tone: 'ok' | 'warn' | 'bad' | 'neutral';
+}
+
+interface BotCategorySection {
+  key: string;
+  label: string;
+  description: string | null;
+  summary: string | null;
+  bots: BotCard[];
 }
 
 interface DimensionCard {
@@ -93,6 +111,11 @@ interface MetricListItem {
   label: string;
   value: string;
   tone: 'ok' | 'warn' | 'bad' | 'neutral';
+}
+
+interface EnvelopeFieldItem {
+  label: string;
+  value: string;
 }
 
 interface SecondaryQuickWinsResponse {
@@ -168,7 +191,6 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     { key: 'onpage', label: 'Content & Onpage' },
     { key: 'technik', label: 'Technische Basis' },
     { key: 'offpage', label: 'Autorität & Offpage' },
-    { key: 'geo', label: 'AI' },
   ];
 
   private readonly _record = signal<StoredSeoGeoReport | null>(findSeoGeoReport(this.reportId));
@@ -176,7 +198,53 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
 
   readonly record = this._record.asReadonly();
   readonly jobStatus = this._jobStatus.asReadonly();
-  readonly output = computed<GeoWebhookResult | null>(() => this._record()?.payload ?? null);
+  readonly output = computed<GeoWebhookResult | null>(() => {
+    const payload = this._record()?.payload ?? null;
+    return this.agentId === 'seo-geo-analyse-assistent-nollm'
+      ? sanitizeNoLlmGeoWebhookResult(payload)
+      : payload;
+  });
+  readonly primaryInput = computed<GeoWebhookInput | null>(() =>
+    this.extractSecondaryQuickWinsInput(this.output()) ?? null,
+  );
+  readonly isEnvelopeOnlyResult = computed<boolean>(() =>
+    this.isEnvelopeOnlyPayload(this.output()),
+  );
+  readonly displayReportTitle = computed<string>(() => {
+    const url = this.primaryInput()?.url;
+    if (url) {
+      return this.compactUrl(url);
+    }
+
+    return this.isEnvelopeOnlyResult() ? 'NoLLM Request' : 'Report';
+  });
+  readonly displayReportTimestamp = computed<string | number | null>(() =>
+    this.output()?.analysedAt ?? this.record()?.createdAt ?? null,
+  );
+  readonly envelopeInputItems = computed<EnvelopeFieldItem[]>(() => {
+    const input = this.primaryInput();
+    return [
+      { label: 'Website', value: input?.url ?? '' },
+      { label: 'Marke', value: input?.brand ?? '' },
+      { label: 'Branche', value: input?.industry ?? '' },
+      { label: 'Standort', value: input?.location ?? '' },
+    ].filter((item) => item.value.trim().length > 0);
+  });
+  readonly envelopeDiagnosticItems = computed<EnvelopeFieldItem[]>(() => {
+    const payload = this.output();
+    const headers = payload?.headers ?? {};
+
+    return [
+      { label: 'Webhook URL', value: payload?.webhookUrl ?? '' },
+      { label: 'Execution Mode', value: payload?.executionMode ?? '' },
+      { label: 'Origin', value: headers['origin'] ?? '' },
+      { label: 'Referer', value: headers['referer'] ?? '' },
+      { label: 'Host', value: headers['host'] ?? '' },
+      { label: 'Forwarded Proto', value: headers['x-forwarded-proto'] ?? '' },
+      { label: 'User-Agent', value: headers['user-agent'] ?? '' },
+      { label: 'Content-Type', value: headers['content-type'] ?? '' },
+    ].filter((item) => item.value.trim().length > 0);
+  });
   readonly isSecondaryQuickWinsLoading = computed<boolean>(() => !!this.output()?.secondaryQuickWinsLoading);
   readonly secondaryQuickWinsMeta = computed<SecondaryQuickWinsMeta | null>(() =>
     this.output()?.secondaryQuickWinsMeta ?? null,
@@ -198,7 +266,7 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   readonly currentJobStep = computed<string>(() => this.jobStatus()?.step ?? 'Analyse gestartet');
   readonly currentJobUrl = computed<string>(() => {
     const url = this.jobStatus()?.input?.url;
-    return url ? url.replace(/^https?:\/\//, '') : 'SEO/GEO Analyse';
+    return url ? this.compactUrl(url) : 'SEO/GEO Analyse';
   });
   readonly currentJobStatusLabel = computed<string>(() =>
     this.toStatusLabel(this.jobStatus()?.status),
@@ -272,10 +340,13 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
 
   readonly techniqueBotCards = computed<BotCard[]>(() => {
     const check = this.output()?.botAccessibilityCheck;
-    const fromCategories = (check?.categories?.['AI Search']?.bots ?? [])
-      .concat(check?.categories?.['AI Training']?.bots ?? [])
-      .concat(check?.categories?.['AI Assistant']?.bots ?? [])
-      .map((bot) => this.toBotCard(bot));
+    const categoryBots = Object.values(check?.categories ?? {})
+      .flatMap((category) => category.bots ?? []);
+    const summaryBots = (check?.categorySummaries ?? [])
+      .flatMap((category) => category.bots ?? []);
+    const reportBots = (this.output()?.report?.botAccessibility?.categories ?? [])
+      .flatMap((category) => category.bots ?? []);
+    const fromCategories = this.uniqueBotCards([...categoryBots, ...summaryBots, ...reportBots]);
 
     if (fromCategories.length) {
       return fromCategories;
@@ -295,6 +366,8 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
       provider: 'Blockiert',
       statusCode: null,
       blocked: true,
+      statusLabel: 'Blockiert',
+      description: null,
     }));
   });
 
@@ -348,14 +421,72 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
 
     return items;
   });
-  readonly botAssessmentFacts = computed<string[]>(() => {
+  readonly botAssessmentItems = computed<BotAssessmentItem[]>(() => {
     const assessment = this.output()?.botAccessibilityCheck?.assessment;
     return [
-      assessment?.aiSearchBots,
-      assessment?.aiTrainingBots,
-      assessment?.aiAssistantBots,
-      assessment?.oapScore,
-    ].filter((item): item is string => !!item);
+      { label: 'AI Search', value: assessment?.aiSearchBots },
+      { label: 'AI Training', value: assessment?.aiTrainingBots },
+      { label: 'AI Assistant', value: assessment?.aiAssistantBots },
+    ]
+      .filter((item): item is { label: string; value: string } => !!item.value)
+      .map((item) => ({
+        ...item,
+        tone: this.reachabilityTone(item.value),
+      }));
+  });
+  readonly oapBotCategory = computed<BotCategorySection | null>(() =>
+    this.botCategorySections().find((category) => category.key === 'oap-bots') ?? null,
+  );
+  readonly nonOapBotCategory = computed<BotCategorySection | null>(() =>
+    this.botCategorySections().find((category) => category.key === 'other-bots') ?? null,
+  );
+  readonly blockedBotCards = computed<BotCard[]>(() =>
+    this.techniqueBotCards().filter((bot) => bot.blocked),
+  );
+  readonly botRecommendation = computed<string | null>(() =>
+    this.output()?.botAccessibilityCheck?.assessment?.recommendation
+    ?? this.output()?.report?.botAccessibility?.summary?.recommendation
+    ?? null,
+  );
+  readonly botCategorySections = computed<BotCategorySection[]>(() => {
+    const check = this.output()?.botAccessibilityCheck;
+    const reportCategories = this.output()?.report?.botAccessibility?.categories ?? [];
+    const summaryCategories = check?.categorySummaries ?? [];
+    const oapSection = this.buildOapBotCategorySection();
+    const nonOapSection = this.buildNonOapBotCategorySection();
+
+    const preferredCategories = summaryCategories.length ? summaryCategories : reportCategories;
+    const mappedPreferredCategories = preferredCategories
+        .map((category, index) => this.toBotCategorySection(category, index))
+        .filter((category): category is BotCategorySection => !!category);
+
+    if (mappedPreferredCategories.length || oapSection) {
+      return [oapSection, nonOapSection, ...mappedPreferredCategories]
+        .filter((category): category is BotCategorySection => !!category);
+    }
+
+    const fallbackCategories = Object.entries(check?.categories ?? {})
+      .filter(([key]) => key.trim().toLowerCase() !== 'archive')
+      .map(([key, category]) => {
+        const total = category.total;
+        const accessible = category.accessible;
+        const blocked = category.blocked ?? 0;
+        const summary = total !== undefined && accessible !== undefined
+          ? `${accessible}/${total} erreichbar`
+          : null;
+
+        return {
+          key,
+          label: key,
+          description: blocked > 0 ? `${blocked} blockiert` : null,
+          summary,
+          bots: this.uniqueBotCards(category.bots ?? []),
+        } satisfies BotCategorySection;
+      })
+      .filter((category) => !!category.summary || category.bots.length > 0);
+
+    return [oapSection, nonOapSection, ...fallbackCategories]
+      .filter((category): category is BotCategorySection => !!category);
   });
   readonly technicalDetails = computed<MetricListItem[]>(() => {
     const fileChecks = this.output()?.fileChecks;
@@ -681,13 +812,16 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
 
   readonly hasBotAccessibilityData = computed(() => {
     const check = this.output()?.botAccessibilityCheck;
-    if (!check) return false;
+    const reportBotAccessibility = this.output()?.report?.botAccessibility;
+    if (!check && !reportBotAccessibility) return false;
     return (
       this.botSummaryItems().length > 0 ||
-      this.botAssessmentFacts().length > 0 ||
-      this.techniqueBotCards().length > 0 ||
+      this.botAssessmentItems().length > 0 ||
+      !!this.oapBotCategory() ||
+      !!this.nonOapBotCategory() ||
+      this.blockedBotCards().length > 0 ||
       this.criticalBlockingBots().length > 0 ||
-      !!check.assessment?.recommendation
+      !!this.botRecommendation()
     );
   });
   readonly aiLiveSummaryItems = computed<MetricListItem[]>(() => {
@@ -858,14 +992,14 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     void this.pollJobStatus();
   }
 
-  formatDate(value?: string): string {
+  formatDate(value?: string | number | null): string {
     if (!value) {
       return '–';
     }
 
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) {
-      return value;
+      return `${value}`;
     }
 
     return new Intl.DateTimeFormat('de-DE', {
@@ -1019,6 +1153,12 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
       : 'border-emerald-500/20 border-l-[3px]';
   }
 
+  botCategoryChipClass(card: BotCard): string {
+    return card.blocked
+      ? 'border border-red-500/20 bg-red-500/10 text-red-300'
+      : 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-300';
+  }
+
   detailToneClass(tone: MetricListItem['tone']): string {
     switch (tone) {
       case 'ok':
@@ -1119,6 +1259,15 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     }
 
     return this.currentReport()?.quickWins ?? [];
+  }
+
+  shouldShowQuickWinsCard(): boolean {
+    return !!(
+      this.isSecondaryQuickWinsLoading() ||
+      this.secondaryQuickWinsMeta() ||
+      this.currentQuickWins().length > 0 ||
+      (this.agentId === 'seo-geo-analyse-assistent-nollm' && this.secondaryQuickWinsDebug())
+    );
   }
 
   private dimensionIcon(key?: string): string {
@@ -1634,12 +1783,145 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   }
 
   private toBotCard(bot: BotCategoryItem): BotCard {
+    const statusLabel = bot.statusLabel
+      ?? (bot.status === 'blocked' ? 'Blockiert' : bot.status === 'ok' ? 'Erfolgreich' : null);
     return {
       name: bot.name ?? 'Bot',
       provider: bot.provider ?? '–',
       statusCode: bot.statusCode ?? null,
-      blocked: !!bot.blocked,
+      blocked: !!bot.blocked || bot.accessible === false || bot.status === 'blocked',
+      statusLabel,
+      description: bot.description ?? null,
     };
+  }
+
+  private uniqueBotCards(bots: BotCategoryItem[]): BotCard[] {
+    const seen = new Set<string>();
+    const cards: BotCard[] = [];
+
+    for (const bot of bots) {
+      const card = this.toBotCard(bot);
+      const key = `${card.name}::${card.provider}`;
+      if (seen.has(key)) {
+        continue;
+      }
+
+      seen.add(key);
+      cards.push(card);
+    }
+
+    return cards;
+  }
+
+  private toBotCategorySection(category: BotCategorySummary, index: number): BotCategorySection | null {
+    const label = category.category?.trim();
+    const description = category.description?.trim() || null;
+    const summary = category.summary?.trim() || null;
+    const bots = this.uniqueBotCards(category.bots ?? []);
+
+    if (label?.toLowerCase() === 'archive') {
+      return null;
+    }
+
+    if (!label && !summary && bots.length === 0) {
+      return null;
+    }
+
+    return {
+      key: label ? label.toLowerCase().replace(/\s+/g, '-') : `category-${index}`,
+      label: label || `Kategorie ${index + 1}`,
+      description,
+      summary,
+      bots,
+    };
+  }
+
+  private reachabilityTone(value: string): 'ok' | 'warn' | 'bad' | 'neutral' {
+    const match = value.match(/(\d+)\s*\/\s*(\d+)/);
+    if (!match) {
+      return 'neutral';
+    }
+
+    const accessible = Number(match[1]);
+    const total = Number(match[2]);
+    if (!Number.isFinite(accessible) || !Number.isFinite(total) || total <= 0) {
+      return 'neutral';
+    }
+
+    const ratio = accessible / total;
+    if (ratio >= 1) {
+      return 'ok';
+    }
+
+    if (ratio >= 0.65) {
+      return 'warn';
+    }
+
+    return 'bad';
+  }
+
+  private buildOapBotCategorySection(): BotCategorySection | null {
+    const check = this.output()?.botAccessibilityCheck;
+    const oapBots = this.uniqueBotCards(
+      this.collectDetailedBotItems()
+        .filter((bot) => bot.isOAP),
+    );
+
+    if (!oapBots.length) {
+      return null;
+    }
+
+    const oapSummary = check?.assessment?.oapScore
+      ?? this.output()?.report?.botAccessibility?.summary?.oapText
+      ?? this.formatOapSummary(check?.summary?.oapBots);
+
+    return {
+      key: 'oap-bots',
+      label: 'OAP Bots',
+      description: 'OpenAI, Anthropic und weitere OAP-relevante Bots aus dem Payload.',
+      summary: oapSummary,
+      bots: oapBots,
+    };
+  }
+
+  private buildNonOapBotCategorySection(): BotCategorySection | null {
+    const otherBots = this.uniqueBotCards(
+      this.collectDetailedBotItems()
+        .filter((bot) => !bot.isOAP),
+    );
+
+    if (!otherBots.length) {
+      return null;
+    }
+
+    const accessible = otherBots.filter((bot) => !bot.blocked).length;
+    const total = otherBots.length;
+
+    return {
+      key: 'other-bots',
+      label: 'Weitere Bots',
+      description: 'Weitere getestete Bots ausserhalb der OAP-Gruppe.',
+      summary: `${accessible}/${total} erreichbar`,
+      bots: otherBots,
+    };
+  }
+
+  private collectDetailedBotItems(): BotCategoryItem[] {
+    const check = this.output()?.botAccessibilityCheck;
+    return [
+      ...(check?.allBotsTested ?? []),
+      ...(check?.successfulBots ?? []),
+      ...(check?.blockedBotsDetailed ?? []),
+      ...(check?.errorBots ?? []),
+    ];
+  }
+
+  private formatOapSummary(summary?: { total?: number; accessible?: number }): string | null {
+    if (summary?.total === undefined || summary?.accessible === undefined) {
+      return null;
+    }
+
+    return `${summary.accessible}/${summary.total} erreichbar`;
   }
 
   private async pollJobStatus(): Promise<void> {
@@ -1746,6 +2028,10 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   private maybeLoadSecondaryQuickWins(): void {
     const record = this._record();
     if (!record || this.secondaryQuickWinsRequestStarted || this.agentId !== 'seo-geo-analyse-assistent-nollm') {
+      return;
+    }
+
+    if (this.isEnvelopeOnlyPayload(record.payload)) {
       return;
     }
 
@@ -2056,6 +2342,14 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
       }
     }
 
+    const nestedBody = (candidate as { body?: unknown }).body;
+    if (nestedBody) {
+      const extractedBody = this.extractSecondaryQuickWinsInput(nestedBody);
+      if (extractedBody) {
+        return extractedBody;
+      }
+    }
+
     const { url, brand, industry, location } = candidate as GeoWebhookInput;
     if (![url, brand, industry, location].some((entry) => typeof entry === 'string' && entry.trim().length > 0)) {
       return null;
@@ -2131,5 +2425,57 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
       default:
         return 'Läuft';
     }
+  }
+
+  private compactUrl(value: string): string {
+    return value.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+  }
+
+  private isEnvelopeOnlyPayload(payload?: GeoWebhookResult | null): boolean {
+    return this.hasEnvelopeData(payload) && !this.hasAnalysisCore(payload);
+  }
+
+  private hasEnvelopeData(payload?: GeoWebhookResult | null): boolean {
+    if (!payload) {
+      return false;
+    }
+
+    return (
+      !!this.extractSecondaryQuickWinsInput(payload.body) ||
+      payload.headers !== undefined ||
+      typeof payload.webhookUrl === 'string'
+    );
+  }
+
+  private hasAnalysisCore(payload?: GeoWebhookResult | null): boolean {
+    if (!payload) {
+      return false;
+    }
+
+    return (
+      this.hasPopulatedObject(payload.score) ||
+      (payload.dimensions?.length ?? 0) > 0 ||
+      this.hasPopulatedObject(payload.report) ||
+      this.hasPopulatedObject(payload.botAccessibilityCheck) ||
+      (payload.aiPlatforms?.length ?? 0) > 0
+    );
+  }
+
+  private hasPopulatedObject(value: unknown): boolean {
+    if (!value || typeof value !== 'object') {
+      return false;
+    }
+
+    return Object.values(value as Record<string, unknown>).some((entry) => {
+      if (Array.isArray(entry)) {
+        return entry.length > 0;
+      }
+
+      if (entry && typeof entry === 'object') {
+        return Object.keys(entry as Record<string, unknown>).length > 0;
+      }
+
+      return entry !== undefined && entry !== null && entry !== '';
+    });
   }
 }
