@@ -1340,6 +1340,7 @@ export class AgentDetail {
       case 'content-strategy':   summary = `Content-Strategie: ${output.primaryTopic}`; break;
       case 'social-media':       summary = `Social Media: ${output.topic}`; break;
       case 'product-text':       summary = output.structuredResult?.seo?.title ?? output.structuredResult?.seo?.h1 ?? output.generatedFile?.fileName ?? 'Produkttext generiert'; break;
+      case 'csv-product-text':   summary = `${output.rowCount} Produkte verarbeitet`; break;
     }
 
     this.saveAndNavigate(output, summary, input);

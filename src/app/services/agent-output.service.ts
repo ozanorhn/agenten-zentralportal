@@ -14,6 +14,7 @@ import {
   SocialMediaOutput,
   ContentStrategyOutput,
   ProductTextOutput,
+  CsvProductTextOutput,
   RunInputData,
 } from '../models/interfaces';
 
@@ -61,6 +62,8 @@ export class AgentOutputService {
         );
       case 'produkttext-agent':
         return this.generateProductTextPlaceholder(input.productReference || input.productImageName || 'shop.example.com/produkt');
+      case 'csv-produkttext-agent':
+        return this.generateCsvProductTextPlaceholder(input.csvFileName || 'produkte.csv');
       default:
         return this.generateColdEmail(audience, url, tone);
     }
@@ -272,6 +275,18 @@ export class AgentOutputService {
         descriptionHeaderName: null,
         fileSource: 'none',
       },
+    };
+  }
+
+  private generateCsvProductTextPlaceholder(inputFileName: string): CsvProductTextOutput {
+    return {
+      type: 'csv-product-text',
+      inputFileName,
+      rowCount: 0,
+      columns: [],
+      rows: [],
+      downloadFileName: 'produkttexte-seo-export.csv',
+      generatedAt: new Date().toISOString(),
     };
   }
 

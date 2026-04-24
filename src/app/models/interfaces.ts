@@ -19,6 +19,7 @@ export interface RunInputData {
   outline?: string;
   productImageName?: string;
   productReference?: string;
+  csvFileName?: string;
 }
 
 export interface RunRecord {
@@ -49,7 +50,8 @@ export type AgentOutput =
   | SocialMediaOutput
   | ContentStrategyOutput
   | BlogEditorOutput
-  | ProductTextOutput;
+  | ProductTextOutput
+  | CsvProductTextOutput;
 
 export interface EmailOutput {
   type: 'email';
@@ -477,6 +479,30 @@ export interface ProductTextOutput {
   structuredResult: ProductTextStructuredResult | null;
   responseMeta: ProductTextResponseMeta;
   platformResult?: ProductTextPlatformResult | ProductTextPlatformResult[] | null;
+}
+
+export interface CsvProductTextRow {
+  [key: string]: unknown;
+  id?: number | string | null;
+  title?: string | null;
+  sku?: string | null;
+  price?: string | number | null;
+  category?: string | null;
+  vendor?: string | null;
+  tags?: string[] | string | null;
+  seo_description?: string | null;
+  meta_title?: string | null;
+  meta_description?: string | null;
+}
+
+export interface CsvProductTextOutput {
+  type: 'csv-product-text';
+  inputFileName: string;
+  rowCount: number;
+  columns: string[];
+  rows: CsvProductTextRow[];
+  downloadFileName: string;
+  generatedAt: string;
 }
 
 // ─── Notifications ────────────────────────────────────────────────────────────

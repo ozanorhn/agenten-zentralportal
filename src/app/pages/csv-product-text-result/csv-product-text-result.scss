@@ -1,0 +1,35 @@
+:host {
+  display: block;
+}
+
+.csv-cell-content {
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.csv-cell-content--collapsed {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 10;
+}
+
+.csv-cell-content--nowrap {
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
+
+.csv-cell-content--multiline {
+  white-space: pre-line;
+}
+
+.csv-cell-toggle {
+  color: #7db4ff;
+  transition: color 0.2s ease;
+}
+
+.csv-cell-toggle:hover {
+  color: #9ec6ff;
+}

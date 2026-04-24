@@ -72,6 +72,7 @@ export interface GeoBreakdownGroup {
   max?: number;
   score?: number;
   present?: string[];
+  exclamation?: string[];
   missing?: string[];
   rationale?: string;
 }
@@ -84,8 +85,10 @@ export interface DimensionScore {
   status?: string;
   label_text?: string;
   presentCount?: number;
+  exclamationCount?: number;
   missingCount?: number;
   present?: string[];
+  exclamation?: string[];
   missing?: string[];
   rationale?: string;
   explanation?: string;

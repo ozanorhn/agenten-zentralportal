@@ -147,6 +147,16 @@ export class Dashboard implements OnInit, OnDestroy {
       badgeVariant: 'primary',
     },
     {
+      id: 'csv-produkttext-agent',
+      name: 'CSV Produkttext-Agent',
+      description:
+        'Laedt eine CSV hoch, sendet sie an den Webhook und liefert SEO-basierte Produktbeschreibungen als Ergebnis-CSV zurueck.',
+      icon: 'table_chart',
+      category: 'Content',
+      badgeLabel: 'LIVE',
+      badgeVariant: 'primary',
+    },
+    {
       id: 'lead-researcher',
       name: 'Lead-Researcher',
       description:

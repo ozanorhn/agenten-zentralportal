@@ -1,0 +1,165 @@
+<div class="min-h-screen bg-surface text-on-surface font-body px-4 py-10 md:px-8">
+  <div class="mx-auto max-w-6xl">
+    <a
+      routerLink="/dashboard"
+      class="mb-8 inline-flex items-center gap-2 text-sm text-on-surface-variant/60 transition-colors hover:text-on-surface"
+    >
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      Zurueck zum Marketplace
+    </a>
+
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(320px,0.92fr)]">
+      <section class="overflow-hidden rounded-[2rem] border border-outline-variant/20 bg-surface-container shadow-[0_24px_64px_rgba(0,0,0,0.18)]">
+        <div
+          class="border-b border-outline-variant/10 px-8 py-8"
+          style="background:
+            radial-gradient(circle at top left, rgba(0, 112, 255, 0.18), transparent 38%),
+            linear-gradient(135deg, rgba(16, 22, 32, 0.96), rgba(8, 14, 24, 0.92));"
+        >
+          <div class="mb-5 inline-flex items-center gap-2 rounded-full border border-[#0070FF]/25 bg-[#0070FF]/10 px-4 py-2">
+            <span class="material-symbols-outlined text-[#7DB4FF] text-base" style="font-variation-settings:'FILL' 1;">table_chart</span>
+            <span class="text-[10px] font-black uppercase tracking-[0.24em] text-[#9EC6FF]">CSV Produkttext Agent</span>
+          </div>
+
+          <div class="space-y-3">
+            <h1 class="text-4xl font-headline font-black tracking-tight text-white md:text-5xl">
+              CSV rein.
+              <span class="text-[#7DB4FF]">SEO-Texte raus.</span>
+            </h1>
+            <p class="max-w-2xl text-sm leading-relaxed text-blue-50/75 md:text-base">
+              Lade eine CSV-Datei hoch. Der Agent sendet sie direkt an den Webhook und bereitet dir danach eine
+              Ergebnis-Seite mit Vorschau und Download der angereicherten CSV auf.
+            </p>
+          </div>
+        </div>
+
+        <div class="space-y-6 px-8 py-8">
+          <div class="space-y-3">
+            <label class="block text-[10px] font-black uppercase tracking-[0.22em] text-outline">
+              CSV Upload
+            </label>
+
+            <div
+              class="relative overflow-hidden rounded-[1.75rem] border-2 border-dashed p-6 transition-all"
+              [class.border-[#0070FF]/60]="dragOver() || hasSelectedFile()"
+              [class.bg-[#0070FF]/8]="dragOver()"
+              [class.border-outline-variant/30]="!dragOver() && !hasSelectedFile()"
+              (drop)="onDrop($event)"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave()"
+              (click)="fileInput.click()"
+            >
+              <input #fileInput type="file" accept=".csv,text/csv" hidden (change)="onFileSelected($event)" />
+
+              <div class="flex flex-col items-center justify-center gap-3 py-6 text-center">
+                <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
+                  <span class="material-symbols-outlined text-4xl" style="font-variation-settings:'FILL' 1;">upload_file</span>
+                </div>
+                <div>
+                  <p class="text-base font-semibold text-on-surface">
+                    CSV hier hineinziehen oder auswaehlen
+                  </p>
+                  <p class="mt-1 text-sm text-on-surface-variant/60">
+                    Die Datei wird direkt per Upload an den n8n-Webhook gesendet.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 px-5 py-4">
+            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Datei</p>
+            <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-on-surface">{{ selectedFileName() }}</p>
+                <p class="mt-1 text-xs text-on-surface-variant/60">Groesse: {{ selectedFileSize() }}</p>
+              </div>
+
+              @if (hasSelectedFile()) {
+                <button
+                  type="button"
+                  (click)="clearSelectedFile()"
+                  class="inline-flex items-center gap-2 rounded-xl border border-outline-variant/20 bg-surface-container-high px-4 py-2 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest"
+                >
+                  <span class="material-symbols-outlined text-base">close</span>
+                  Entfernen
+                </button>
+              }
+            </div>
+          </div>
+
+          @if (errorMessage()) {
+            <div class="rounded-2xl border border-red-500/25 bg-red-500/10 px-5 py-4 text-sm text-red-200">
+              {{ errorMessage() }}
+            </div>
+          }
+
+          <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 px-5 py-4">
+            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Status</p>
+            <p class="mt-2 text-sm text-on-surface-variant">{{ statusLabel() }}</p>
+          </div>
+
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              (click)="clearSelectedFile()"
+              class="inline-flex items-center justify-center gap-2 rounded-2xl border border-outline-variant/20 bg-surface-container-high px-6 py-4 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest"
+            >
+              Auswahl loeschen
+            </button>
+
+            <button
+              type="button"
+              (click)="submit()"
+              [disabled]="isSubmitting()"
+              class="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#0070FF] px-6 py-4 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#0060db] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              @if (isSubmitting()) {
+                <span class="material-symbols-outlined animate-spin text-base">progress_activity</span>
+                Verarbeitung laeuft…
+              } @else {
+                CSV verarbeiten
+                <span class="material-symbols-outlined text-base">arrow_forward</span>
+              }
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="space-y-6">
+        <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
+          <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Was du bekommst</p>
+          <div class="mt-5 space-y-4">
+            @for (item of [
+              'Eine Batch-Verarbeitung fuer deine komplette Produkt-CSV.',
+              'SEO-Beschreibungen inklusive Meta Title und Meta Description.',
+              'Eine eigene Ergebnis-Seite mit Tabellenvorschau und Download.'
+            ]; track item) {
+              <div class="flex gap-3">
+                <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#0070FF]/10 text-[11px] font-black text-[#0070FF]">
+                  {{ $index + 1 }}
+                </span>
+                <p class="text-sm leading-relaxed text-on-surface-variant">{{ item }}</p>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
+          <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Hinweise</p>
+          <div class="mt-5 space-y-4">
+            @for (tip of [
+              'Der Upload bleibt generisch. Es gibt im Frontend keine feste Spaltenpflicht.',
+              'Der Download wird aus der JSON-Antwort des Webhooks wieder als CSV erzeugt.',
+              'Auf der Ergebnis-Seite siehst du die wichtigsten Felder direkt als Tabelle.'
+            ]; track tip) {
+              <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 px-4 py-4">
+                <p class="text-sm leading-relaxed text-on-surface-variant">{{ tip }}</p>
+              </div>
+            }
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+</div>

@@ -240,6 +240,7 @@ export class AgentResult {
       case 'content-strategy': return `Content-Strategie: ${output.primaryTopic}`;
       case 'blog-editor': return output.articleTitle ?? `Blog-Artikel: ${output.topic}`;
       case 'product-text': return output.generatedFile?.fileName ?? 'Produkttext';
+      case 'csv-product-text': return `${output.rowCount} Produkte verarbeitet`;
     }
   }
 
@@ -573,6 +574,13 @@ export class AgentResult {
           `Datei: ${out.generatedFile?.fileName ?? 'Keine Datei erhalten'}`,
           '',
           out.description,
+        );
+        break;
+      case 'csv-product-text':
+        lines.push(
+          `Datei: ${out.inputFileName}`,
+          `Produkte: ${out.rowCount}`,
+          `Spalten: ${out.columns.join(', ') || '–'}`,
         );
         break;
     }

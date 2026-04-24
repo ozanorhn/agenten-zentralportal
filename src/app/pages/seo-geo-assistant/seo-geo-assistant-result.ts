@@ -99,6 +99,7 @@ interface DimensionCard {
 interface DimensionFact {
   raw: string;
   text: string;
+  tone: 'ok' | 'warn' | 'bad';
 }
 
 interface GeoDimensionEntry {
@@ -632,12 +633,18 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
       });
     }
 
-    if (content.hasVisibleAuthor !== undefined) {
+    const authorVisibility = this.resolveAuthorVisibilitySignal();
+    if (authorVisibility !== null) {
       items.push({
         label: 'Autor sichtbar',
-        value: content.hasVisibleAuthor ? 'Ja' : 'Nein',
-        tone: content.hasVisibleAuthor ? 'ok' : 'bad',
+        value: authorVisibility ? 'Ja' : 'Nein',
+        tone: authorVisibility ? 'ok' : 'bad',
       });
+    } else if (this.isNoLlmAgent()) {
+      const fallbackDetail = this.resolveNoLlmAuthorFallbackDetail();
+      if (fallbackDetail) {
+        items.push(fallbackDetail);
+      }
     }
 
     if (content.semanticDensity !== undefined) {
@@ -1198,16 +1205,26 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     }
   }
 
-  factIcon(fact: string): string {
-    if (this.isNegativeFact(fact)) return 'close';
-    if (this.isWarningFact(fact)) return 'priority_high';
-    return 'check';
+  factIcon(tone: DimensionFact['tone']): string {
+    switch (tone) {
+      case 'bad':
+        return 'close';
+      case 'warn':
+        return 'priority_high';
+      default:
+        return 'check';
+    }
   }
 
-  factClass(fact: string): string {
-    if (this.isNegativeFact(fact)) return 'text-red-300';
-    if (this.isWarningFact(fact)) return 'text-amber-400';
-    return 'text-emerald-300';
+  factClass(tone: DimensionFact['tone']): string {
+    switch (tone) {
+      case 'bad':
+        return 'text-red-300';
+      case 'warn':
+        return 'text-amber-400';
+      default:
+        return 'text-emerald-300';
+    }
   }
 
   toggleDimensionNote(key: string): void {
@@ -1427,8 +1444,14 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
       return null;
     }
 
-    const hasVisibleAuthor = this.output()?.content?.hasVisibleAuthor;
-    if (hasVisibleAuthor === undefined) {
+    // In the NoLLM flow we only show the webhook-provided author signal
+    // in the dedicated content details and avoid synthesizing extra EEAT facts.
+    if (this.isNoLlmAgent()) {
+      return card;
+    }
+
+    const hasVisibleAuthor = this.resolveAuthorVisibilitySignal();
+    if (hasVisibleAuthor === null) {
       return card;
     }
 
@@ -1540,12 +1563,17 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   }
 
   private dimensionFacts(dimension: DimensionScore): DimensionFact[] {
-    const webhookFacts = [...(dimension.present ?? []), ...(dimension.missing ?? [])]
-      .map((fact) => fact.trim())
-      .filter((fact) => fact.length > 0);
+    const webhookFacts = [
+      ...(dimension.present ?? [])
+        .map((fact) => this.toDimensionFact(this.ensureFactPrefix(fact, 'present'), 'ok')),
+      ...(dimension.exclamation ?? [])
+        .map((fact) => this.toDimensionFact(this.ensureFactPrefix(fact, 'exclamation'), 'warn')),
+      ...(dimension.missing ?? [])
+        .map((fact) => this.toDimensionFact(this.ensureFactPrefix(fact, 'missing'), 'bad')),
+    ].filter((fact) => fact.text.length > 0);
 
     if (webhookFacts.length) {
-      return webhookFacts.map((fact) => this.toDimensionFact(fact));
+      return webhookFacts;
     }
 
     if (dimension.facts?.length) {
@@ -1593,11 +1621,50 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     return facts.map((fact) => this.toDimensionFact(fact));
   }
 
-  private toDimensionFact(raw: string): DimensionFact {
+  private toDimensionFact(raw: string, tone?: DimensionFact['tone']): DimensionFact {
     return {
       raw,
       text: raw.replace(/^(✅|❌|ⓘ|✓|✗|✕|!|⚠️|⚠)\s*/u, '').trim(),
+      tone: tone ?? this.inferFactTone(raw),
     };
+  }
+
+  private isNoLlmAgent(): boolean {
+    return this.agentId === 'seo-geo-analyse-assistent-nollm';
+  }
+
+  private resolveAuthorVisibilitySignal(): boolean | null {
+    const authorVisibility = this.output()?.content?.hasVisibleAuthor;
+
+    if (this.isNoLlmAgent()) {
+      return authorVisibility === true ? true : null;
+    }
+
+    return authorVisibility === undefined ? null : authorVisibility;
+  }
+
+  private resolveNoLlmAuthorFallbackDetail(): MetricListItem | null {
+    const eeatSignals = this.output()?.eeat?.signals ?? {};
+    const hasPersonSchema = eeatSignals['hasPersonSchema'];
+
+    if (typeof hasPersonSchema === 'boolean') {
+      return {
+        label: 'Person-Schema',
+        value: hasPersonSchema ? 'Vorhanden' : 'Fehlt',
+        tone: hasPersonSchema ? 'ok' : 'warn',
+      };
+    }
+
+    const hasFaqSchema = this.output()?.content?.hasFaqSchema;
+    if (hasFaqSchema !== undefined) {
+      return {
+        label: 'FAQ Schema',
+        value: hasFaqSchema ? 'Vorhanden' : 'Nicht erkannt',
+        tone: hasFaqSchema ? 'ok' : 'warn',
+      };
+    }
+
+    return null;
   }
 
   private toDimensionCard(dimension: DimensionScore): DimensionCard {
@@ -1656,17 +1723,22 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     const presentFacts = (group.present ?? [])
       .map((fact) => fact.trim())
       .filter((fact) => fact.length > 0)
-      .map((fact) => this.toDimensionFact(this.ensureFactPrefix(fact, 'present')));
+      .map((fact) => this.toDimensionFact(this.ensureFactPrefix(fact, 'present'), 'ok'));
+
+    const exclamationFacts = (group.exclamation ?? [])
+      .map((fact) => fact.trim())
+      .filter((fact) => fact.length > 0)
+      .map((fact) => this.toDimensionFact(this.ensureFactPrefix(fact, 'exclamation'), 'warn'));
 
     const missingFacts = (group.missing ?? [])
       .map((fact) => fact.trim())
       .filter((fact) => fact.length > 0)
-      .map((fact) => this.toDimensionFact(this.ensureFactPrefix(fact, 'missing')));
+      .map((fact) => this.toDimensionFact(this.ensureFactPrefix(fact, 'missing'), 'bad'));
 
-    return [...presentFacts, ...missingFacts];
+    return [...presentFacts, ...exclamationFacts, ...missingFacts];
   }
 
-  private ensureFactPrefix(fact: string, source?: 'present' | 'missing'): string {
+  private ensureFactPrefix(fact: string, source?: 'present' | 'exclamation' | 'missing'): string {
     const trimmed = fact.trim();
     if (/^(✅|❌|ⓘ|✓|✗|✕|!|⚠️|⚠)\s*/u.test(trimmed)) {
       return trimmed;
@@ -1674,6 +1746,10 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
 
     if (source === 'present') {
       return `✅ ${trimmed}`;
+    }
+
+    if (source === 'exclamation') {
+      return `ⓘ ${trimmed}`;
     }
 
     if (source === 'missing') {
@@ -1685,6 +1761,18 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     }
 
     return `✅ ${trimmed}`;
+  }
+
+  private inferFactTone(text: string): DimensionFact['tone'] {
+    if (this.isNegativeFact(text)) {
+      return 'bad';
+    }
+
+    if (this.isWarningFact(text)) {
+      return 'warn';
+    }
+
+    return 'ok';
   }
 
   private normalizedBreakdownScore(group?: GeoBreakdownGroup, fallback?: number | null): number | null {

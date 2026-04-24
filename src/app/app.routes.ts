@@ -30,9 +30,19 @@ export const routes: Routes = [
           import('./pages/product-text-result/product-text-result').then((m) => m.ProductTextResultComponent),
       },
       {
+        path: 'agents/csv-produkttext-agent/result',
+        loadComponent: () =>
+          import('./pages/csv-product-text-result/csv-product-text-result').then((m) => m.CsvProductTextResultComponent),
+      },
+      {
         path: 'agents/produkttext-agent',
         loadComponent: () =>
           import('./pages/product-text-agent/product-text-agent').then((m) => m.ProductTextAgentComponent),
+      },
+      {
+        path: 'agents/csv-produkttext-agent',
+        loadComponent: () =>
+          import('./pages/csv-product-text-agent/csv-product-text-agent').then((m) => m.CsvProductTextAgentComponent),
       },
       {
         path: 'agents/seo-geo-analyse-assistent',

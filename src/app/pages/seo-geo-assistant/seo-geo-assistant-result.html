@@ -279,8 +279,8 @@
 
               <div class="mt-3 space-y-1.5">
                 @for (fact of dimension.facts; track fact.raw) {
-                  <div class="flex items-start gap-2 text-[12px] leading-4 text-on-surface-variant">
-                    <span class="material-symbols-outlined mt-[-1px] text-sm leading-none" [class]="factClass(fact.raw)">{{ factIcon(fact.raw) }}</span>
+                  <div class="flex items-start gap-2 text-[12px] leading-4" [class]="factClass(fact.tone)">
+                    <span class="material-symbols-outlined mt-[-1px] text-sm leading-none">{{ factIcon(fact.tone) }}</span>
                     <span>{{ fact.text }}</span>
                   </div>
                 } @empty {
