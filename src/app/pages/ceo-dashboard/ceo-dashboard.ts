@@ -233,16 +233,16 @@ export class CeoDashboard {
 
   costItems = [
     { label: 'Sales-Automatisierung', value: '€ 2.100', pct: 90, color: '#0070FF' },
-    { label: 'Content-Erstellung', value: '€ 1.340', pct: 62, color: '#A855F7' },
-    { label: 'SEO & Research', value: '€ 890', pct: 42, color: '#FF5F1F' },
-    { label: 'Daten & Reporting', value: '€ 490', pct: 24, color: '#00C48C' },
+    { label: 'Content-Erstellung', value: '€ 1.340', pct: 62, color: '#60A5FA' },
+    { label: 'SEO & Research', value: '€ 890', pct: 42, color: '#93C5FD' },
+    { label: 'Daten & Reporting', value: '€ 490', pct: 24, color: '#BFDBFE' },
   ];
 
   agentRows: AgentRow[] = [
-    { name: 'Cold-Mail-Cyborg', category: 'Sales', timeSaved: '96 Std', tasks: 480, status: 'active' },
-    { name: 'LinkedIn-Ghostwriter', category: 'Content', timeSaved: '72 Std', tasks: 312, status: 'active' },
+    { name: 'Outreach-Agent', category: 'Sales', timeSaved: '96 Std', tasks: 480, status: 'active' },
+    { name: 'LinkedIn-Post-Agent', category: 'Content', timeSaved: '72 Std', tasks: 312, status: 'active' },
     { name: 'Lead-Researcher', category: 'Data', timeSaved: '58 Std', tasks: 890, status: 'active' },
-    { name: 'Top-Ranker Bot', category: 'SEO', timeSaved: '44 Std', tasks: 127, status: 'standby' },
-    { name: 'Script-Savant', category: 'Content', timeSaved: '42 Std', tasks: 38, status: 'standby' },
+    { name: 'SERP-Optimierungs-Agent', category: 'SEO', timeSaved: '44 Std', tasks: 127, status: 'standby' },
+    { name: 'Short-Form-Video-Agent', category: 'Content', timeSaved: '42 Std', tasks: 38, status: 'standby' },
   ];
 }

@@ -70,31 +70,35 @@ export class AgentOutputService {
   }
 
   private generateColdEmail(audience: string, url: string, tone: string): EmailOutput {
+    const companyLabel = url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '') || 'Ihrem Team';
+
     return {
       type: 'email',
-      subject: `Wie ${audience.split(' ')[0] || 'Ihr Team'} 8h/Woche mit KI-Agenten einspart`,
+      subject: `Kurze Idee fuer effizientere Ablaeufe bei ${companyLabel}`,
       greeting: 'Hallo [Vorname],',
       body: [
-        `Ich habe mir ${url} angesehen und eine spannende Parallele zu anderen ${audience} entdeckt, mit denen wir arbeiten.`,
-        `Die meisten Teams in Ihrer Position verbringen noch immer 60–70 % der Zeit mit wiederkehrenden, manuellen Prozessen — dabei wäre genau das der Hebel für sofortiges Wachstum.`,
-        `Unser ${tone === 'Direkt & Provokant' ? 'Battle-hardened' : 'intelligentes'} Agenten-Framework hat in vergleichbaren Setups durchschnittlich 8 Stunden pro Woche freigeschaufelt — ohne zusätzliche Headcount.`,
-        `Konkret: Automatisiertes Outreach-Scoring, smarte Follow-up-Sequenzen und Live-Datenanalyse — alles in einem autonomen Loop.`,
+        `ich habe mir ${url} angesehen. Gerade bei ${audience} sehen wir oft, dass wiederkehrende Aufgaben in Recherche, Follow-up und Datenpflege viel operative Zeit binden.`,
+        `Wir setzen deshalb nicht bei noch mehr Tools an, sondern bei klar umrissenen Workflows: Vorqualifizierung, persoenliche Erstansprache und saubere Uebergabe ins CRM.`,
+        `In vergleichbaren Setups sorgt das vor allem fuer mehr Verlaesslichkeit im Tagesgeschaeft und spuerenbar weniger manuellen Aufwand.`,
+        `Falls das fuer Sie relevant ist, skizziere ich gern 2 bis 3 konkrete Einsatzfaelle fuer ${companyLabel}.`,
       ],
-      cta: 'Hätten Sie 15 Minuten diese Woche für ein kurzes Gespräch? Ich zeige Ihnen live, was in Ihrem konkreten Setup möglich wäre.',
+      cta: tone === 'Direkt & Provokant'
+        ? 'Wenn das grundsaetzlich spannend klingt, schlage ich gern einen kurzen Termin fuer einen praxisnahen Austausch vor.'
+        : 'Wenn das fuer Sie interessant ist, schlage ich gern einen kurzen Termin fuer einen praxisnahen Austausch vor.',
     };
   }
 
   private generateNetworkingEmail(audience: string, url: string, _tone: string): EmailOutput {
     return {
       type: 'email',
-      subject: `Verbindungsanfrage: KI-Strategien für ${audience}`,
+      subject: `Austausch zu operativen KI-Workflows im Bereich ${audience}`,
       greeting: 'Hallo [Vorname],',
       body: [
-        `Ich bin auf Ihr Profil gestoßen und war sofort begeistert von Ihrem Fokus auf Innovation im Bereich ${audience}.`,
-        `Ich arbeite mit Arcnode an autonomen KI-Agenten, die speziell für Teams wie Ihres entwickelt wurden — mit Fokus auf messbare Effizienzgewinne ohne langen Implementierungsaufwand.`,
-        `Ihre Arbeit bei ${url.replace('https://', '').replace('http://', '')} passt perfekt zu dem, was ich gerade aufbaue — ich würde mich freuen, mich zu vernetzen und Erfahrungen auszutauschen.`,
+        `ich bin im Kontext von ${audience} auf Ihr Profil gestossen und fand den fachlichen Fokus sehr passend.`,
+        `Bei Arcnode arbeiten wir daran, wiederkehrende Marketing- und Sales-Prozesse sauber in KI-gestuetzte Workflows zu ueberfuehren, ohne Teams mit zusaetzlicher Komplexitaet zu belasten.`,
+        `Die Perspektive aus ${url.replace('https://', '').replace('http://', '').replace(/\/$/, '')} waere fuer mich spannend. Ich wuerde mich freuen, wenn wir uns vernetzen und Erfahrungen austauschen.`,
       ],
-      cta: 'Darf ich eine kurze Verbindungsanfrage senden? Würde mich freuen, mehr über Ihre Perspektive zu erfahren.',
+      cta: 'Wenn es fuer Sie passt, vernetzen wir uns gern und sprechen bei Gelegenheit ueber praktische Einsatzfaelle.',
     };
   }
 
@@ -103,50 +107,50 @@ export class AgentOutputService {
     return {
       type: 'linkedin-post',
       headline: isProvocative
-        ? `Warum 90 % der ${audience} KI falsch einsetzen — und was wirklich funktioniert`
-        : `Die stille Revolution: Wie KI-Agenten die Arbeitsweise von ${audience} verändern`,
+        ? `Viele Teams sprechen ueber KI. Die wenigsten haben schon einen belastbaren Prozess.`
+        : `Wo KI im Alltag von ${audience} zuerst echten Nutzen stiftet`,
       body: [
         isProvocative
-          ? `Harte Wahrheit: Die meisten Teams kaufen KI-Tools und nennen das "Transformation". Das ist kein Fortschritt — das ist teures Spielzeug.`
-          : `Die Zukunft des Arbeitens ist nicht mehr manuell. Während andere noch debattieren, handeln die Besten bereits.`,
-        `Was echte Automatisierung bedeutet: Nicht ein Tool, das dir Arbeit abnimmt. Sondern ein System, das selbstständig denkt, priorisiert und ausführt.`,
-        `In unserem neuesten Deployment für ${audience} haben wir gesehen:\n✅ 8h gesparte Zeit pro Woche\n✅ 3x höhere Conversion-Rate im Outreach\n✅ 0 manuelle Follow-ups notwendig`,
+          ? 'Viele Unternehmen verwechseln Tool-Kauf noch immer mit operativer Verbesserung. Der Effekt bleibt dann aus, weil kein klarer Workflow dahintersteht.'
+          : `Die spannendsten KI-Projekte starten selten mit einem grossen Umbau. Sie starten dort, wo Prozesse heute wiederkehrend, manuell und messbar sind.`,
+        `Bei ${audience} sind das oft drei Bereiche: Recherche, Aufbereitung und Follow-up. Genau dort laesst sich Qualitaet sichern und Zeit freispielen, ohne den Betrieb neu zu erfinden.`,
+        `In laufenden Setups sehen wir vor allem diese Effekte:\n- kuerzere Durchlaufzeiten\n- weniger Medienbrueche\n- sauberere Uebergaben zwischen Marketing, Sales und Operations`,
         isProvocative
-          ? `Die Frage ist nicht mehr OB ihr KI einsetzt. Die Frage ist, ob ihr es richtig macht.`
-          : `Die Technologie ist bereit. Sind es Ihre Prozesse?`,
+          ? 'Die eigentliche Frage ist deshalb nicht, ob KI relevant ist. Die Frage ist, welcher Prozess als Erstes sauber operationalisiert wird.'
+          : 'Wer klein und sauber startet, baut schneller vertrauenswuerdige Systeme auf als Teams mit zu grossem Anspruch im ersten Schritt.',
       ],
-      cta: 'Was ist eure größte operative Herausforderung gerade? Schreibt es in die Kommentare — ich antworte auf jede Antwort. 👇',
-      hashtags: ['#KI', '#Automatisierung', '#FutureOfWork', '#Produktivität', '#B2B'],
-      estimatedEngagement: '4.2%',
-      estimatedReach: '12.400',
+      cta: 'Welcher wiederkehrende Prozess kostet Ihr Team aktuell am meisten Zeit?',
+      hashtags: ['#KI', '#B2B', '#MarketingOperations', '#SalesOperations', '#Automatisierung'],
+      estimatedEngagement: '3.1%',
+      estimatedReach: '8.600',
     };
   }
 
   private generateVideoScript(audience: string, _url: string, _tone: string): VideoScriptOutput {
     return {
       type: 'video-script',
-      title: `So spart dein Team 8h/Woche mit KI-Agenten`,
-      hook: `Stop. Bevor du wieder manuell Leads recherchierst — schau dir das an. In 60 Sekunden zeige ich dir, wie ${audience} das komplett automatisieren.`,
+      title: `Drei Workflows, die ${audience} zuerst automatisieren sollten`,
+      hook: `Wenn Teams ueber KI sprechen, denken viele zuerst an grosse Visionen. Im Alltag entsteht der Nutzen aber meist dort, wo Recherche, Aufbereitung und Follow-up heute noch manuell laufen.`,
       sections: [
         {
-          heading: '📌 Das Problem',
-          narration: `Die meisten Teams für ${audience} verbringen noch immer 70 % ihrer Zeit mit Aufgaben, die eine KI in Sekunden erledigen könnte. Outreach, Recherche, Follow-ups — alles manuell. Das ist nicht nur ineffizient. Das ist teuer.`,
-          visualNote: 'Screen-Recording: überfüllte Inbox, manuelle Spreadsheets, viele offene Tabs',
+          heading: 'Ausgangslage',
+          narration: `Viele Teams im Bereich ${audience} arbeiten mit guten Leuten, aber fragmentierten Ablaeufen. Informationen liegen verteilt, Follow-ups haengen an Einzelpersonen und Inhalte muessen mehrfach aufbereitet werden.`,
+          visualNote: 'Ruhige Bildschirmaufnahmen mit CRM, Dokumenten und mehreren offenen Arbeitsschritten',
         },
         {
-          heading: '⚡ Die Lösung',
-          narration: `Arcnode-Agenten analysieren deine Zielgruppe in Echtzeit, personalisieren jeden Touchpoint und triggern automatisch Follow-up-Aktionen — ohne dass du einen Finger rühren musst.`,
-          visualNote: 'Animation: Agent-Dashboard mit laufenden Tasks, Statusbalken, Ergebnisse erscheinen in Echtzeit',
+          heading: 'Ansatz',
+          narration: 'Ein vernuenftiger Startpunkt ist nicht die Vollautomatisierung, sondern ein klar umrissener Workflow mit messbarem Nutzen. Zum Beispiel Erstansprache, Lead-Vorqualifizierung oder interne Content-Aufbereitung.',
+          visualNote: 'UI-Ansichten mit Briefing, strukturierter Ausgabe und klaren Statusanzeigen',
         },
         {
-          heading: '📊 Die Ergebnisse',
-          narration: `Unsere Kunden berichten von durchschnittlich 8 Stunden Zeitersparnis pro Woche, 3-fach höheren Antwortquoten und einem ROI, der sich in den ersten 30 Tagen rechnet.`,
-          visualNote: 'Infografik: Vorher/Nachher-Vergleich, Zahlen animiert einblenden',
+          heading: 'Ergebnis',
+          narration: 'Wenn Input, Qualitaetssicherung und Uebergabe sauber definiert sind, entstehen verlässlichere Prozesse. Teams gewinnen Zeit, reduzieren Reibung und koennen Entscheidungen auf besser aufbereitete Daten stuetzen.',
+          visualNote: 'Zurueckhaltende Kennzahlen, saubere Vergleichsansichten und Ergebnisbausteine statt Effekthascherei',
         },
       ],
-      cta: `Willst du sehen, was das für dein Team bedeutet? Link in der Bio — buche einen 15-Minuten-Demo-Call. Kostenlos, unverbindlich.`,
-      hashtags: ['#KI', '#VideoMarketing', '#B2BSales', '#Automatisierung'],
-      estimatedDuration: '1:45 Min.',
+      cta: 'Wenn Sie dazu ein konkretes Beispiel aus Marketing, Sales oder SEO sehen moechten, kann daraus direkt ein Demo-Format fuer ein Gespraech entstehen.',
+      hashtags: ['#KI', '#B2BMarketing', '#SalesOps', '#Automatisierung'],
+      estimatedDuration: '1:20 Min.',
     };
   }
 
@@ -236,8 +240,10 @@ export class AgentOutputService {
       industry,
       city,
       companies: [
-        { companyName: 'Beispiel GmbH', street: 'Musterstraße 1', city: `30159 ${city}`, fullAddress: `Musterstraße 1, 30159 ${city}`, phoneNumber: '0511 123456', website: 'https://www.beispiel.de' },
-        { companyName: 'Demo AG', street: 'Testweg 5', city: `30169 ${city}`, fullAddress: `Testweg 5, 30169 ${city}`, phoneNumber: '0511 654321', website: null },
+        { companyName: 'Nordlicht Digital GmbH', street: 'Lister Meile 21', city: `30161 ${city}`, fullAddress: `Lister Meile 21, 30161 ${city}`, phoneNumber: '0511 4287610', website: 'https://www.nordlicht-digital.de' },
+        { companyName: 'Atlas Gewerbeservice', street: 'Vahrenwalder Strasse 87', city: `30165 ${city}`, fullAddress: `Vahrenwalder Strasse 87, 30165 ${city}`, phoneNumber: '0511 4287611', website: 'https://www.atlas-gewerbeservice.de' },
+        { companyName: 'Hanse Datenwerk GmbH', street: 'Hildesheimer Strasse 54', city: `30169 ${city}`, fullAddress: `Hildesheimer Strasse 54, 30169 ${city}`, phoneNumber: '0511 4287612', website: 'https://www.hanse-datenwerk.de' },
+        { companyName: 'Mittelstand Servicepartner', street: 'Bruehlstrasse 8', city: `30169 ${city}`, fullAddress: `Bruehlstrasse 8, 30169 ${city}`, phoneNumber: '0511 4287613', website: null },
       ],
     };
   }
@@ -291,16 +297,18 @@ export class AgentOutputService {
   }
 
   private generateSocialMediaPlaceholder(topic: string, brandVoice: string, targetAudience: string): SocialMediaOutput {
+    const voiceLabel = brandVoice || 'ruhig, klar und fachlich';
+
     return {
       type: 'social-media',
       topic,
       brandVoice,
       targetAudience,
-      twitter: `🚀 ${topic} — Das verändert alles.\n\nWer jetzt nicht handelt, verliert den Anschluss.\n\n#KI #Automation #Growth`,
-      linkedin: `Ich habe etwas gelernt, das ich sofort teilen möchte:\n\n${topic}\n\nDas ist kein Hype. Das ist Realität.\n\nWie geht ihr damit um? Schreibt es in die Kommentare.\n\n#KI #Innovation #Vertrieb`,
-      redditTitle: `${topic} — meine ehrlichen Erfahrungen nach 3 Monaten`,
-      redditBody: `Ich wollte hier mal transparent teilen, was ich in den letzten Monaten mit dem Thema "${topic}" erlebt habe...\n\nEs gibt viel Hype, aber auch echte Substanz. Fragt mich gerne alles.`,
-      instagramCaption: `${topic} ✨\n\nDas Spiel hat sich verändert — bist du bereit?\n\nSave this post für später 👇\n\n#KI #Business #Wachstum #Automation #Erfolg`,
+      twitter: `${topic}: Der groesste Hebel liegt oft nicht in neuen Tools, sondern in sauber definierten Workflows.\n\nGerade fuer ${targetAudience} lohnt es sich, zuerst wiederkehrende Aufgaben zu identifizieren.\n\n#KI #B2B #Operations`,
+      linkedin: `Viele Teams sprechen ueber ${topic} vor allem auf strategischer Ebene.\n\nOperativ entsteht der Nutzen aber meistens dort, wo wiederkehrende Aufgaben heute noch manuell laufen.\n\nUnser Blick darauf: klein starten, Qualitaet sichern, erst dann skalieren.\n\nTonality: ${voiceLabel}.\n\nWelche Aufgabe wuerdet ihr zuerst systematisieren?\n\n#KI #MarketingOperations #SalesOps`,
+      redditTitle: `${topic}: Wo wir im Alltag tatsaechlich Nutzen sehen`,
+      redditBody: `Wir haben das Thema "${topic}" in mehreren B2B-Setups beobachtet. Das Muster ist oft aehnlich: Nicht die grossen Visionen bringen zuerst Ergebnisse, sondern sauber abgegrenzte Workflows mit klaren Eingaben und messbarer Ausgabe.\n\nMich wuerde interessieren, bei welchen Prozessen ihr aktuell den groessten Hebel seht.`,
+      instagramCaption: `${topic}\n\nPremium entsteht nicht durch mehr Lautstaerke, sondern durch Klarheit im Prozess.\n\nGerade fuer ${targetAudience} ist das oft der Unterschied zwischen nettem Experiment und belastbarem System.\n\n#KI #B2B #Systeme #Operations`,
     };
   }
 
@@ -314,28 +322,28 @@ export class AgentOutputService {
       primaryTopic,
       targetAudience,
       contentType,
-      brief: `## Executive Summary\n**Ziel:** Ein strategisches Content-Piece für ${targetAudience} rund um ${primaryTopic}.`,
-      structuredAnalysis: `# Structured Analysis\n\n## Primary Opportunities\n- ${primaryTopic}\n- Praxisbeispiele\n- ROI und Umsetzung`,
-      primaryKeywords: [primaryTopic, 'Marketing Automation', 'Künstliche Intelligenz im Marketing'],
+      brief: `## Executive Summary\n**Ziel:** Ein belastbares Content-Piece fuer ${targetAudience} rund um ${primaryTopic} mit klarer Suchintention, fachlicher Tiefe und direkter Anschlussfaehigkeit fuer Vertrieb oder Beratung.\n\n**Empfohlener Fokus:** Problemverstaendnis, operative Umsetzung und messbare Auswirkungen im Tagesgeschaeft.`,
+      structuredAnalysis: `# Structured Analysis\n\n## Primary Opportunities\n- ${primaryTopic}\n- Operative Einfuehrung in Teams\n- Wirtschaftlicher Nutzen und Priorisierung\n\n## Editorial Angle\n- Weg von abstrakter KI-Rhetorik hin zu klaren, nachvollziehbaren Einsatzfaellen\n- Glaubwuerdigkeit ueber Beispiele, Prozesse und Entscheidungshilfen\n- Content so anlegen, dass Marketing, Sales und Geschaeftsfuehrung ihn intern weiterverwenden koennen`,
+      primaryKeywords: [primaryTopic, 'ki prozesse im marketing', 'ki workflow automatisierung'],
       longTailKeywords: [
-        { keyword: 'Wie KI den ROI im Marketing steigert', intent: 'informational' },
-        { keyword: 'KI Marketing Software vergleichen', intent: 'commercial' },
-        { keyword: 'Agentur für KI Marketing beauftragen', intent: 'transactional' },
+        { keyword: 'ki prozesse im marketing einfuehren', intent: 'informational' },
+        { keyword: 'ki workflows fuer b2b teams', intent: 'commercial' },
+        { keyword: 'ki systeme fuer marketing und sales', intent: 'transactional' },
       ],
       questionBasedKeywords: [
-        'Wie verbessert KI meine Marketingstrategie?',
-        'Welche Tools eignen sich für kleine Teams?',
+        'Welche Prozesse sollten Teams zuerst mit KI unterstuetzen?',
+        'Wie fuehrt man KI-Systeme in Marketing und Sales sinnvoll ein?',
       ],
-      relatedTopics: ['Customer Journey', 'Marketing Automation', 'Programmatic Advertising'],
+      relatedTopics: ['Revenue Operations', 'Marketing Automation', 'Content Operations'],
       competitorUrls: [],
       keywords: [
         {
           keyword: primaryTopic,
-          searchVolume: 480,
-          keywordDifficulty: 24,
+          searchVolume: 390,
+          keywordDifficulty: 21,
           competition: 'MEDIUM',
-          competitionIndex: 34,
-          cpc: 8.51,
+          competitionIndex: 29,
+          cpc: 7.2,
           monthlySearches: [],
         },
       ],

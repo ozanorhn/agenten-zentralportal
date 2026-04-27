@@ -5,7 +5,7 @@ import { ToastService } from '../../services/toast.service';
   selector: 'app-toast',
   standalone: true,
   template: `
-    <div class="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none">
+    <div class="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none" aria-live="polite">
       @for (toast of toastService.toasts(); track toast.id) {
         <div
           class="pointer-events-auto flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl
@@ -18,7 +18,7 @@ import { ToastService } from '../../services/toast.service';
             {{ toastIcon(toast.type) }}
           </span>
           <span class="flex-1">{{ toast.message }}</span>
-          <button class="opacity-50 hover:opacity-100 transition-opacity ml-2">
+          <button class="opacity-50 hover:opacity-100 transition-opacity ml-2" aria-label="Hinweis schließen">
             <span class="material-symbols-outlined text-base">close</span>
           </button>
         </div>

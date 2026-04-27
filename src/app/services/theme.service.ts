@@ -8,8 +8,7 @@ export class ThemeService {
 
   constructor() {
     const saved = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const startDark = saved ? saved === 'dark' : prefersDark;
+    const startDark = saved ? saved === 'dark' : true;
     this._isDark.set(startDark);
     this.applyClass(startDark);
   }

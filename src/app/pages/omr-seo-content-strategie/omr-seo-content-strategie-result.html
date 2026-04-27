@@ -1,0 +1,180 @@
+<div class="min-h-screen bg-surface text-on-surface font-body">
+  <div class="sticky top-[56px] z-30 border-b border-outline-variant/20 bg-surface-container-low/85 backdrop-blur-xl">
+    <div class="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-3 px-4 py-4 md:px-6">
+      <div class="flex items-center gap-4">
+        <button
+          (click)="goBack()"
+          class="inline-flex items-center gap-2 text-sm text-on-surface-variant transition-colors hover:text-on-surface"
+        >
+          <span class="material-symbols-outlined text-sm">arrow_back</span>
+          Zurueck
+        </button>
+
+        <div class="h-4 w-px bg-outline-variant/30"></div>
+
+        <div class="flex items-center gap-3">
+          <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#0070FF]/15 text-[#0070FF]">
+            <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1;">{{ agentMeta.icon }}</span>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-on-surface">{{ agentMeta.name }}</p>
+            <p class="text-[10px] uppercase tracking-[0.2em] text-outline">Webhook Result</p>
+          </div>
+        </div>
+      </div>
+
+      @if (record()) {
+        <button
+          type="button"
+          (click)="rerun()"
+          class="inline-flex items-center gap-2 rounded-xl border border-outline-variant/20 bg-surface-container-high/50 px-4 py-2 text-sm font-medium text-on-surface transition-colors hover:bg-surface-container-highest"
+        >
+          <span class="material-symbols-outlined text-base">refresh</span>
+          Neu starten
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-[1120px] px-4 py-6 md:px-6">
+    @if (record(); as report) {
+      <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div class="max-w-3xl">
+            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">OMR SEO-Content-Strategie</p>
+            <h1 class="mt-2 font-headline text-2xl font-black tracking-tight text-on-surface md:text-4xl">
+              {{ report.input.topic }}
+            </h1>
+            <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+              Erstellt am {{ formatDate(report.createdAt) }}
+            </p>
+          </div>
+
+          <div class="grid min-w-[280px] gap-3 sm:grid-cols-2">
+            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-4">
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Audience</p>
+              <p class="mt-2 text-sm leading-relaxed text-on-surface">{{ report.input.audience }}</p>
+            </div>
+            <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-4 sm:col-span-2">
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Offer</p>
+              <p class="mt-2 text-sm leading-relaxed text-on-surface">{{ report.input.offer }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      @if (keywordMarkdownResult(); as result) {
+        <section class="mt-4 rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Primäres Keyword</p>
+              <h2 class="mt-2 font-headline text-xl font-black tracking-tight text-on-surface md:text-3xl">
+                {{ result.keyword || report.input.topic }}
+              </h2>
+              <p class="mt-3 max-w-3xl text-sm leading-relaxed text-on-surface-variant">
+                Der folgende Plan stammt direkt aus dem Webhook und wird als Markdown gerendert, damit Artikelideen,
+                LinkedIn-Hooks und die Messe-Follow-up-Mail sofort lesbar sind.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="mt-4 rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+          <div class="mb-5 flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
+              <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">description</span>
+            </div>
+            <div>
+              <h2 class="text-base font-semibold text-on-surface">Content-Plan</h2>
+              <p class="text-sm text-on-surface-variant">
+                Gerenderte Markdown-Antwort aus dem OMR-Webhook.
+              </p>
+            </div>
+          </div>
+
+          <article class="md-content" [innerHTML]="renderedMarkdown()"></article>
+        </section>
+      }
+
+      @if (responseSections().length) {
+        <div class="mt-4 grid gap-4 lg:grid-cols-2">
+          @for (section of responseSections(); track section.key) {
+            <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+              <div class="flex items-start gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
+                  <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">article</span>
+                </div>
+                <div>
+                  <h2 class="text-base font-semibold text-on-surface">{{ section.label }}</h2>
+                  <p class="mt-1 text-sm leading-relaxed text-on-surface-variant">
+                    Direkt aus der Webhook-Antwort aufbereitet.
+                  </p>
+                </div>
+              </div>
+
+              @if (section.kind === 'text') {
+                <p class="mt-5 text-sm leading-relaxed text-on-surface-variant">
+                  {{ section.text }}
+                </p>
+              }
+
+              @if (section.kind === 'string-list') {
+                <div class="mt-5 space-y-3">
+                  @for (item of section.items ?? []; track item) {
+                    <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-3 text-sm leading-relaxed text-on-surface-variant">
+                      {{ item }}
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (section.kind === 'json') {
+                <pre class="mt-5 overflow-x-auto rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-4 text-xs leading-relaxed text-on-surface-variant">{{ section.json }}</pre>
+              }
+            </section>
+          }
+        </div>
+      }
+
+      <section class="mt-4 rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+        <div class="flex items-start gap-3">
+          <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
+            <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">data_object</span>
+          </div>
+          <div>
+            <h2 class="text-base font-semibold text-on-surface">Raw Response</h2>
+            <p class="mt-1 text-sm leading-relaxed text-on-surface-variant">
+              Vollstaendige Webhook-Antwort zur Kontrolle und fuer Debugging.
+            </p>
+          </div>
+        </div>
+
+        @if (rawJson()) {
+          <pre class="mt-5 overflow-x-auto rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-4 text-xs leading-relaxed text-on-surface-variant">{{ rawJson() }}</pre>
+        } @else {
+          <pre class="mt-5 overflow-x-auto whitespace-pre-wrap rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-4 text-xs leading-relaxed text-on-surface-variant">{{ rawText() }}</pre>
+        }
+      </section>
+    } @else {
+      <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-8 text-center md:px-6">
+        <div class="mx-auto max-w-xl">
+          <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
+            <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">article_shortcut</span>
+          </div>
+          <h1 class="mt-5 font-headline text-2xl font-black text-on-surface">Kein gespeicherter Report gefunden</h1>
+          <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+            Starte den Agenten erneut und sende Topic, Audience und Offer ab, damit wir die Webhook-Antwort anzeigen koennen.
+          </p>
+          <button
+            type="button"
+            (click)="goBack()"
+            class="mt-6 inline-flex items-center gap-2 rounded-2xl bg-[#0070FF] px-6 py-4 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#0060db]"
+          >
+            Zum Agenten
+            <span class="material-symbols-outlined text-base">east</span>
+          </button>
+        </div>
+      </section>
+    }
+  </div>
+</div>

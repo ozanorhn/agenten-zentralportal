@@ -13,7 +13,9 @@ import { NotificationService } from '../../services/notification.service';
       <!-- Dropdown panel -->
       <div class="absolute top-full right-0 mt-2 w-[380px] z-[70]
                   bg-surface-container-low/95 backdrop-blur-2xl
-                  border border-outline-variant/20 rounded-2xl shadow-2xl overflow-hidden">
+                  border border-outline-variant/20 rounded-2xl shadow-2xl overflow-hidden"
+           role="dialog"
+           aria-label="Benachrichtigungen">
 
         <!-- Header -->
         <div class="flex items-center justify-between px-5 py-4 border-b border-outline-variant/20">
@@ -28,6 +30,7 @@ import { NotificationService } from '../../services/notification.service';
           <button
             (click)="notifService.markAllRead()"
             class="text-[11px] text-[#0070FF] hover:text-primary font-semibold transition-colors"
+            aria-label="Alle Benachrichtigungen als gelesen markieren"
           >
             Alle gelesen
           </button>
@@ -73,6 +76,7 @@ import { NotificationService } from '../../services/notification.service';
           <button
             class="w-full text-xs text-on-surface-variant hover:text-on-surface transition-colors text-center"
             (click)="close.emit()"
+            aria-label="Benachrichtigungen schließen"
           >
             Alle anzeigen →
           </button>

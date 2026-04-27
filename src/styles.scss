@@ -2,153 +2,238 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
 
 * {
   box-sizing: border-box;
 }
 
-// ─── CSS Custom Properties ────────────────────────────────────────────────────
-// Light Mode (Default)
 :root {
-  --color-surface:                    240 242 248;
-  --color-surface-dim:                232 234 242;
-  --color-surface-container-lowest:   255 255 255;
-  --color-surface-container-low:      232 234 242;
-  --color-surface-container:          224 226 236;
-  --color-surface-container-high:     216 218 230;
-  --color-surface-container-highest:  204 208 220;
-  --color-surface-variant:            221 224 237;
-  --color-surface-bright:             245 246 251;
-  --color-surface-tint:               0 88 203;
-  --color-background:                 240 242 248;
+  color-scheme: light;
 
-  --color-on-surface:                 26 28 34;
-  --color-on-surface-variant:         68 71 90;
-  --color-on-background:              26 28 34;
-  --color-inverse-surface:            46 48 56;
-  --color-inverse-on-surface:         240 242 248;
+  --brand-accent-rgb:                59 130 246;
+  --brand-accent-light-rgb:          96 165 250;
+  --brand-accent-soft-rgb:           147 197 253;
+  --brand-accent-muted-rgb:          231 246 255;
 
-  --color-primary:                    0 88 203;
-  --color-primary-container:          26 133 255;
-  --color-primary-fixed:              214 226 255;
-  --color-primary-fixed-dim:          172 199 255;
-  --color-on-primary:                 255 255 255;
-  --color-on-primary-container:       255 255 255;
-  --color-on-primary-fixed:           0 25 69;
-  --color-on-primary-fixed-variant:   0 66 156;
-  --color-inverse-primary:            176 198 255;
+  --color-surface:                   233 240 249;
+  --color-surface-dim:               225 234 246;
+  --color-surface-container-lowest:  255 255 255;
+  --color-surface-container-low:     245 249 254;
+  --color-surface-container:         236 243 251;
+  --color-surface-container-high:    226 236 248;
+  --color-surface-container-highest: 212 225 242;
+  --color-surface-variant:           200 216 237;
+  --color-surface-bright:            249 251 255;
+  --color-surface-tint:              59 130 246;
+  --color-background:                225 235 247;
 
-  --color-secondary:                  192 57 13;
-  --color-secondary-container:        250 92 28;
-  --color-secondary-fixed:            255 219 207;
-  --color-secondary-fixed-dim:        255 181 156;
-  --color-on-secondary:               255 255 255;
-  --color-on-secondary-container:     255 255 255;
-  --color-on-secondary-fixed:         57 12 0;
-  --color-on-secondary-fixed-variant: 131 39 0;
+  --color-on-surface:                17 24 39;
+  --color-on-surface-variant:        71 85 105;
+  --color-on-background:             17 24 39;
+  --color-inverse-surface:           8 12 24;
+  --color-inverse-on-surface:        241 245 249;
 
-  --color-tertiary:                   88 91 106;
-  --color-tertiary-container:         221 224 239;
-  --color-tertiary-fixed:             224 226 237;
-  --color-tertiary-fixed-dim:         196 198 208;
-  --color-on-tertiary:                255 255 255;
-  --color-on-tertiary-container:      24 27 35;
-  --color-on-tertiary-fixed:          24 27 35;
-  --color-on-tertiary-fixed-variant:  68 71 79;
+  --color-primary:                   59 130 246;
+  --color-primary-container:         96 165 250;
+  --color-primary-fixed:             191 219 254;
+  --color-primary-fixed-dim:         147 197 253;
+  --color-on-primary:                241 245 249;
+  --color-on-primary-container:      8 12 24;
+  --color-on-primary-fixed:          17 24 39;
+  --color-on-primary-fixed-variant:  30 41 59;
+  --color-inverse-primary:           96 165 250;
 
-  --color-error:                      186 26 26;
-  --color-error-container:            255 218 214;
-  --color-on-error:                   255 255 255;
-  --color-on-error-container:         65 0 2;
+  --color-secondary:                 96 165 250;
+  --color-secondary-container:       147 197 253;
+  --color-secondary-fixed:           219 234 254;
+  --color-secondary-fixed-dim:       191 219 254;
+  --color-on-secondary:              8 12 24;
+  --color-on-secondary-container:    8 12 24;
+  --color-on-secondary-fixed:        17 24 39;
+  --color-on-secondary-fixed-variant:30 41 59;
 
-  --color-outline:                    117 120 138;
-  --color-outline-variant:            196 198 214;
+  --color-tertiary:                  17 24 39;
+  --color-tertiary-container:        200 216 237;
+  --color-tertiary-fixed:            231 246 255;
+  --color-tertiary-fixed-dim:        212 225 242;
+  --color-on-tertiary:               241 245 249;
+  --color-on-tertiary-container:     17 24 39;
+  --color-on-tertiary-fixed:         17 24 39;
+  --color-on-tertiary-fixed-variant: 71 85 105;
 
-  // Utility overlays (theme-aware)
-  --glass-bg:                         rgba(255, 255, 255, 0.65);
-  --glass-border:                     rgba(0, 0, 0, 0.06);
-  --kinetic-border-shadow:            inset 0 0 0 1px rgba(0, 0, 0, 0.08);
-  --canvas-dot:                       rgba(0, 0, 0, 0.04);
-  --scrollbar-track:                  rgb(240, 242, 248);
-  --scrollbar-thumb:                  rgb(196, 198, 214);
-  --scrollbar-thumb-hover:            rgb(117, 120, 138);
+  --color-error:                     96 165 250;
+  --color-error-container:           219 234 254;
+  --color-on-error:                  8 12 24;
+  --color-on-error-container:        17 24 39;
+
+  --color-outline:                   120 145 184;
+  --color-outline-variant:           179 201 229;
+
+  --glass-bg:                        rgba(255, 255, 255, 0.74);
+  --glass-border:                    rgba(59, 130, 246, 0.08);
+  --kinetic-border-shadow:           inset 0 0 0 1px rgba(59, 130, 246, 0.08);
+  --canvas-dot:                      rgba(59, 130, 246, 0.08);
+  --scrollbar-track:                 rgb(225, 235, 247);
+  --scrollbar-thumb:                 rgb(179, 201, 229);
+  --scrollbar-thumb-hover:           rgb(120, 145, 184);
 }
 
-// Dark Mode
 .dark {
-  --color-surface:                    17 19 23;
-  --color-surface-dim:                17 19 23;
-  --color-surface-container-lowest:   12 14 18;
-  --color-surface-container-low:      26 28 32;
-  --color-surface-container:          30 32 36;
-  --color-surface-container-high:     40 42 46;
-  --color-surface-container-highest:  51 53 57;
-  --color-surface-variant:            51 53 57;
-  --color-surface-bright:             55 57 62;
-  --color-surface-tint:               176 198 255;
-  --color-background:                 17 19 23;
+  color-scheme: dark;
 
-  --color-on-surface:                 226 226 232;
-  --color-on-surface-variant:         194 198 216;
-  --color-on-background:              226 226 232;
-  --color-inverse-surface:            226 226 232;
-  --color-inverse-on-surface:         47 48 53;
+  --color-surface:                   12 17 29;
+  --color-surface-dim:               8 12 24;
+  --color-surface-container-lowest:  8 12 24;
+  --color-surface-container-low:     17 24 39;
+  --color-surface-container:         22 33 54;
+  --color-surface-container-high:    30 44 72;
+  --color-surface-container-highest: 38 57 93;
+  --color-surface-variant:           30 44 72;
+  --color-surface-bright:            46 68 108;
+  --color-surface-tint:              96 165 250;
+  --color-background:                8 12 24;
 
-  --color-primary:                    176 198 255;
-  --color-primary-container:          86 141 255;
-  --color-primary-fixed:              217 226 255;
-  --color-primary-fixed-dim:          176 198 255;
-  --color-on-primary:                 0 45 111;
-  --color-on-primary-container:       0 38 97;
-  --color-on-primary-fixed:           0 25 69;
-  --color-on-primary-fixed-variant:   0 66 156;
-  --color-inverse-primary:            0 88 203;
+  --color-on-surface:                241 245 249;
+  --color-on-surface-variant:        207 226 245;
+  --color-on-background:             231 246 255;
+  --color-inverse-surface:           231 246 255;
+  --color-inverse-on-surface:        17 24 39;
 
-  --color-secondary:                  255 181 156;
-  --color-secondary-container:        250 92 28;
-  --color-secondary-fixed:            255 219 207;
-  --color-secondary-fixed-dim:        255 181 156;
-  --color-on-secondary:               92 25 0;
-  --color-on-secondary-container:     81 21 0;
-  --color-on-secondary-fixed:         57 12 0;
-  --color-on-secondary-fixed-variant: 131 39 0;
+  --color-primary:                   59 130 246;
+  --color-primary-container:         96 165 250;
+  --color-primary-fixed:             147 197 253;
+  --color-primary-fixed-dim:         96 165 250;
+  --color-on-primary:                241 245 249;
+  --color-on-primary-container:      8 12 24;
+  --color-on-primary-fixed:          8 12 24;
+  --color-on-primary-fixed-variant:  17 24 39;
+  --color-inverse-primary:           147 197 253;
 
-  --color-tertiary:                   196 198 208;
-  --color-tertiary-container:         142 144 154;
-  --color-tertiary-fixed:             224 226 237;
-  --color-tertiary-fixed-dim:         196 198 208;
-  --color-on-tertiary:                45 48 56;
-  --color-on-tertiary-container:      39 42 50;
-  --color-on-tertiary-fixed:          24 27 35;
-  --color-on-tertiary-fixed-variant:  68 71 79;
+  --color-secondary:                 96 165 250;
+  --color-secondary-container:       147 197 253;
+  --color-secondary-fixed:           191 219 254;
+  --color-secondary-fixed-dim:       147 197 253;
+  --color-on-secondary:              8 12 24;
+  --color-on-secondary-container:    8 12 24;
+  --color-on-secondary-fixed:        17 24 39;
+  --color-on-secondary-fixed-variant:30 41 59;
 
-  --color-error:                      255 180 171;
-  --color-error-container:            147 0 10;
-  --color-on-error:                   105 0 5;
-  --color-on-error-container:         255 218 214;
+  --color-tertiary:                  231 246 255;
+  --color-tertiary-container:        38 57 93;
+  --color-tertiary-fixed:            231 246 255;
+  --color-tertiary-fixed-dim:        191 219 254;
+  --color-on-tertiary:               8 12 24;
+  --color-on-tertiary-container:     231 246 255;
+  --color-on-tertiary-fixed:         8 12 24;
+  --color-on-tertiary-fixed-variant: 17 24 39;
 
-  --color-outline:                    140 144 161;
-  --color-outline-variant:            66 70 85;
+  --color-error:                     96 165 250;
+  --color-error-container:           30 44 72;
+  --color-on-error:                  231 246 255;
+  --color-on-error-container:        231 246 255;
 
-  // Utility overlays
-  --glass-bg:                         rgba(51, 53, 57, 0.4);
-  --glass-border:                     rgba(140, 144, 161, 0.15);
-  --kinetic-border-shadow:            inset 0 0 0 1px rgba(140, 144, 161, 0.15);
-  --canvas-dot:                       rgba(255, 255, 255, 0.05);
-  --scrollbar-track:                  rgb(17, 19, 23);
-  --scrollbar-thumb:                  rgb(66, 70, 85);
-  --scrollbar-thumb-hover:            rgb(140, 144, 161);
+  --color-outline:                   109 138 182;
+  --color-outline-variant:           46 68 108;
+
+  --glass-bg:                        rgba(17, 24, 39, 0.74);
+  --glass-border:                    rgba(96, 165, 250, 0.12);
+  --kinetic-border-shadow:           inset 0 0 0 1px rgba(96, 165, 250, 0.12);
+  --canvas-dot:                      rgba(96, 165, 250, 0.11);
+  --scrollbar-track:                 rgb(8, 12, 24);
+  --scrollbar-thumb:                 rgb(38, 57, 93);
+  --scrollbar-thumb-hover:           rgb(96, 165, 250);
 }
 
-// ─── Base ─────────────────────────────────────────────────────────────────────
 html,
 body {
   height: 100%;
   margin: 0;
   padding: 0;
   font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  background: rgb(var(--color-background));
+  color: rgb(var(--color-on-background));
+}
+
+body {
+  background-image:
+    radial-gradient(circle at top right, rgba(var(--brand-accent-rgb), 0.16), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(var(--brand-accent-light-rgb), 0.1), transparent 24%),
+    linear-gradient(180deg, rgba(17, 24, 39, 0.06), transparent 24%);
+  background-attachment: fixed;
+}
+
+a {
+  color: rgb(var(--color-primary));
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: rgb(var(--color-primary-container));
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid rgba(var(--brand-accent-light-rgb), 0.85);
+  outline-offset: 2px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: rgb(var(--color-on-surface));
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a[class*='bg-'][class*='px-'] {
+  border-radius: 999px !important;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+input,
+select,
+textarea {
+  border-radius: 1.25rem !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: rgba(var(--brand-accent-light-rgb), 0.7) !important;
+  box-shadow: 0 0 0 2px rgba(var(--brand-accent-rgb), 0.14) !important;
+  outline: none;
+}
+
+.font-headline {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+}
+
+.brand-title {
+  text-transform: lowercase !important;
+  letter-spacing: -0.08em;
 }
 
 .material-symbols-outlined {
@@ -158,27 +243,22 @@ body {
   line-height: 1;
 }
 
-// ─── Utility Classes ──────────────────────────────────────────────────────────
-
-// Glass panel — semi-transparent frosted surface (theme-aware)
 .glass-panel {
   background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
-// Kinetic border — subtle inset glow instead of hard lines
 .kinetic-border {
   box-shadow: var(--kinetic-border-shadow);
 }
 
-// Canvas background — subtle dot grid
 .canvas-bg {
   background-image: radial-gradient(circle at 2px 2px, var(--canvas-dot) 1px, transparent 0);
   background-size: 24px 24px;
 }
 
-// Gradient glow border for special cards
 .glow-border {
   position: relative;
 }
@@ -189,7 +269,12 @@ body {
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(to bottom right, rgba(176, 198, 255, 0.2), rgba(255, 181, 156, 0.1), transparent);
+  background: linear-gradient(
+    to bottom right,
+    rgba(var(--brand-accent-light-rgb), 0.28),
+    rgba(var(--brand-accent-rgb), 0.14),
+    transparent
+  );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -197,23 +282,268 @@ body {
   pointer-events: none;
 }
 
-// Custom scrollbar
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--scrollbar-track);
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb);
-  border-radius: 3px;
+  border-radius: 999px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--scrollbar-thumb-hover);
 }
 
-// Theme transition — smooth switch on all elements
 html {
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Legacy hardcoded accents are remapped globally to the arcnode blue scale. */
+[class*='text-[#0070FF]'],
+[class*='text-[#0A66FF]'],
+[class*='text-[#06B6D4]'],
+[class*='text-[#00C48C]'],
+[class*='text-[#F59E0B]'],
+[class*='text-[#A855F7]'],
+[class*='text-[#EF9F27]'],
+[class*='text-[#22c55e]'],
+[class*='text-[#ef4444]'],
+[class*='text-[#639922]'] {
+  color: rgb(var(--brand-accent-rgb)) !important;
+}
+
+[class*='text-[#7DB4FF]'],
+[class*='text-[#9EC6FF]'],
+[class*='text-[#378ADD]'],
+[class*='text-[#0891B2]'],
+[class*='text-[#0A4FB7]'] {
+  color: rgb(var(--brand-accent-light-rgb)) !important;
+}
+
+[class*='border-[#0070FF]'],
+[class*='border-[#0A66FF]'],
+[class*='border-[#06B6D4]'],
+[class*='border-[#00C48C]'],
+[class*='border-[#F59E0B]'],
+[class*='border-[#A855F7]'],
+[class*='border-[#EF9F27]'],
+[class*='border-[#22c55e]'],
+[class*='border-[#ef4444]'],
+[class*='border-[#639922]'] {
+  border-color: rgba(var(--brand-accent-rgb), 0.32) !important;
+}
+
+[class*='bg-[#0070FF]'],
+[class*='bg-[#0A66FF]'],
+[class*='bg-[#06B6D4]'],
+[class*='bg-[#00C48C]'],
+[class*='bg-[#F59E0B]'],
+[class*='bg-[#A855F7]'],
+[class*='bg-[#EF9F27]'],
+[class*='bg-[#22c55e]'],
+[class*='bg-[#ef4444]'],
+[class*='bg-[#639922]'] {
+  background-color: rgb(var(--brand-accent-rgb)) !important;
+}
+
+[class*='bg-[#7DB4FF]'],
+[class*='bg-[#9EC6FF]'],
+[class*='bg-[#378ADD]'],
+[class*='bg-[#0891B2]'],
+[class*='bg-[#0A4FB7]'] {
+  background-color: rgb(var(--brand-accent-light-rgb)) !important;
+}
+
+[class*='bg-[#0070FF]/5'],
+[class*='bg-[#0A66FF]/5'],
+[class*='bg-[#06B6D4]/5'],
+[class*='bg-[#00C48C]/5'],
+[class*='bg-[#F59E0B]/5'],
+[class*='bg-[#A855F7]/5'],
+[class*='bg-[#EF9F27]/5'],
+[class*='bg-[#22c55e]/5'],
+[class*='bg-[#ef4444]/5'] {
+  background-color: rgba(var(--brand-accent-rgb), 0.05) !important;
+}
+
+[class*='bg-[#0070FF]/8'],
+[class*='bg-[#0A66FF]/8'],
+[class*='bg-[#06B6D4]/8'],
+[class*='bg-[#00C48C]/8'],
+[class*='bg-[#F59E0B]/8'],
+[class*='bg-[#A855F7]/8'],
+[class*='bg-[#EF9F27]/8'],
+[class*='bg-[#22c55e]/8'],
+[class*='bg-[#ef4444]/8'] {
+  background-color: rgba(var(--brand-accent-rgb), 0.08) !important;
+}
+
+[class*='bg-[#0070FF]/10'],
+[class*='bg-[#0A66FF]/10'],
+[class*='bg-[#06B6D4]/10'],
+[class*='bg-[#00C48C]/10'],
+[class*='bg-[#F59E0B]/10'],
+[class*='bg-[#A855F7]/10'],
+[class*='bg-[#EF9F27]/10'],
+[class*='bg-[#22c55e]/10'],
+[class*='bg-[#ef4444]/10'],
+[class*='bg-[#639922]/10'] {
+  background-color: rgba(var(--brand-accent-rgb), 0.1) !important;
+}
+
+[class*='bg-[#0070FF]/12'],
+[class*='bg-[#0A66FF]/12'],
+[class*='bg-[#06B6D4]/12'],
+[class*='bg-[#00C48C]/12'],
+[class*='bg-[#F59E0B]/12'],
+[class*='bg-[#A855F7]/12'],
+[class*='bg-[#EF9F27]/12'] {
+  background-color: rgba(var(--brand-accent-rgb), 0.12) !important;
+}
+
+[class*='bg-[#0070FF]/15'],
+[class*='bg-[#0A66FF]/15'],
+[class*='bg-[#06B6D4]/15'],
+[class*='bg-[#00C48C]/15'],
+[class*='bg-[#F59E0B]/15'],
+[class*='bg-[#A855F7]/15'],
+[class*='bg-[#EF9F27]/15'],
+[class*='bg-[#22c55e]/15'],
+[class*='bg-[#ef4444]/15'] {
+  background-color: rgba(var(--brand-accent-rgb), 0.15) !important;
+}
+
+[class*='bg-[#0070FF]/18'],
+[class*='bg-[#0A66FF]/18'],
+[class*='bg-[#06B6D4]/18'],
+[class*='bg-[#00C48C]/18'],
+[class*='bg-[#F59E0B]/18'] {
+  background-color: rgba(var(--brand-accent-rgb), 0.18) !important;
+}
+
+[class*='bg-[#0070FF]/20'],
+[class*='bg-[#0A66FF]/20'],
+[class*='bg-[#06B6D4]/20'],
+[class*='bg-[#00C48C]/20'],
+[class*='bg-[#F59E0B]/20'],
+[class*='bg-[#A855F7]/20'],
+[class*='bg-[#EF9F27]/20'],
+[class*='bg-[#22c55e]/20'],
+[class*='bg-[#ef4444]/20'] {
+  background-color: rgba(var(--brand-accent-rgb), 0.2) !important;
+}
+
+[class*='bg-[#0070FF]/30'],
+[class*='bg-[#0A66FF]/30'],
+[class*='bg-[#06B6D4]/30'],
+[class*='bg-[#00C48C]/30'],
+[class*='bg-[#F59E0B]/30'],
+[class*='bg-[#A855F7]/30'],
+[class*='bg-[#EF9F27]/30'] {
+  background-color: rgba(var(--brand-accent-rgb), 0.3) !important;
+}
+
+[class*='bg-[#0070FF]/40'],
+[class*='bg-[#0A66FF]/40'],
+[class*='bg-[#06B6D4]/40'],
+[class*='bg-[#00C48C]/40'],
+[class*='bg-[#F59E0B]/40'] {
+  background-color: rgba(var(--brand-accent-rgb), 0.4) !important;
+}
+
+[class*='bg-[#0070FF]/60'],
+[class*='bg-[#0A66FF]/60'],
+[class*='bg-[#06B6D4]/60'],
+[class*='bg-[#00C48C]/60'],
+[class*='bg-[#F59E0B]/60'] {
+  background-color: rgba(var(--brand-accent-rgb), 0.6) !important;
+}
+
+[class*='bg-[#0070FF]/70'],
+[class*='bg-[#0A66FF]/70'],
+[class*='bg-[#06B6D4]/70'],
+[class*='bg-[#00C48C]/70'],
+[class*='bg-[#F59E0B]/70'] {
+  background-color: rgba(var(--brand-accent-rgb), 0.7) !important;
+}
+
+[class*='bg-[#0070FF]/80'],
+[class*='bg-[#0A66FF]/80'],
+[class*='bg-[#06B6D4]/80'],
+[class*='bg-[#00C48C]/80'] {
+  background-color: rgba(var(--brand-accent-rgb), 0.8) !important;
+}
+
+[class*='border-[#0070FF]/15'],
+[class*='border-[#0A66FF]/15'],
+[class*='border-[#06B6D4]/15'],
+[class*='border-[#00C48C]/15'],
+[class*='border-[#F59E0B]/15'] {
+  border-color: rgba(var(--brand-accent-rgb), 0.15) !important;
+}
+
+[class*='border-[#0070FF]/20'],
+[class*='border-[#0A66FF]/20'],
+[class*='border-[#06B6D4]/20'],
+[class*='border-[#00C48C]/20'],
+[class*='border-[#F59E0B]/20'],
+[class*='border-[#A855F7]/20'],
+[class*='border-[#EF9F27]/20'] {
+  border-color: rgba(var(--brand-accent-rgb), 0.2) !important;
+}
+
+[class*='border-[#0070FF]/25'],
+[class*='border-[#0A66FF]/25'],
+[class*='border-[#06B6D4]/25'],
+[class*='border-[#00C48C]/25'],
+[class*='border-[#F59E0B]/25'] {
+  border-color: rgba(var(--brand-accent-rgb), 0.25) !important;
+}
+
+[class*='border-[#0070FF]/30'],
+[class*='border-[#0A66FF]/30'],
+[class*='border-[#06B6D4]/30'],
+[class*='border-[#00C48C]/30'],
+[class*='border-[#F59E0B]/30'],
+[class*='border-[#A855F7]/30'],
+[class*='border-[#EF9F27]/30'] {
+  border-color: rgba(var(--brand-accent-rgb), 0.3) !important;
+}
+
+[class*='border-[#0070FF]/40'],
+[class*='border-[#0A66FF]/40'],
+[class*='border-[#06B6D4]/40'],
+[class*='border-[#00C48C]/40'] {
+  border-color: rgba(var(--brand-accent-rgb), 0.4) !important;
+}
+
+[class*='border-[#0070FF]/50'],
+[class*='border-[#0A66FF]/50'],
+[class*='border-[#06B6D4]/50'],
+[class*='border-[#00C48C]/50'] {
+  border-color: rgba(var(--brand-accent-rgb), 0.5) !important;
+}
+
+[class*='border-[#0070FF]/60'],
+[class*='border-[#0A66FF]/60'],
+[class*='border-[#06B6D4]/60'],
+[class*='border-[#00C48C]/60'] {
+  border-color: rgba(var(--brand-accent-rgb), 0.6) !important;
+}
+
+[class*='shadow-[0_0_'],
+[class*='shadow-[0_8px_32px_rgba(255,120,50'],
+[class*='shadow-[0_0_30px_rgba(255,181,156'],
+[class*='shadow-[0_0_40px_rgba(255,181,156'],
+[class*='shadow-[0_0_12px_rgba(255,120,50'],
+[class*='shadow-[0_0_48px_rgba(255,120,50'],
+[class*='shadow-[0_0_16px_rgba(0,112,255'],
+[class*='shadow-[0_0_8px_rgba(0,112,255'] {
+  box-shadow: 0 0 24px rgba(var(--brand-accent-rgb), 0.2) !important;
 }

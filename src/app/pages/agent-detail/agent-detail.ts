@@ -90,7 +90,7 @@ export class AgentDetail {
 
   readonly isSubmitting = signal(false);
   readonly progress = signal(0);
-  readonly progressLabel = signal('Initialisiere Agent…');
+  readonly progressLabel = signal('System startet …');
   readonly webhookError = signal(false);
 
   readonly toneOptions = [
@@ -115,49 +115,94 @@ export class AgentDetail {
 
   readonly chartBars = [40, 65, 55, 90, 75, 45, 60, 85, 30, 50, 70, 95];
 
+  readonly premiumUseCase = computed(() => {
+    switch (this.agentId) {
+      case 'networking-ninja':
+        return 'Nach einem Event sollen neue Kontakte priorisiert, segmentiert und mit einem passenden Follow-up angesprochen werden.';
+      case 'cold-mail-cyborg':
+        return 'Ein Vertriebsteam braucht präzise Erstansprachen für einen klar definierten ICP statt generischer Sequenzen.';
+      case 'linkedin-ghostwriter':
+        return 'Fachliche Erfahrungen aus Vertrieb, Delivery oder Produkt sollen als glaubwürdige LinkedIn-Posts sichtbar werden.';
+      case 'top-ranker-bot':
+        return 'Ein bestehender Content-Hub soll auf Basis realer SERP-Muster priorisiert weiterentwickelt werden.';
+      case 'sync-master':
+        return 'CRM, Spreadsheet und Kampagnendaten sollen in einen belastbaren operativen Zustand gebracht werden.';
+      case 'firmen-finder':
+        return 'Für eine Region oder Branche wird eine saubere Erstliste lokaler Unternehmen für Vertrieb oder Research benötigt.';
+      default:
+        return 'Das System übersetzt strukturierte Eingaben in einen operativ nutzbaren ersten Output mit klarer nächster Handlung.';
+    }
+  });
+
+  readonly premiumOutcome = computed(() => {
+    switch (this.agentMeta?.category) {
+      case 'SEO':
+        return 'Sie erhalten priorisierte Analysen, konkrete Maßnahmen und einen Output, der direkt ins nächste SEO-Arbeitspaket überführt werden kann.';
+      case 'Data':
+        return 'Sie erhalten eine strukturierte Datengrundlage oder Prozesssicht, die sich unmittelbar in operative Systeme zurückspielen lässt.';
+      case 'Content':
+        return 'Sie erhalten einen redaktionell verwertbaren Entwurf mit klarer Struktur, Tonalität und nachvollziehbarer Ausrichtung.';
+      default:
+        return 'Sie erhalten einen belastbaren Arbeitsstand, der direkt für Outreach, Follow-up oder interne Abstimmung nutzbar ist.';
+    }
+  });
+
+  readonly outputModules = computed(() => {
+    switch (this.agentMeta?.category) {
+      case 'SEO':
+        return ['Analyse', 'Priorisierung', 'Empfehlungen'];
+      case 'Data':
+        return ['Datensicht', 'Struktur', 'Nächste Schritte'];
+      case 'Content':
+        return ['Entwurf', 'Tonality Fit', 'Weiterverarbeitung'];
+      default:
+        return ['Recherche', 'Personalisierung', 'Versandbereit'];
+    }
+  });
+
   private readonly PROGRESS_LABELS_FIRMEN = [
-    'Initialisiere Agent…',
-    'Verbinde mit Verzeichnis-Datenbank…',
-    'Suche Unternehmen in der Region…',
-    'Filtere nach Branche…',
-    'Extrahiere Kontaktdaten…',
-    'Firmenliste fertig ✓',
+    'System startet …',
+    'Verbinde mit Verzeichnis-Datenbank …',
+    'Suche Unternehmen in der Region …',
+    'Filtere nach Branche …',
+    'Extrahiere Kontaktdaten …',
+    'Firmenliste bereit',
   ];
 
   private readonly PROGRESS_LABELS_LEAD = [
-    'Initialisiere Agent…',
-    'Verbinde mit Recherche-Engine…',
-    'Analysiere Website-Daten…',
-    'Erstelle Sales-Briefing…',
-    'Finalisiere Dokument…',
-    'Briefing fertig ✓',
+    'System startet …',
+    'Verbinde mit Recherche-Engine …',
+    'Analysiere Website-Daten …',
+    'Erstelle Sales-Briefing …',
+    'Finalisiere Dokument …',
+    'Briefing bereit',
   ];
 
   private readonly PROGRESS_LABELS = [
-    'Initialisiere Agent…',
-    'Analysiere Zielgruppe…',
-    'Verarbeite Website-Daten…',
-    'Generiere Content…',
-    'Optimiere Ausgabe…',
-    'Workflow abgeschlossen ✓',
+    'System startet …',
+    'Analysiere Zielgruppe …',
+    'Verarbeite Website-Daten …',
+    'Generiere Content …',
+    'Optimiere Ausgabe …',
+    'Analyse abgeschlossen',
   ];
 
   private readonly PROGRESS_LABELS_GEO = [
-    'Initialisiere GEO Audit…',
-    'Verbinde mit Sitemap-Crawler…',
-    'Pruefe robots.txt und llms.txt…',
-    'Analysiere Seitenstruktur und KI-Signale…',
-    'Baue Ranking und Prioritaetenliste…',
-    'Geo Site Audit fertig ✓',
+    'GEO Audit startet …',
+    'Verbinde mit Sitemap-Crawler …',
+    'Prüfe robots.txt und llms.txt …',
+    'Analysiere Seitenstruktur und KI-Signale …',
+    'Erstelle Ranking und Prioritätenliste …',
+    'GEO Audit abgeschlossen',
   ];
 
   private readonly PROGRESS_LABELS_BLOG = [
-    'Initialisiere Redaktion…',
-    'Pruefe Briefing und Outline…',
-    'Analysiere Keywords und SERP…',
-    'Erstelle Artikelentwurf…',
-    'Baue Redaktions-Check auf…',
-    'Blog-Paket fertig ✓',
+    'Redaktion startet …',
+    'Prüfe Briefing und Outline …',
+    'Analysiere Keywords und SERP …',
+    'Erstelle Artikelentwurf …',
+    'Führe Redaktions-Check durch …',
+    'Blog-Paket bereit',
   ];
 
   submitWorkflow(): void {
@@ -775,12 +820,12 @@ export class AgentDetail {
 
   private runSocialMediaWizardWorkflow(): void {
     const labels = [
-      'Initialisiere Agent…',
-      'Analysiere Brand Voice…',
-      'Generiere Plattform-Content…',
-      'Überprüfe und verfeinere…',
-      'Finalisiere Inhalte…',
-      'Social-Media-Paket fertig ✓',
+      'System startet …',
+      'Analysiere Brand Voice …',
+      'Generiere Plattform-Content …',
+      'Überprüfe und verfeinere …',
+      'Finalisiere Inhalte …',
+      'Social-Media-Paket bereit',
     ];
     this.progressLabel.set(labels[0]);
 
@@ -859,12 +904,12 @@ export class AgentDetail {
 
   private runContentStrategyWorkflow(): void {
     const labels = [
-      'Initialisiere Agent…',
-      'Verbinde mit Keyword-Datenbank…',
-      'Analysiere Suchvolumen und Difficulty…',
-      'Recherchiere Wettbewerber-URLs…',
-      'Erstelle Content-Strategie…',
-      'Content-Plan fertig ✓',
+      'System startet …',
+      'Verbinde mit Keyword-Datenbank …',
+      'Analysiere Suchvolumen und Difficulty …',
+      'Recherchiere Wettbewerber-URLs …',
+      'Erstelle Content-Strategie …',
+      'Content-Plan bereit',
     ];
     this.progressLabel.set(labels[0]);
 

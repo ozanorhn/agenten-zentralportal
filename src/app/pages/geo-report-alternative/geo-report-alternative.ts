@@ -106,7 +106,7 @@ export class GeoReportAlternativeComponent {
   }
 
   fillExample(): void {
-    this.websiteUrl = 'https://eom.de/agency/seo';
+    this.websiteUrl = 'https://www.sistrix.de/';
   }
 
   private async fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {

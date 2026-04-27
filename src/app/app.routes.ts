@@ -60,6 +60,36 @@ export const routes: Routes = [
           import('./pages/geo-report-alternative/geo-report-alternative').then((m) => m.GeoReportAlternativeComponent),
       },
       {
+        path: 'agents/content-seo-analyzer',
+        loadComponent: () =>
+          import('./pages/content-seo-analyzer/content-seo-analyzer').then((m) => m.ContentSeoAnalyzerComponent),
+      },
+      {
+        path: 'agents/content-seo-analyzer/result',
+        loadComponent: () =>
+          import('./pages/content-seo-analyzer/content-seo-analyzer-result').then((m) => m.ContentSeoAnalyzerResultComponent),
+      },
+      {
+        path: 'agents/omr-seo-content-strategie',
+        loadComponent: () =>
+          import('./pages/omr-seo-content-strategie/omr-seo-content-strategie').then((m) => m.OmrSeoContentStrategieComponent),
+      },
+      {
+        path: 'agents/omr-seo-content-strategie/result',
+        loadComponent: () =>
+          import('./pages/omr-seo-content-strategie/omr-seo-content-strategie-result').then((m) => m.OmrSeoContentStrategieResultComponent),
+      },
+      {
+        path: 'agents/interne-verlinkung-vorschlaege',
+        loadComponent: () =>
+          import('./pages/interne-verlinkung-vorschlaege/interne-verlinkung-vorschlaege').then((m) => m.InterneVerlinkungVorschlaegeComponent),
+      },
+      {
+        path: 'agents/interne-verlinkung-vorschlaege/result',
+        loadComponent: () =>
+          import('./pages/interne-verlinkung-vorschlaege/interne-verlinkung-vorschlaege-result').then((m) => m.InterneVerlinkungVorschlaegeResultComponent),
+      },
+      {
         path: 'agents/seo-geo-analyse-assistent/result',
         data: { agentId: 'seo-geo-analyse-assistent' },
         loadComponent: () =>

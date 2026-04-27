@@ -1,0 +1,185 @@
+<div class="min-h-screen bg-surface text-on-surface font-body">
+  <div class="sticky top-[56px] z-30 border-b border-outline-variant/20 bg-surface-container-low/85 backdrop-blur-xl">
+    <div class="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-3 px-4 py-4 md:px-6">
+      <div class="flex items-center gap-4">
+        <button
+          (click)="goBack()"
+          class="inline-flex items-center gap-2 text-sm text-on-surface-variant transition-colors hover:text-on-surface"
+        >
+          <span class="material-symbols-outlined text-sm">arrow_back</span>
+          Zurueck
+        </button>
+
+        <div class="h-4 w-px bg-outline-variant/30"></div>
+
+        <div class="flex items-center gap-3">
+          <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#0070FF]/15 text-[#0070FF]">
+            <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1;">{{ agentMeta.icon }}</span>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-on-surface">{{ agentMeta.name }}</p>
+            <p class="text-[10px] uppercase tracking-[0.2em] text-outline">Structured Result</p>
+          </div>
+        </div>
+      </div>
+
+      @if (record()) {
+        <button
+          type="button"
+          (click)="rerun()"
+          class="inline-flex items-center gap-2 rounded-xl border border-outline-variant/20 bg-surface-container-high/50 px-4 py-2 text-sm font-medium text-on-surface transition-colors hover:bg-surface-container-highest"
+        >
+          <span class="material-symbols-outlined text-base">refresh</span>
+          Neu starten
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-[1120px] px-4 py-6 md:px-6">
+    @if (record(); as report) {
+      <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Content & SEO Analyse</p>
+            <h1 class="mt-2 font-headline text-2xl font-black tracking-tight text-on-surface md:text-4xl">
+              {{ report.domain }}
+            </h1>
+            <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+              Erstellt am {{ formatDate(report.createdAt) }}
+            </p>
+          </div>
+
+          <div class="min-w-[220px] rounded-[1.75rem] border border-outline-variant/20 bg-surface-container-high/40 px-5 py-5">
+            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">SEO Score</p>
+            <div class="mt-3 flex items-end gap-2">
+              <span class="font-headline text-5xl font-black" [class]="scoreToneClass()">
+                {{ seoScore() ?? '–' }}
+              </span>
+              <span class="pb-1 text-sm text-on-surface-variant">/ 10</span>
+            </div>
+            <p class="mt-2 text-sm font-semibold text-on-surface">{{ scoreLabel() }}</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="mt-4 grid gap-4 lg:grid-cols-3">
+        @for (card of seoInsightCards(); track card.title) {
+          <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+            <div class="flex items-start gap-3">
+              <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
+                <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">{{ card.icon }}</span>
+              </div>
+              <div>
+                <h2 class="text-base font-semibold text-on-surface">{{ card.title }}</h2>
+                <p class="mt-1 text-sm leading-relaxed text-on-surface-variant">{{ card.description }}</p>
+              </div>
+            </div>
+
+            <div class="mt-5 space-y-3">
+              @for (item of card.items; track item) {
+                <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-3 text-sm leading-relaxed text-on-surface-variant">
+                  {{ item }}
+                </div>
+              }
+            </div>
+          </section>
+        }
+      </div>
+
+      <div class="mt-4 grid gap-4 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+        <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+          <div class="flex items-start gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
+              <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">groups</span>
+            </div>
+            <div>
+              <h2 class="text-base font-semibold text-on-surface">Wettbewerb</h2>
+              <p class="mt-1 text-sm leading-relaxed text-on-surface-variant">
+                Relevante Wettbewerber und aktuelle Marktposition.
+              </p>
+            </div>
+          </div>
+
+          @if (competitive()?.topCompetitors?.length) {
+            <div class="mt-5">
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Top Competitors</p>
+              <div class="mt-3 flex flex-wrap gap-2">
+                @for (competitor of competitive()!.topCompetitors!; track competitor) {
+                  <span class="rounded-full border border-outline-variant/20 bg-surface-container-high/40 px-3 py-2 text-sm text-on-surface">
+                    {{ competitor }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+
+          @if (competitive()?.marketPosition) {
+            <div class="mt-5 rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-4">
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Market Position</p>
+              <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+                {{ competitive()!.marketPosition }}
+              </p>
+            </div>
+          }
+        </section>
+
+        <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+          <div class="flex items-start gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
+              <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">emoji_objects</span>
+            </div>
+            <div>
+              <h2 class="text-base font-semibold text-on-surface">Positionierung</h2>
+              <p class="mt-1 text-sm leading-relaxed text-on-surface-variant">
+                Stärken und empfohlene Differenzierung im Markt.
+              </p>
+            </div>
+          </div>
+
+          @if (competitive()?.advantages?.length) {
+            <div class="mt-5">
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Advantages</p>
+              <div class="mt-3 space-y-3">
+                @for (advantage of competitive()!.advantages!; track advantage) {
+                  <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-3 text-sm leading-relaxed text-on-surface-variant">
+                    {{ advantage }}
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          @if (competitive()?.recommendedPositioning) {
+            <div class="mt-5 rounded-2xl border border-[#0070FF]/20 bg-[#0070FF]/8 px-4 py-4">
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-[#0070FF]">Recommended Positioning</p>
+              <p class="mt-3 text-sm leading-relaxed text-on-surface">
+                {{ competitive()!.recommendedPositioning }}
+              </p>
+            </div>
+          }
+        </section>
+      </div>
+    } @else {
+      <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-8 text-center md:px-6">
+        <div class="mx-auto max-w-xl">
+          <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
+            <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">insights</span>
+          </div>
+          <h1 class="mt-5 font-headline text-2xl font-black text-on-surface">Kein gespeicherter Analyse-Report gefunden</h1>
+          <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+            Starte den Agenten erneut und sende eine Domain ab, damit wir die SEO- und Wettbewerbsanalyse anzeigen koennen.
+          </p>
+          <button
+            type="button"
+            (click)="goBack()"
+            class="mt-6 inline-flex items-center gap-2 rounded-2xl bg-[#0070FF] px-6 py-4 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#0060db]"
+          >
+            Zum Agenten
+            <span class="material-symbols-outlined text-base">east</span>
+          </button>
+        </div>
+      </section>
+    }
+  </div>
+</div>

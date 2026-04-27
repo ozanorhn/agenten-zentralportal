@@ -109,13 +109,13 @@ interface ChatMessage {
                 </p>
                 <p>
                   <strong class="text-on-surface">Sales:</strong>
-                  Der Cold-Mail-Cyborg hat 480 personalisierte Outreach-Sequenzen verschickt.
+                  Der Outreach-Agent hat 480 personalisierte Outreach-Sequenzen vorbereitet.
                   Conversion-Rate dieser Woche: <strong class="text-[#0070FF]">8,4 %</strong>.
                   3 neue Deals in der Pipeline (Gesamtwert: ~€ 24.000).
                 </p>
                 <p>
                   <strong class="text-on-surface">Content:</strong>
-                  LinkedIn-Ghostwriter hat 12 Thought-Leadership-Posts publiziert.
+                  LinkedIn-Post-Agent hat 12 Beiträge zur Freigabe vorbereitet.
                   Durchschnittliche Engagement-Rate: <strong class="text-[#0070FF]">6,2 %</strong>.
                 </p>
                 <p>

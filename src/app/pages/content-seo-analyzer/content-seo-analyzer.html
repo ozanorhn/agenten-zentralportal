@@ -1,14 +1,15 @@
 <div class="px-4 py-8 pb-24 md:px-8 md:py-10 md:pb-10">
   <div class="mx-auto max-w-7xl">
     <div class="mb-10 max-w-4xl">
-      <span class="mb-4 block text-xs font-bold uppercase tracking-[0.2em] text-secondary font-headline">
-        SEO
+      <span class="mb-4 block font-headline text-xs font-bold uppercase tracking-[0.2em] text-secondary">
+        {{ agentMeta.category }}
       </span>
-      <h1 class="mb-5 text-4xl font-black leading-none tracking-tighter text-on-surface font-headline md:text-6xl">
-        SEO/GEO Analyse <span class="text-[#0070FF]">Assistent</span>
+      <h1 class="mb-5 font-headline text-4xl font-black leading-none tracking-tighter text-on-surface md:text-6xl">
+        Content <span class="text-[#0070FF]">&amp; SEO Analyzer</span>
       </h1>
       <p class="max-w-3xl text-lg font-light leading-relaxed text-on-surface-variant md:text-xl">
-        Felder ausfüllen, Analyse starten und den Live-Status danach direkt auf der eigenen Ergebnisseite verfolgen.
+        Gib nur eine Domain ein. Das System startet daraus eine schnelle Content- und SEO-Analyse
+        und legt den Report auf einer eigenen Ergebnisseite ab.
       </p>
     </div>
 
@@ -17,11 +18,11 @@
         <div class="border-b border-outline-variant/10 px-6 py-5 md:px-8">
           <div class="flex items-center gap-3">
             <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
-              <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">edit_document</span>
+              <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">travel_explore</span>
             </div>
             <div>
               <p class="text-sm font-bold text-on-surface">Analyse starten</p>
-              <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Webhook Formular</p>
+              <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Domain-only Workflow</p>
             </div>
           </div>
         </div>
@@ -29,78 +30,27 @@
         <div class="space-y-6 px-6 py-6 md:px-8 md:py-8">
           <div class="space-y-2">
             <label class="block text-[10px] font-bold uppercase tracking-[0.22em] text-outline">
-              Website URL
+              Domain
             </label>
             <div class="relative">
               <input
-                [(ngModel)]="websiteUrl"
-                type="url"
-                placeholder="https://..."
-                class="w-full rounded-2xl border-0 bg-surface-container-highest px-4 py-4 pl-12 text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]"
-              />
-              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">link</span>
-            </div>
-          </div>
-
-          <div class="grid gap-6 md:grid-cols-2">
-            <div class="space-y-2">
-              <label class="block text-[10px] font-bold uppercase tracking-[0.22em] text-outline">
-                Marke
-              </label>
-              <div class="relative">
-                <input
-                  [(ngModel)]="brand"
-                  type="text"
-                  placeholder="z. B. Effektiv Online-Marketing"
-                  class="w-full rounded-2xl border-0 bg-surface-container-highest px-4 py-4 pl-12 text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]"
-                />
-                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">branding_watermark</span>
-              </div>
-              <p class="text-xs leading-relaxed text-on-surface-variant">
-                Markennamen bitte vollständig und ohne Kürzungen angeben.
-              </p>
-            </div>
-
-            <div class="space-y-2">
-              <label class="block text-[10px] font-bold uppercase tracking-[0.22em] text-outline">
-                Branche
-              </label>
-              <div class="relative">
-                <input
-                  [(ngModel)]="industry"
-                  type="text"
-                  placeholder="z. B. online Marketing"
-                  class="w-full rounded-2xl border-0 bg-surface-container-highest px-4 py-4 pl-12 text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]"
-                />
-                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">category</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="space-y-2">
-            <label class="block text-[10px] font-bold uppercase tracking-[0.22em] text-outline">
-              Standort
-            </label>
-            <div class="relative">
-              <input
-                [(ngModel)]="location"
+                [(ngModel)]="domain"
                 type="text"
-                placeholder="Deutschland"
+                inputmode="url"
+                placeholder="z.B. eom.de"
                 class="w-full rounded-2xl border-0 bg-surface-container-highest px-4 py-4 pl-12 text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]"
               />
-              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">location_on</span>
+              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50">language</span>
             </div>
+              <p class="text-sm leading-relaxed text-on-surface-variant/70">
+              Erlaubt sind Eingaben wie `sistrix.de`, `www.sistrix.de` oder `https://sistrix.de`.
+              Gesendet wird nur die normalisierte Domain.
+            </p>
           </div>
 
           @if (errorMessage()) {
             <div class="rounded-2xl border border-error/20 bg-error/10 px-5 py-4 text-sm text-error">
               {{ errorMessage() }}
-            </div>
-          }
-
-          @if (isSubmitting() && showLongWaitNotice()) {
-            <div class="rounded-2xl border border-[#0070FF]/20 bg-[#0070FF]/10 px-5 py-4 text-sm text-[#0A4FB7]">
-              Die Analyse wird gerade vorbereitet. Sobald die Job-ID da ist, springt die Seite automatisch in den Live-Status.
             </div>
           }
 
@@ -115,7 +65,7 @@
                 <span class="material-symbols-outlined animate-spin text-base">progress_activity</span>
                 Analyse startet...
               } @else {
-                Report erstellen
+                Analyse starten
                 <span class="material-symbols-outlined text-base">east</span>
               }
             </button>
@@ -135,22 +85,22 @@
         <section class="glass-panel kinetic-border rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
           <div class="flex items-start gap-4">
             <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
-              <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">webhook</span>
+              <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">hub</span>
             </div>
             <div>
-              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Webhook</p>
-              <p class="mt-2 text-lg font-black text-on-surface font-headline">Start-Endpunkt</p>
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Technik</p>
+              <p class="mt-2 font-headline text-lg font-black text-on-surface">Technischer Endpunkt</p>
               <p class="mt-3 break-all text-sm leading-relaxed text-on-surface-variant">
-                {{ environment.geoAnalysisStartWebhookUrl }}
+                {{ environment.contentSeoAnalyzerWebhookUrl }}
               </p>
             </div>
           </div>
 
           <div class="mt-6 space-y-4">
             @for (step of [
-              'Formular absenden',
-              'Sofort zur eigenen Status-Seite springen',
-              'Status pollen und Ergebnis automatisch laden'
+              'Domain validieren und in ein sauberes Eingabeformat ueberfuehren',
+              'Analysejob an den Content- und SEO-Workflow uebergeben',
+              'Report im Portal speichern und direkt in der Ergebnisansicht oeffnen'
             ]; track step) {
               <div class="flex gap-3">
                 <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#0070FF]/10 text-[11px] font-black text-[#0070FF]">
@@ -163,13 +113,12 @@
         </section>
 
         <section class="glass-panel kinetic-border rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
-          <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Report Struktur</p>
+          <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Einsatz</p>
           <div class="mt-4 space-y-3">
             @for (item of [
-              'Onpage',
-              'Technik',
-              'Offpage',
-              'AI'
+              'Schneller Einstieg fuer Domain-Screenings im Presales',
+              'Ein sauberer Single-Input statt komplexem Briefing',
+              'Getrennter Workflow mit eigener Report-Ansicht fuer Teams'
             ]; track item) {
               <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-3 text-sm text-on-surface-variant">
                 {{ item }}
@@ -182,7 +131,7 @@
             class="mt-6 inline-flex items-center gap-2 text-sm text-on-surface-variant transition-colors hover:text-on-surface"
           >
             <span class="material-symbols-outlined text-base">arrow_back</span>
-            Zurück zur Übersicht
+            Zurueck zum Marketplace
           </a>
         </section>
       </aside>

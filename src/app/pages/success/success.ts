@@ -5,21 +5,21 @@ import { map } from 'rxjs';
 
 const CONFIG: Record<string, { title: string; message: string; color: string; icon: string }> = {
   error: {
-    title: 'Fehler gemeldet!',
-    message: 'Danke für deinen Hinweis. Wir kümmern uns so schnell wie möglich darum.',
-    color: '#F59E0B',
+    title: 'Hinweis übermittelt',
+    message: 'Danke für die Rückmeldung. Wir prüfen das und melden uns, sobald es relevant ist.',
+    color: '#60A5FA',
     icon: 'check_circle',
   },
   contact: {
-    title: 'Nachricht gesendet!',
-    message: 'Wir haben deine Nachricht erhalten und melden uns bald bei dir.',
-    color: '#06B6D4',
+    title: 'Nachricht erhalten',
+    message: 'Wir haben deine Nachricht erhalten und melden uns in Kürze.',
+    color: '#3B82F6',
     icon: 'mark_email_read',
   },
   idea: {
-    title: 'Idee eingereicht!',
-    message: 'Super, danke für deine Idee! Wir prüfen das Potenzial und kommen auf dich zu.',
-    color: '#0070FF',
+    title: 'Vorschlag eingereicht',
+    message: 'Danke für deinen Vorschlag. Wir prüfen das Potenzial und kommen auf dich zu.',
+    color: '#3B82F6',
     icon: 'lightbulb',
   },
 };

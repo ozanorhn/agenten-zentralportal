@@ -163,10 +163,10 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
   }
 
   fillExample(): void {
-    this.websiteUrl = 'https://eom.de/agency/seo';
-    this.brand = 'Effektiv Online-Marketing';
-    this.industry = 'online Marketing';
-    this.location = 'Hannover, DE';
+    this.websiteUrl = 'https://www.sistrix.de/';
+    this.brand = 'SISTRIX';
+    this.industry = 'SEO-Software';
+    this.location = 'Deutschland';
     this.websiteType = 'Landingpage';
   }
 

@@ -1,4 +1,4 @@
-<div class="flex h-[calc(100vh-56px)] overflow-hidden relative">
+<div class="agent-workspace flex h-[calc(100vh-56px)] overflow-hidden relative">
 
   <!-- Loading Overlay -->
   @if (isSubmitting()) {
@@ -33,7 +33,7 @@
         </button>
       } @else {
         <h2 class="text-2xl font-headline font-black text-on-surface mb-2 tracking-tight">
-          Workflow läuft…
+          Analyse läuft …
         </h2>
         <p class="text-sm text-on-surface-variant mb-8">{{ progressLabel() }}</p>
 
@@ -54,17 +54,17 @@
   }
 
   <!-- Left Panel: Input Controls -->
-  <section class="w-[380px] flex-shrink-0 border-r border-outline-variant/20 bg-surface-container-low
+  <section class="agent-sidebar w-[380px] flex-shrink-0 border-r border-outline-variant/20 bg-surface-container-low
                   flex flex-col p-8 space-y-8 overflow-y-auto">
     <header>
       <a routerLink="/dashboard"
          class="flex items-center gap-2 text-on-surface-variant/50 hover:text-on-surface text-sm mb-6 transition-colors">
         <span class="material-symbols-outlined text-sm">arrow_back</span>
-        Zurück zum Marketplace
+        Zurück zur Übersicht
       </a>
       <div class="flex items-center gap-2 mb-2">
-        <span class="w-2 h-2 rounded-full bg-secondary animate-pulse shadow-[0_0_8px_#ffb59c]"></span>
-        <span class="text-[10px] font-bold tracking-[0.2em] text-secondary uppercase">Agent Live</span>
+        <span class="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(59,130,246,0.45)]"></span>
+        <span class="text-[10px] font-bold tracking-[0.2em] text-primary uppercase">System bereit</span>
       </div>
       @if (agentMeta) {
         <div class="flex items-center gap-3 mb-2">
@@ -467,7 +467,7 @@
 
       <!-- Skills Matrix -->
       <div class="space-y-4 pt-2">
-        <p class="text-[10px] font-bold tracking-widest text-outline uppercase px-1">Fähigkeiten-Matrix</p>
+        <p class="text-[10px] font-bold tracking-widest text-outline uppercase px-1">Leistungsprofil</p>
         @for (skill of skills(); track skill.label) {
           <div class="space-y-1.5">
             <div class="flex justify-between text-xs font-bold uppercase tracking-widest text-on-surface-variant">
@@ -489,20 +489,35 @@
           class="w-full py-4 bg-[#0070FF] hover:bg-primary-container text-white font-black rounded-xl
                  hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group
                  disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100">
-          <span>{{ isSubmitting() ? 'Läuft…' : (isBlogRedakteur ? 'Jetzt generieren' : (isContentStrategyBot ? 'Starten' : 'Workflow starten')) }}</span>
+          <span>{{ isSubmitting() ? 'Läuft …' : (isBlogRedakteur ? 'Jetzt generieren' : 'Starten') }}</span>
           <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform"
                 style="font-variation-settings:'FILL' 1;">auto_awesome</span>
         </button>
       </div>
     </div>
 
+    <div class="glass-panel rounded-2xl p-5 border border-outline-variant/20">
+      <p class="text-[10px] font-bold tracking-[0.2em] text-outline uppercase mb-3">Typischer Einsatz</p>
+      <p class="text-sm text-on-surface leading-relaxed mb-4">{{ premiumUseCase() }}</p>
+      <div class="grid grid-cols-1 gap-2">
+        @for (module of outputModules(); track module) {
+          <div class="flex items-center gap-3 rounded-2xl bg-primary/8 px-4 py-3 border border-primary/12">
+            <span class="flex h-7 w-7 items-center justify-center rounded-full bg-primary/12 text-primary text-[11px] font-black">
+              {{ $index + 1 }}
+            </span>
+            <span class="text-sm text-on-surface">{{ module }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
     <!-- Agent Tip -->
-    <div class="mt-auto glass-panel rounded-2xl p-4 border border-outline-variant/20">
+    <div class="agent-tip-card mt-auto glass-panel rounded-2xl p-4 border border-outline-variant/20">
       <div class="flex items-center gap-3 mb-3">
         <div class="w-8 h-8 rounded-lg bg-[#0070FF]/20 flex items-center justify-center">
           <span class="material-symbols-outlined text-[#0070FF] text-sm">smart_toy</span>
         </div>
-        <span class="text-xs font-bold text-on-surface">Pro-Tipp vom Agenten</span>
+        <span class="text-xs font-bold text-on-surface">Hinweis</span>
       </div>
       <p class="text-xs text-on-surface-variant leading-relaxed">
         {{ agentMeta.tip }}
@@ -511,11 +526,11 @@
   </section>
 
   <!-- Right Panel: Canvas -->
-  <section class="flex-1 bg-surface-container-lowest overflow-y-auto canvas-bg relative p-12">
+  <section class="agent-canvas flex-1 bg-surface-container-lowest overflow-y-auto canvas-bg relative p-12">
     <div class="max-w-4xl mx-auto space-y-12">
 
       <!-- Generated Content Preview Card -->
-      <div class="glass-panel border border-outline-variant/20 rounded-[2rem] p-12 shadow-2xl relative">
+      <div class="agent-preview-card glass-panel border border-outline-variant/20 rounded-[2rem] p-12 shadow-2xl relative">
         <div class="absolute top-8 right-8 px-4 py-1.5 glass-panel border border-outline-variant/30 rounded-full">
           <span class="text-[10px] font-black tracking-widest text-primary uppercase">
             @if (agentMeta) { {{ agentMeta.name }} Preview } @else { Preview }
@@ -525,25 +540,25 @@
         <article>
           <h2 class="text-4xl font-headline font-black tracking-tight text-on-surface mb-8">
             @if (agentMeta.id === 'geo-site-audit') {
-              GEO Site Audit bereit 🌍
+              GEO Site Audit — bereit
             } @else if (agentMeta.id === 'blog-redakteur') {
-              Blog-Paket erstellen 📝
+              Blog-Paket erstellen
             } @else if (agentMeta.id === 'content-strategy-bot') {
-              Content-Strategie erstellen 📝
+              Content-Strategie erstellen
             } @else if (agentMeta.category === 'SEO') {
-              Keyword-Analyse bereit 🔍
+              Keyword-Analyse — bereit
             } @else if (agentMeta.category === 'Data') {
-              Daten-Pipeline aktiv 📊
+              Datenpipeline — bereit
             } @else if (agentMeta.id === 'lead-researcher') {
-              Sales Briefing erstellen 📋
+              Sales-Briefing erstellen
             } @else if (agentMeta.id === 'firmen-finder') {
-              Unternehmen finden 🏢
+              Unternehmen finden
             } @else if (agentMeta.id === 'linkedin-ghostwriter') {
-              LinkedIn-Post generiert 🚀
+              LinkedIn-Post erstellen
             } @else if (agentMeta.id === 'social-media-wizard') {
-              Social-Media-Paket erstellen 📣
+              Social-Media-Paket erstellen
             } @else {
-              Ergebnis bereit — starte den Workflow! ✨
+              Systemvorschau — bereit
             }
           </h2>
           <div class="space-y-6 text-on-surface-variant leading-relaxed text-lg font-light">
@@ -559,8 +574,8 @@
                 Gib dein Hauptthema, deine Zielgruppe und den Content-Typ ein. Der Agent analysiert
                 Suchvolumen, Keyword-Difficulty und findet die stärksten Wettbewerber-URLs für deinen Plan.
               } @else {
-                Die Zukunft des Vertriebs ist nicht mehr manuell. Während Ihre Konkurrenz noch händisch
-                Outreach-Listen pflegt, setzen Marktführer bereits auf autonome Intelligence-Layer.
+                Links definieren Sie Zielgruppe, Kontext und Quellen. Rechts sehen Sie die Arbeitsfläche,
+                in der das System Ihren Input in einen belastbaren Entwurf, eine Recherche oder eine priorisierte Empfehlung übersetzt.
               }
             </p>
             <p class="border-l-2 border-[#0070FF] pl-6 italic">
@@ -569,7 +584,7 @@
               } @else if (agentMeta.id === 'blog-redakteur') {
                 "Starke Blogartikel entstehen nicht nur aus Text, sondern aus sauberem Briefing, klarer Suchintention und strenger Redaktion."
               } @else {
-                "Die Effizienzsteigerung durch Agentic Workflows ist der größte Hebel im 21. Jahrhundert."
+                "Gute KI-Systeme reduzieren nicht nur Aufwand. Sie erhöhen die Qualität operativer Entscheidungen."
               }
             </p>
             <p>
@@ -581,13 +596,27 @@
                 <span class="text-on-surface font-semibold">"Jetzt generieren"</span>
                 — danach bekommst du ein vollständiges Redaktionspaket statt nur eines einzelnen Textblocks.
               } @else {
-                Konfiguriere die Parameter links und klicke auf
-                <span class="text-on-surface font-semibold">"Workflow starten"</span>
-                — der Agent verarbeitet deine Anfrage in ~3 Sekunden.
+                Geben Sie links Ihre Parameter ein und starten Sie den Workflow. Das Ergebnis bleibt nicht abstrakt,
+                sondern ist so gedacht, dass es direkt weiterbearbeitet, bewertet oder intern verwendet werden kann.
               }
             </p>
           </div>
         </article>
+
+        <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="rounded-[1.5rem] border border-primary/12 bg-primary/8 px-5 py-5">
+            <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-primary mb-2">Output-Logik</p>
+            <p class="text-sm text-on-surface leading-relaxed">Strukturiert, nachvollziehbar und für die direkte Weiterarbeit gedacht.</p>
+          </div>
+          <div class="rounded-[1.5rem] border border-primary/12 bg-primary/8 px-5 py-5">
+            <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-primary mb-2">Typischer Nutzen</p>
+            <p class="text-sm text-on-surface leading-relaxed">{{ premiumOutcome() }}</p>
+          </div>
+          <div class="rounded-[1.5rem] border border-primary/12 bg-primary/8 px-5 py-5">
+            <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-primary mb-2">Qualitätsanspruch</p>
+            <p class="text-sm text-on-surface leading-relaxed">Kein Demo-Gimmick, sondern ein belastbarer erster Arbeitsstand für Ihr Team.</p>
+          </div>
+        </div>
 
         <!-- Edit Controls -->
         <div class="mt-12 pt-8 border-t border-outline-variant/20 flex items-center justify-between">
@@ -602,7 +631,7 @@
               <span class="material-symbols-outlined">link</span>
             </button>
           </div>
-          <span class="text-[10px] text-outline uppercase tracking-widest">Bereit zur Generierung</span>
+          <span class="text-[10px] text-outline uppercase tracking-widest">Bereit</span>
         </div>
       </div>
 
@@ -616,7 +645,7 @@
                  hover:-translate-y-1 transition-all flex items-center gap-3 relative overflow-hidden group
                  disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0">
           <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">rocket_launch</span>
-          <span>{{ isSubmitting() ? 'Workflow läuft…' : (isBlogRedakteur ? 'Jetzt generieren' : 'Workflow starten') }}</span>
+          <span>{{ isSubmitting() ? 'Läuft …' : (isBlogRedakteur ? 'Jetzt generieren' : 'Starten') }}</span>
           <div class="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
         </button>
       </div>
