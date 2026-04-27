@@ -107,6 +107,11 @@ export const routes: Routes = [
           import('./pages/geo-report-alternative/geo-report-alternative-result').then((m) => m.GeoReportAlternativeResultComponent),
       },
       {
+        path: 'agents/seo-intelligence-dashboard',
+        loadComponent: () =>
+          import('./pages/seo-intelligence-dashboard/seo-intelligence-dashboard').then((m) => m.SeoIntelligenceDashboard),
+      },
+      {
         path: 'agents/:id',
         loadComponent: () =>
           import('./pages/agent-detail/agent-detail').then((m) => m.AgentDetail),

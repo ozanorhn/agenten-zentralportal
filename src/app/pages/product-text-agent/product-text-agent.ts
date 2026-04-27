@@ -10,7 +10,7 @@ import {
   StoredBinaryFile,
 } from '../../services/binary-file-store.service';
 
-const PRODUCT_TEXT_WEBHOOK_PATH = '/webhook-test/seo-product-description';
+const PRODUCT_TEXT_WEBHOOK_PATH = '/webhook/seo-product-description';
 const MAX_PERSISTED_BINARY_BYTES = 3_500_000;
 const PRODUCT_TEXT_SESSION_RUN_KEY = 'product-text:last-run';
 

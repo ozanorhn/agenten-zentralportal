@@ -1,0 +1,148 @@
+<div class="min-h-screen bg-background text-on-surface font-body pb-24 md:pb-10">
+
+  <!-- Back link -->
+  <div class="px-6 pt-6">
+    <a routerLink="/agents" [queryParams]="{ category: 'Marketing' }"
+       class="inline-flex items-center gap-1.5 text-xs text-on-surface-variant/50 hover:text-primary transition-colors duration-200">
+      <span class="material-symbols-outlined text-sm">arrow_back</span>
+      Marketing-Systeme
+    </a>
+  </div>
+
+  <!-- Hero -->
+  <div class="px-6 pt-6 pb-8">
+    <div class="flex items-start gap-4">
+      <div class="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+        <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings:'FILL' 1">query_stats</span>
+      </div>
+      <div class="flex-1">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-primary/15 text-primary border border-primary/20">LIVE</span>
+          <span class="text-[10px] uppercase tracking-[0.18em] text-on-surface-variant/50 font-bold">SEO Intelligence</span>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-black font-headline text-on-surface leading-tight">
+          Daily SEO Intelligence
+        </h1>
+        <p class="mt-2 text-sm text-on-surface-variant/70 leading-relaxed">
+          Startet den täglichen SEO-Intelligence-Workflow und liefert aktuelle Prioritäten direkt aus n8n zurück.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="px-6">
+
+    <!-- Idle / Loading / Error state -->
+    @if (state() !== 'success') {
+      <div class="rounded-3xl border bg-surface-container border-primary/10 p-10 flex flex-col items-center text-center gap-6 max-w-md mx-auto">
+        <div class="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+          <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings:'FILL' 1">rocket_launch</span>
+        </div>
+        <div>
+          <h3 class="font-black text-on-surface text-xl font-headline mb-2">Workflow starten</h3>
+          <p class="text-sm text-on-surface-variant/55 leading-relaxed">
+            Löst den n8n-Workflow aus und zeigt die aktuellen SEO-Maßnahmen direkt hier an.
+          </p>
+        </div>
+
+        @if (state() === 'error') {
+          <p class="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2 w-full text-left break-all">{{ errorMsg() }}</p>
+        }
+
+        <button
+          (click)="trigger()"
+          [disabled]="state() === 'loading'"
+          [ngClass]="state() === 'loading' ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-[0_0_32px_rgba(59,130,246,0.4)] hover:-translate-y-0.5 active:scale-95'"
+          class="px-10 py-4 rounded-2xl font-black text-sm uppercase tracking-wider
+                 bg-primary text-white transition-all duration-300
+                 shadow-[0_8px_24px_rgba(59,130,246,0.25)] flex items-center gap-2.5"
+        >
+          @if (state() === 'loading') {
+            <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+            Wird analysiert…
+          } @else {
+            <span class="material-symbols-outlined text-lg">send</span>
+            Jetzt starten
+          }
+        </button>
+
+        <div class="flex flex-wrap gap-4 text-xs text-on-surface-variant/40 justify-center">
+          <span>Webhook · n8n.eom.de</span>
+          <span>Payload · Zeitstempel (Berlin)</span>
+        </div>
+      </div>
+    }
+
+    <!-- Success state: full-width grid -->
+    @if (state() === 'success') {
+      <div>
+        <!-- Stats bar -->
+        <div class="flex items-center justify-between mb-5">
+          <p class="text-[10px] uppercase tracking-[0.2em] font-bold text-on-surface-variant/40">
+            Aktuelle Maßnahmen · {{ responseItems().length }} URLs
+          </p>
+          <div class="flex gap-2">
+            <span class="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold">
+              {{ ctrCount }}× CTR
+            </span>
+            <span class="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold">
+              {{ rankingCount }}× Ranking
+            </span>
+            <button (click)="reset()"
+                    class="px-3 py-1 rounded-full border border-primary/10 text-on-surface-variant/40 hover:text-primary hover:border-primary/30 text-xs transition-colors duration-200">
+              Erneut starten
+            </button>
+          </div>
+        </div>
+
+        <!-- Cards grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          @for (item of responseItems(); track item.url; let i = $index) {
+            <div class="relative rounded-2xl border bg-surface-container border-primary/10 overflow-hidden flex flex-col">
+              <div class="absolute left-0 top-0 bottom-0 w-0.5"
+                   [ngClass]="item.fokus === 'CTR' ? 'bg-amber-500' : 'bg-primary'"></div>
+
+              <div class="pl-5 pr-4 py-4 flex flex-col gap-3 flex-1">
+                <!-- Header -->
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="w-5 h-5 rounded-full bg-surface-container-high border border-primary/10 flex items-center justify-center text-[10px] font-black text-on-surface-variant/50 flex-shrink-0">
+                    {{ i + 1 }}
+                  </span>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider"
+                        [ngClass]="item.fokus === 'CTR'
+                          ? 'bg-amber-500/15 text-amber-400 border border-amber-500/20'
+                          : 'bg-primary/15 text-primary border border-primary/20'">
+                    {{ item.fokus }}
+                  </span>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                        [ngClass]="item.prioritaet === 10
+                          ? 'bg-red-500/10 text-red-400 border border-red-500/15'
+                          : 'bg-amber-500/10 text-amber-400 border border-amber-500/15'">
+                    Prio {{ item.prioritaet }}
+                  </span>
+                  <a [href]="item.url" target="_blank" rel="noopener"
+                     class="text-xs text-on-surface-variant/50 hover:text-primary transition-colors truncate">
+                    {{ item.url.replace('https://eom.de', '') || '/' }}
+                    <span class="material-symbols-outlined text-[10px] align-middle ml-0.5">open_in_new</span>
+                  </a>
+                </div>
+
+                <!-- Analyse -->
+                <p class="text-xs text-on-surface-variant/60 leading-relaxed">{{ item.analyse }}</p>
+
+                <!-- Empfehlung -->
+                <p class="text-xs leading-relaxed mt-auto"
+                   [ngClass]="item.fokus === 'CTR' ? 'text-amber-400/80' : 'text-primary/80'">
+                  <span class="material-symbols-outlined text-[11px] align-middle mr-0.5" style="font-variation-settings:'FILL' 1">lightbulb</span>
+                  {{ item.empfehlung }}
+                </p>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+  </div>
+</div>

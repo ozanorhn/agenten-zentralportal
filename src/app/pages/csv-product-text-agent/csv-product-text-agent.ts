@@ -10,7 +10,7 @@ import {
 import { NotificationService } from '../../services/notification.service';
 import { RunHistoryService } from '../../services/run-history.service';
 
-const CSV_PRODUCT_TEXT_WEBHOOK_PATH = '/webhook-test/csv-product-descriptions';
+const CSV_PRODUCT_TEXT_WEBHOOK_PATH = '/webhook/csv-product-descriptions';
 const CSV_PRODUCT_TEXT_SESSION_RUN_KEY = 'csv-product-text:last-run';
 const CSV_FILE_EXTENSION_PATTERN = /\.csv$/i;
 const PREFERRED_COLUMN_ORDER = [

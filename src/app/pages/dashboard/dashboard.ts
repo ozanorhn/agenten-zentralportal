@@ -115,7 +115,7 @@ export class Dashboard implements OnInit, OnDestroy {
       label: 'SEO / GEO',
       icon: 'manage_search',
       description: 'Sichtbarkeit, SERP-Analyse, Content-Strategie und KI-Optimierung.',
-      ids: ['top-ranker-bot', 'content-strategy-bot', 'omr-seo-content-strategie', 'seo-geo-analyse-assistent', 'geo-site-audit', 'interne-verlinkung-vorschlaege', 'content-seo-analyzer'],
+      ids: ['seo-intelligence-dashboard', 'top-ranker-bot', 'content-strategy-bot', 'omr-seo-content-strategie', 'seo-geo-analyse-assistent', 'geo-site-audit', 'interne-verlinkung-vorschlaege', 'content-seo-analyzer'],
     },
   ];
 
@@ -137,6 +137,16 @@ export class Dashboard implements OnInit, OnDestroy {
   }
 
   agents: Agent[] = [
+    {
+      id: 'seo-intelligence-dashboard',
+      name: 'Daily SEO Intelligence',
+      description:
+        'Startet den täglichen SEO-Intelligence-Workflow und übergibt aktuelle Prioritäten mit Zeitstempel an n8n zur Weiterverarbeitung.',
+      icon: 'query_stats',
+      category: 'SEO',
+      badgeLabel: 'LIVE',
+      badgeVariant: 'primary',
+    },
     {
       id: 'linkedin-ghostwriter',
       name: 'LinkedIn-Post-Agent',
