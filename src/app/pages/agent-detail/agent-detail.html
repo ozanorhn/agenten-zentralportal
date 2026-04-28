@@ -414,6 +414,31 @@
                    placeholder:text-on-surface-variant/30 transition-all resize-none font-mono"
           ></textarea>
         </div>
+      } @else if (isGoogleAdsAudit) {
+        <div class="rounded-2xl border border-[#0070FF]/20 bg-[#0070FF]/8 p-5 space-y-4">
+          <div class="flex items-start gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0070FF]/15 text-[#7DB4FF]">
+              <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">ads_click</span>
+            </div>
+            <div class="space-y-1">
+              <p class="text-sm font-bold text-on-surface">Audit ohne Eingabe</p>
+              <p class="text-sm text-on-surface-variant leading-relaxed">
+                Dieses Tool simuliert einen vollständigen Google-Ads-Audit im Portalstil und liefert nach 5 Sekunden den fertigen Report.
+              </p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 gap-2">
+            <div class="rounded-xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-3 text-sm text-on-surface">
+              Prüft Kontostruktur, Tracking und Conversion-Signale
+            </div>
+            <div class="rounded-xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-3 text-sm text-on-surface">
+              Zeigt kritische Befunde, Warnungen und positive Setups
+            </div>
+            <div class="rounded-xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-3 text-sm text-on-surface">
+              Liefert einen priorisierten 7-Punkte-Maßnahmenplan
+            </div>
+          </div>
+        </div>
       } @else {
         <!-- Generic agents: Zielgruppe + Website + Tone of Voice -->
         <div class="space-y-2">
@@ -489,7 +514,7 @@
           class="w-full py-4 bg-[#0070FF] hover:bg-primary-container text-white font-black rounded-xl
                  hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group
                  disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100">
-          <span>{{ isSubmitting() ? 'Läuft …' : (isBlogRedakteur ? 'Jetzt generieren' : 'Starten') }}</span>
+          <span>{{ isSubmitting() ? 'Läuft …' : (isGoogleAdsAudit ? 'Jetzt starten' : (isBlogRedakteur ? 'Jetzt generieren' : 'Starten')) }}</span>
           <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform"
                 style="font-variation-settings:'FILL' 1;">auto_awesome</span>
         </button>
@@ -541,6 +566,8 @@
           <h2 class="text-4xl font-headline font-black tracking-tight text-on-surface mb-8">
             @if (agentMeta.id === 'geo-site-audit') {
               GEO Site Audit — bereit
+            } @else if (agentMeta.id === 'google-ads-audit') {
+              Google Ads Audit — bereit
             } @else if (agentMeta.id === 'blog-redakteur') {
               Blog-Paket erstellen
             } @else if (agentMeta.id === 'content-strategy-bot') {
@@ -566,6 +593,9 @@
               @if (agentMeta.id === 'geo-site-audit') {
                 Gib links deine Domain und den Crawl-Umfang an. Der Agent prueft Sitemap, robots.txt,
                 llms.txt und die wichtigsten Struktur-, Trust- und KI-Signale ueber alle gefundenen Seiten.
+              } @else if (agentMeta.id === 'google-ads-audit') {
+                Der Agent simuliert einen Google-Ads-Audit für eom.de und bewertet Kontostruktur, Conversion-Tracking,
+                Brand-Schutz und Anzeigenqualität in einem kompakten Management-Report.
               } @else if (agentMeta.id === 'blog-redakteur') {
                 Gib links dein Redaktions-Briefing ein. Der Agent kombiniert Thema, Primary Keyword,
                 Zielgruppe, Wortanzahl und Outline zu einem strukturierten Blog-Ergebnis mit Artikel,
@@ -581,6 +611,8 @@
             <p class="border-l-2 border-[#0070FF] pl-6 italic">
               @if (agentMeta.id === 'geo-site-audit') {
                 "Ein starker GEO-Audit zeigt nicht nur Rankings, sondern wo KI-Crawler, Struktur und Vertrauen siteweit bremsen."
+              } @else if (agentMeta.id === 'google-ads-audit') {
+                "Ein guter Ads-Audit zeigt nicht nur Fehler, sondern welche Änderungen den größten Hebel auf Leads, CPA und ROAS haben."
               } @else if (agentMeta.id === 'blog-redakteur') {
                 "Starke Blogartikel entstehen nicht nur aus Text, sondern aus sauberem Briefing, klarer Suchintention und strenger Redaktion."
               } @else {
@@ -591,6 +623,9 @@
               @if (agentMeta.id === 'geo-site-audit') {
                 Konfiguriere links Domain und Seitenlimit und starte den Crawl. Das Ergebnis zeigt dir
                 die staerksten Seiten, die groessten Muster und die kritischsten Ausreisser auf einen Blick.
+              } @else if (agentMeta.id === 'google-ads-audit') {
+                Klicke auf <span class="text-on-surface font-semibold">"Jetzt starten"</span> und warte kurz.
+                Danach erscheint ein strukturierter Audit mit Score, Befunden und priorisiertem Maßnahmenplan im Stil des Portals.
               } @else if (agentMeta.id === 'blog-redakteur') {
                 Nutze die Platzhalter als Vorlage für dein Briefing und klicke auf
                 <span class="text-on-surface font-semibold">"Jetzt generieren"</span>
@@ -645,7 +680,7 @@
                  hover:-translate-y-1 transition-all flex items-center gap-3 relative overflow-hidden group
                  disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0">
           <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">rocket_launch</span>
-          <span>{{ isSubmitting() ? 'Läuft …' : (isBlogRedakteur ? 'Jetzt generieren' : 'Starten') }}</span>
+          <span>{{ isSubmitting() ? 'Läuft …' : (isGoogleAdsAudit ? 'Jetzt starten' : (isBlogRedakteur ? 'Jetzt generieren' : 'Starten')) }}</span>
           <div class="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
         </button>
       </div>

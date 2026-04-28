@@ -1,1 +1,46 @@
-// Dashboard styles
+.agent-card-wrapper {
+  position: relative;
+
+  &.coming-soon {
+    article {
+      opacity: 0.5;
+      filter: blur(1.5px);
+      pointer-events: none;
+      user-select: none;
+      cursor: default;
+
+      // Neutralize all Tailwind hover utilities since pointer-events are gone,
+      // but also cover the case where CSS hover might still trigger
+      &:hover {
+        transform: none !important;
+        box-shadow: 0 16px 40px rgba(8, 12, 24, 0.22) !important;
+      }
+    }
+  }
+}
+
+.coming-soon-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2rem;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.coming-soon-badge {
+  background: linear-gradient(135deg, #0070ff, #3b82f6);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  border-radius: 100px;
+  box-shadow:
+    0 4px 20px rgba(0, 112, 255, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.12);
+}

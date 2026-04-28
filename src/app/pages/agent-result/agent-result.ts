@@ -23,6 +23,9 @@ import {
   ContentStrategyOutput,
   KeywordDataRow,
   ProductTextOutput,
+  GoogleAdsAuditAction,
+  GoogleAdsAuditFindingTone,
+  GoogleAdsAuditOutput,
 } from '../../models/interfaces';
 import { AGENTS_MAP } from '../../data/agents.data';
 import { renderMarkdownToHtml } from '../../utils/markdown.utils';
@@ -108,12 +111,16 @@ export class AgentResult {
   readonly contentStrategyOutput = computed(() =>
     this.output()?.type === 'content-strategy' ? this.output() as ContentStrategyOutput : null
   );
+  readonly googleAdsAuditOutput = computed(() =>
+    this.output()?.type === 'google-ads-audit' ? this.output() as GoogleAdsAuditOutput : null
+  );
   readonly blogEditorOutput = computed(() =>
     this.output()?.type === 'blog-editor' ? this.output() as BlogEditorOutput : null
   );
   readonly productTextOutput = computed(() =>
     this.output()?.type === 'product-text' ? this.output() as ProductTextOutput : null
   );
+  readonly isWideResult = computed(() => !!this.geoAuditOutput() || !!this.googleAdsAuditOutput());
   readonly renderedContentStrategyBrief = computed((): SafeHtml | null => {
     const brief = this.contentStrategyOutput()?.brief;
     if (!brief) return null;
@@ -241,6 +248,7 @@ export class AgentResult {
       case 'blog-editor': return output.articleTitle ?? `Blog-Artikel: ${output.topic}`;
       case 'product-text': return output.generatedFile?.fileName ?? 'Produkttext';
       case 'csv-product-text': return `${output.rowCount} Produkte verarbeitet`;
+      case 'google-ads-audit': return `Google Ads Audit: ${output.domain}`;
     }
   }
 
@@ -583,6 +591,33 @@ export class AgentResult {
           `Spalten: ${out.columns.join(', ') || '–'}`,
         );
         break;
+      case 'google-ads-audit':
+        lines.push(
+          out.title,
+          `${out.companyName} · ${out.companyContext}`,
+          `Erstellt: ${out.createdAt}`,
+          `Auditiert durch: ${out.auditedBy}`,
+          '',
+          `Gesamtscore: ${out.overallScore}/100`,
+          `Kritisch: ${out.criticalCount}`,
+          `Warnungen: ${out.warningCount}`,
+          `Potenzial: ${out.potentialLift}`,
+          '',
+        );
+        out.sections.forEach((section) => {
+          lines.push(`${section.title} (${section.score}/100)`);
+          section.findings.forEach((finding) => {
+            lines.push(`- [${finding.status}] ${finding.title}`);
+            lines.push(`  ${finding.description}`);
+          });
+          lines.push('');
+        });
+        lines.push('Maßnahmenplan');
+        out.actionPlan.forEach((action) => {
+          lines.push(`${action.id}. ${action.title} | Aufwand: ${action.effort} | Hebel: ${action.leverage}`);
+        });
+        lines.push('', out.footerTitle, out.footerSummary, out.footerContact);
+        break;
     }
     return lines.join('\n');
   }
@@ -859,6 +894,58 @@ export class AgentResult {
         return 'Informational';
       default:
         return 'Weitere';
+    }
+  }
+
+  getGoogleAdsFindingBadgeClass(tone: GoogleAdsAuditFindingTone): string {
+    switch (tone) {
+      case 'critical':
+        return 'bg-red-500/15 text-red-300 border-red-500/30';
+      case 'warning':
+        return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+      default:
+        return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+    }
+  }
+
+  getGoogleAdsFindingDotClass(tone: GoogleAdsAuditFindingTone): string {
+    switch (tone) {
+      case 'critical':
+        return 'bg-red-400';
+      case 'warning':
+        return 'bg-amber-400';
+      default:
+        return 'bg-emerald-400';
+    }
+  }
+
+  getGoogleAdsSectionScoreClass(score: number): string {
+    if (score >= 70) return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+    if (score >= 60) return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+    return 'bg-red-500/15 text-red-300 border-red-500/30';
+  }
+
+  getGoogleAdsActionEffortClass(effort: GoogleAdsAuditAction['effort']): string {
+    switch (effort) {
+      case 'Niedrig':
+        return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+      case 'Mittel':
+        return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+      default:
+        return 'bg-red-500/15 text-red-300 border-red-500/30';
+    }
+  }
+
+  getGoogleAdsActionLeverageClass(leverage: GoogleAdsAuditAction['leverage']): string {
+    switch (leverage) {
+      case 'Sehr hoch':
+        return 'text-red-300';
+      case 'Hoch':
+        return 'text-amber-300';
+      case 'Mittel':
+        return 'text-[#7DB4FF]';
+      default:
+        return 'text-on-surface-variant';
     }
   }
 

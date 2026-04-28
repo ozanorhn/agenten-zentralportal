@@ -8,9 +8,10 @@ export interface Agent {
   name: string;
   description: string;
   icon: string;
-  category: 'Sales' | 'Content' | 'SEO' | 'Data';
+  category: 'Sales' | 'Content' | 'SEO' | 'Data' | 'Ads';
   badgeLabel?: string;
   badgeVariant?: 'primary' | 'secondary';
+  isComingSoon?: boolean;
 }
 
 type AgentCategory = Agent['category'];
@@ -32,7 +33,7 @@ interface HeroContent {
 export class Dashboard implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  readonly categoryOrder: AgentCategory[] = ['Content', 'Sales', 'SEO', 'Data'];
+  readonly categoryOrder: AgentCategory[] = ['Content', 'Sales', 'SEO', 'Ads', 'Data'];
   readonly categoryMeta: Record<AgentCategory, { label: string; description: string }> = {
     Content: {
       label: 'Content',
@@ -45,6 +46,10 @@ export class Dashboard implements OnInit, OnDestroy {
     SEO: {
       label: 'SEO',
       description: 'Audits, SERP-Optimierung und Content-Analysen mit konkreten Maßnahmen.',
+    },
+    Ads: {
+      label: 'Ads',
+      description: 'Google-Ads-Audits, Tracking-Prüfungen und klare Hebel auf CPA, Leads und ROAS.',
     },
     Data: {
       label: 'Data',
@@ -94,6 +99,14 @@ export class Dashboard implements OnInit, OnDestroy {
       description:
         'Systeme für Audits, SERP-Optimierung, interne Verlinkung und Content-Analysen — mit konkreten nächsten Schritten, nicht mit abstrakten Empfehlungen.',
     },
+    Ads: {
+      eyebrow: 'ads systeme',
+      titlePrefix: 'Ads mit ',
+      titleAccent: 'messbaren Hebeln',
+      titleSuffix: '',
+      description:
+        'Systeme für Google-Ads-Audits, Tracking-Prüfungen und priorisierte Optimierungen mit Fokus auf Leads, CPA und ROAS.',
+    },
     Data: {
       eyebrow: 'data systeme',
       titlePrefix: 'Aus Daten wird ',
@@ -117,10 +130,17 @@ export class Dashboard implements OnInit, OnDestroy {
       description: 'Sichtbarkeit, SERP-Analyse, Content-Strategie und KI-Optimierung.',
       ids: ['seo-intelligence-dashboard', 'top-ranker-bot', 'content-strategy-bot', 'omr-seo-content-strategie', 'seo-geo-analyse-assistent', 'geo-site-audit', 'interne-verlinkung-vorschlaege', 'content-seo-analyzer'],
     },
+    {
+      label: 'Ads',
+      icon: 'ads_click',
+      description: 'Google-Ads-Audits mit Fokus auf Kontostruktur, Tracking und direkte Effizienzhebel.',
+      ids: ['google-ads-audit'],
+    },
   ];
 
   getMarketingGroupAgents(ids: string[]): Agent[] {
-    return ids.map(id => this.agents.find(a => a.id === id)).filter(Boolean) as Agent[];
+    return (ids.map(id => this.agents.find(a => a.id === id)).filter(Boolean) as Agent[])
+      .sort((a, b) => (a.isComingSoon ? 1 : 0) - (b.isComingSoon ? 1 : 0));
   }
 
   private paramSub!: Subscription;
@@ -154,6 +174,7 @@ export class Dashboard implements OnInit, OnDestroy {
         'Verdichtet Erfahrungen, Thesen oder Cases in veröffentlichungsreife LinkedIn-Posts mit klarem Ton und sauberer Struktur.',
       icon: 'history_edu',
       category: 'Content',
+      isComingSoon: true,
     },
     {
       id: 'blog-redakteur',
@@ -164,6 +185,7 @@ export class Dashboard implements OnInit, OnDestroy {
       category: 'Content',
       badgeLabel: 'NEU',
       badgeVariant: 'primary',
+      isComingSoon: true,
     },
     {
       id: 'produkttext-agent',
@@ -194,6 +216,7 @@ export class Dashboard implements OnInit, OnDestroy {
       category: 'Content',
       badgeLabel: 'NEU',
       badgeVariant: 'primary',
+      isComingSoon: true,
     },
     {
       id: 'script-savant',
@@ -202,6 +225,7 @@ export class Dashboard implements OnInit, OnDestroy {
         'Leitet aus Thema oder Content-Piece ein kompaktes Skript für Reels, Shorts und andere Social Clips ab.',
       icon: 'video_chat',
       category: 'Content',
+      isComingSoon: true,
     },
     {
       id: 'networking-ninja',
@@ -212,6 +236,7 @@ export class Dashboard implements OnInit, OnDestroy {
       category: 'Sales',
       badgeLabel: 'EVENT',
       badgeVariant: 'primary',
+      isComingSoon: true,
     },
     {
       id: 'firmen-finder',
@@ -222,6 +247,7 @@ export class Dashboard implements OnInit, OnDestroy {
       category: 'Sales',
       badgeLabel: 'NEU',
       badgeVariant: 'primary',
+      isComingSoon: true,
     },
     {
       id: 'cold-mail-cyborg',
@@ -230,6 +256,7 @@ export class Dashboard implements OnInit, OnDestroy {
         'Erstellt personalisierte Outreach-Nachrichten auf Basis von Zielkunde, Positionierung und Anlass.',
       icon: 'alternate_email',
       category: 'Sales',
+      isComingSoon: true,
     },
     {
       id: 'lead-researcher',
@@ -238,6 +265,7 @@ export class Dashboard implements OnInit, OnDestroy {
         'Findet belastbare Neukunden-Signale aus Web, Jobmarkt und Unternehmenskommunikation für die Vertriebspriorisierung.',
       icon: 'biotech',
       category: 'Data',
+      isComingSoon: true,
     },
     {
       id: 'top-ranker-bot',
@@ -246,6 +274,17 @@ export class Dashboard implements OnInit, OnDestroy {
         'Analysiert bestehende Rankings, Wettbewerber und SERP-Muster und priorisiert realistische Optimierungen.',
       icon: 'manage_search',
       category: 'SEO',
+      isComingSoon: true,
+    },
+    {
+      id: 'google-ads-audit',
+      name: 'Google Ads Audit',
+      description:
+        'Prüft das Setup auf Budgetlecks, fehlende Tracking-Signale und die größten Hebel auf Leads, CPA und ROAS.',
+      icon: 'ads_click',
+      category: 'Ads',
+      badgeLabel: 'LIVE',
+      badgeVariant: 'primary',
     },
     {
       id: 'geo-site-audit',
@@ -326,6 +365,7 @@ export class Dashboard implements OnInit, OnDestroy {
       category: 'SEO',
       badgeLabel: 'NEU',
       badgeVariant: 'primary',
+      isComingSoon: true,
     },
     {
       id: 'sync-master',
@@ -334,6 +374,7 @@ export class Dashboard implements OnInit, OnDestroy {
         'Hält CRM-, Spreadsheet- und Marketing-Daten konsistent und reduziert Dubletten, Lücken und manuelle Nachpflege.',
       icon: 'schema',
       category: 'Data',
+      isComingSoon: true,
     },
   ];
 
@@ -345,7 +386,9 @@ export class Dashboard implements OnInit, OnDestroy {
   };
 
   agentsForCategory(category: AgentCategory): Agent[] {
-    return this.agents.filter(agent => agent.category === category);
+    return this.agents
+      .filter(agent => agent.category === category)
+      .sort((a, b) => (a.isComingSoon ? 1 : 0) - (b.isComingSoon ? 1 : 0));
   }
 
   get filteredAgents(): Agent[] {
@@ -358,6 +401,8 @@ export class Dashboard implements OnInit, OnDestroy {
   }
 
   startWorkflow(agentId: string): void {
+    const agent = this.agents.find(a => a.id === agentId);
+    if (agent?.isComingSoon) return;
     this.router.navigate(['/agents', agentId]);
   }
 }

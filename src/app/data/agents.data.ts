@@ -3,7 +3,7 @@ export interface AgentMeta {
   name: string;
   description: string;
   icon: string;
-  category: 'Sales' | 'Content' | 'SEO' | 'Data';
+  category: 'Sales' | 'Content' | 'SEO' | 'Data' | 'Ads';
   badgeLabel?: string;
   badgeVariant?: 'primary' | 'secondary';
   skills: { label: string; value: number }[];
@@ -256,6 +256,24 @@ export const AGENTS: AgentMeta[] = [
     tip: 'Konkretes Thema, klar umrissene Zielgruppe und Offer angeben. Je präziser die Eingabe, desto verwertbarer die Content-Strategie.',
     inputLabel: 'Thema',
     inputPlaceholder: 'z.B. Künstliche Intelligenz im Marketing',
+  },
+  {
+    id: 'google-ads-audit',
+    name: 'Google Ads Audit',
+    description: 'Prüft das Setup auf Budgetlecks, fehlende Tracking-Signale und die größten Hebel auf Leads, CPA und ROAS.',
+    icon: 'ads_click',
+    category: 'Ads',
+    badgeLabel: 'LIVE',
+    badgeVariant: 'primary',
+    skills: [
+      { label: 'Kontoanalyse', value: 97 },
+      { label: 'Tracking-Prüfung', value: 95 },
+      { label: 'Priorisierung', value: 93 },
+      { label: 'CPA-Hebel', value: 96 },
+    ],
+    tip: 'Der Audit ist aktuell ein fester Demo-Report im Portalstil. Er simuliert das Ergebnis bewusst ohne Google-Ads-Login oder API-Anbindung.',
+    inputLabel: 'Audit',
+    inputPlaceholder: 'Keine Eingabe erforderlich',
   },
   {
     id: 'interne-verlinkung-vorschlaege',

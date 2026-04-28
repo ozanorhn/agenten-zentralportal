@@ -27,7 +27,7 @@ export interface RunRecord {
   agentId: string;
   agentName: string;
   agentIcon: string;
-  agentCategory: 'Sales' | 'Content' | 'SEO' | 'Data';
+  agentCategory: 'Sales' | 'Content' | 'SEO' | 'Data' | 'Ads';
   timestamp: number;
   inputData: RunInputData;
   outputSummary: string;
@@ -51,7 +51,8 @@ export type AgentOutput =
   | ContentStrategyOutput
   | BlogEditorOutput
   | ProductTextOutput
-  | CsvProductTextOutput;
+  | CsvProductTextOutput
+  | GoogleAdsAuditOutput;
 
 export interface EmailOutput {
   type: 'email';
@@ -271,6 +272,53 @@ export interface ContentStrategyOutput {
   relatedTopics: string[];
   competitorUrls: string[];
   keywords: KeywordDataRow[];
+}
+
+export type GoogleAdsAuditFindingStatus = 'Kritisch' | 'Warnung' | 'Gut';
+export type GoogleAdsAuditFindingTone = 'critical' | 'warning' | 'good';
+export type GoogleAdsAuditActionEffort = 'Niedrig' | 'Mittel' | 'Hoch';
+export type GoogleAdsAuditActionLeverage = 'Sehr hoch' | 'Hoch' | 'Mittel' | 'Niedrig';
+
+export interface GoogleAdsAuditFinding {
+  title: string;
+  description: string;
+  status: GoogleAdsAuditFindingStatus;
+  tone: GoogleAdsAuditFindingTone;
+}
+
+export interface GoogleAdsAuditSection {
+  title: string;
+  icon: string;
+  score: number;
+  findings: GoogleAdsAuditFinding[];
+}
+
+export interface GoogleAdsAuditAction {
+  id: string;
+  title: string;
+  effort: GoogleAdsAuditActionEffort;
+  leverage: GoogleAdsAuditActionLeverage;
+}
+
+export interface GoogleAdsAuditOutput {
+  type: 'google-ads-audit';
+  title: string;
+  domain: string;
+  companyName: string;
+  companyContext: string;
+  createdAt: string;
+  auditedBy: string;
+  overallScore: number;
+  criticalCount: number;
+  warningCount: number;
+  potentialLift: string;
+  progressLabel: string;
+  sections: GoogleAdsAuditSection[];
+  actionPlan: GoogleAdsAuditAction[];
+  footerTitle: string;
+  footerSummary: string;
+  footerContact: string;
+  footerCtaLabel: string;
 }
 
 export interface BlogEditorSerpResult {

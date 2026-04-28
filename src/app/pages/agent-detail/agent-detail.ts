@@ -65,6 +65,7 @@ export class AgentDetail {
   readonly isLeadResearcher = this.agentId === 'lead-researcher';
   readonly isFirmenFinder = this.agentId === 'firmen-finder';
   readonly isGeoSiteAudit = this.agentId === 'geo-site-audit';
+  readonly isGoogleAdsAudit = this.agentId === 'google-ads-audit';
   readonly isSocialMediaWizard = this.agentId === 'social-media-wizard';
   readonly isContentStrategyBot = this.agentId === 'content-strategy-bot';
   readonly isBlogRedakteur = this.agentId === 'blog-redakteur';
@@ -140,6 +141,8 @@ export class AgentDetail {
         return 'Sie erhalten priorisierte Analysen, konkrete Maßnahmen und einen Output, der direkt ins nächste SEO-Arbeitspaket überführt werden kann.';
       case 'Data':
         return 'Sie erhalten eine strukturierte Datengrundlage oder Prozesssicht, die sich unmittelbar in operative Systeme zurückspielen lässt.';
+      case 'Ads':
+        return 'Sie erhalten einen priorisierten Audit mit klaren Hebeln auf Tracking, Kontoeffizienz und niedrigere Akquisekosten.';
       case 'Content':
         return 'Sie erhalten einen redaktionell verwertbaren Entwurf mit klarer Struktur, Tonalität und nachvollziehbarer Ausrichtung.';
       default:
@@ -151,6 +154,8 @@ export class AgentDetail {
     switch (this.agentMeta?.category) {
       case 'SEO':
         return ['Analyse', 'Priorisierung', 'Empfehlungen'];
+      case 'Ads':
+        return ['Audit', 'Hebel', 'Maßnahmenplan'];
       case 'Data':
         return ['Datensicht', 'Struktur', 'Nächste Schritte'];
       case 'Content':
@@ -205,6 +210,15 @@ export class AgentDetail {
     'Blog-Paket bereit',
   ];
 
+  private readonly PROGRESS_LABELS_GOOGLE_ADS = [
+    'Audit startet …',
+    'Prüfe Kontostruktur und Brand-Abdeckung …',
+    'Analysiere Tracking- und Conversion-Signale …',
+    'Bewerte Anzeigen, Keywords und Erweiterungen …',
+    'Priorisiere Maßnahmen nach Hebel …',
+    'Google Ads Audit bereit',
+  ];
+
   submitWorkflow(): void {
     if (this.isSubmitting()) return;
     this.isSubmitting.set(true);
@@ -217,6 +231,8 @@ export class AgentDetail {
       this.runFirmenFinderWorkflow();
     } else if (this.isGeoSiteAudit) {
       this.runGeoSiteAuditWorkflow();
+    } else if (this.isGoogleAdsAudit) {
+      this.runGoogleAdsAuditWorkflow();
     } else if (this.isSocialMediaWizard) {
       this.runSocialMediaWizardWorkflow();
     } else if (this.isContentStrategyBot) {
@@ -902,6 +918,35 @@ export class AgentDetail {
     this.saveAndNavigate(output, `Social Media: ${this.socialTopic()}`, input);
   }
 
+  private runGoogleAdsAuditWorkflow(): void {
+    const labels = this.PROGRESS_LABELS_GOOGLE_ADS;
+    this.progressLabel.set(labels[0]);
+
+    const startTime = Date.now();
+    const minDuration = 5000;
+
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const pct = Math.min(Math.round((elapsed / minDuration) * 92), 92);
+      this.progress.set(pct);
+      if (pct >= 70) this.progressLabel.set(labels[4]);
+      else if (pct >= 50) this.progressLabel.set(labels[3]);
+      else if (pct >= 28) this.progressLabel.set(labels[2]);
+      else if (pct >= 8) this.progressLabel.set(labels[1]);
+    }, 100);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      this.progress.set(100);
+      this.progressLabel.set(labels[5]);
+
+      const output = this.agentOutput.generateOutput('google-ads-audit', {});
+      setTimeout(() => {
+        this.saveAndNavigate(output, 'Google Ads Audit: eom.de', {});
+      }, 400);
+    }, minDuration);
+  }
+
   private runContentStrategyWorkflow(): void {
     const labels = [
       'System startet …',
@@ -1386,6 +1431,7 @@ export class AgentDetail {
       case 'social-media':       summary = `Social Media: ${output.topic}`; break;
       case 'product-text':       summary = output.structuredResult?.seo?.title ?? output.structuredResult?.seo?.h1 ?? output.generatedFile?.fileName ?? 'Produkttext generiert'; break;
       case 'csv-product-text':   summary = `${output.rowCount} Produkte verarbeitet`; break;
+      case 'google-ads-audit':   summary = `Google Ads Audit: ${output.domain}`; break;
     }
 
     this.saveAndNavigate(output, summary, input);

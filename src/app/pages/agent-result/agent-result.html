@@ -47,10 +47,173 @@
 
   <!-- Main content -->
   <div class="mx-auto px-8 py-12"
-       [class.max-w-4xl]="!geoAuditOutput()"
-       [class.max-w-6xl]="!!geoAuditOutput()">
+       [class.max-w-4xl]="!isWideResult()"
+       [class.max-w-6xl]="isWideResult()">
 
     @if (output()) {
+
+      <!-- ─── GOOGLE ADS AUDIT OUTPUT ─────────────────────────────── -->
+      @if (googleAdsAuditOutput(); as audit) {
+        <div class="space-y-8 google-ads-audit-view">
+          <section class="glass-panel border border-outline-variant/20 rounded-[2rem] overflow-hidden relative">
+            <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#0070FF]/70 to-transparent"></div>
+            <div class="p-6 md:p-8 lg:p-10 space-y-8"
+                 style="background:
+                   radial-gradient(circle at top left, rgba(0, 112, 255, 0.18), transparent 32%),
+                   linear-gradient(180deg, rgba(17, 22, 31, 0.98), rgba(19, 24, 32, 0.98));">
+              <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                <div class="flex items-start gap-4">
+                  <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-900 shadow-[0_8px_24px_rgba(255,255,255,0.12)]">
+                    <span class="text-2xl font-black tracking-tight">eom</span>
+                  </div>
+                  <div class="space-y-2">
+                    <h1 class="text-2xl md:text-4xl font-headline font-black tracking-tight text-white">
+                      {{ audit.title }}
+                    </h1>
+                    <p class="text-sm md:text-base text-on-surface-variant">
+                      {{ audit.companyName }} · {{ audit.companyContext }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="grid gap-1 text-sm text-on-surface-variant lg:text-right">
+                  <p>Erstellt: {{ audit.createdAt }}</p>
+                  <p>Auditiert durch: {{ audit.auditedBy }}</p>
+                </div>
+              </div>
+
+              <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div class="rounded-[1.6rem] border border-outline-variant/20 bg-surface/45 p-5 text-center">
+                  <p class="text-[11px] font-black uppercase tracking-[0.18em] text-outline">Gesamtscore</p>
+                  <p class="google-ads-score-number mt-3 text-5xl font-headline font-black text-amber-300">{{ audit.overallScore }}</p>
+                  <p class="mt-1 text-sm text-on-surface-variant">von 100</p>
+                </div>
+                <div class="rounded-[1.6rem] border border-outline-variant/20 bg-surface/45 p-5 text-center">
+                  <p class="text-[11px] font-black uppercase tracking-[0.18em] text-outline">Kritisch</p>
+                  <p class="google-ads-score-number mt-3 text-5xl font-headline font-black text-red-300">{{ audit.criticalCount }}</p>
+                  <p class="mt-1 text-sm text-on-surface-variant">Befunde</p>
+                </div>
+                <div class="rounded-[1.6rem] border border-outline-variant/20 bg-surface/45 p-5 text-center">
+                  <p class="text-[11px] font-black uppercase tracking-[0.18em] text-outline">Warnungen</p>
+                  <p class="google-ads-score-number mt-3 text-5xl font-headline font-black text-amber-300">{{ audit.warningCount }}</p>
+                  <p class="mt-1 text-sm text-on-surface-variant">Befunde</p>
+                </div>
+                <div class="rounded-[1.6rem] border border-outline-variant/20 bg-surface/45 p-5 text-center">
+                  <p class="text-[11px] font-black uppercase tracking-[0.18em] text-outline">Potenzial</p>
+                  <p class="google-ads-score-number mt-3 text-5xl font-headline font-black text-emerald-300">{{ audit.potentialLift }}</p>
+                  <p class="mt-1 text-sm text-on-surface-variant">CPA-Hebel</p>
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                <div class="flex items-center justify-between gap-4 text-sm">
+                  <span class="font-semibold text-on-surface">Score</span>
+                  <span class="font-black text-amber-300">{{ audit.progressLabel }}</span>
+                </div>
+                <div class="h-3 rounded-full bg-surface-container-high overflow-hidden">
+                  <div class="h-full rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400"
+                       [style.width.%]="audit.overallScore"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          @for (section of audit.sections; track section.title) {
+            <section class="space-y-4">
+              <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">{{ section.icon }}</span>
+                  </div>
+                  <h2 class="text-2xl font-headline font-black text-on-surface">{{ section.title }}</h2>
+                </div>
+                <span class="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-bold"
+                      [class]="getGoogleAdsSectionScoreClass(section.score)">
+                  <span>Score:</span>
+                  <span>{{ section.score }}/100</span>
+                </span>
+              </div>
+
+              <div class="grid gap-4">
+                @for (finding of section.findings; track finding.title) {
+                  <article class="glass-panel border border-outline-variant/20 rounded-[1.6rem] p-5">
+                    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                      <div class="flex-1 space-y-2">
+                        <div class="flex items-start gap-3">
+                          <span class="mt-2 h-2.5 w-2.5 flex-shrink-0 rounded-full"
+                                [class]="getGoogleAdsFindingDotClass(finding.tone)"></span>
+                          <div>
+                            <h3 class="text-xl font-headline font-bold text-on-surface">{{ finding.title }}</h3>
+                            <p class="mt-1 text-base leading-relaxed text-on-surface-variant">{{ finding.description }}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex items-center justify-between gap-3 md:flex-col md:items-end">
+                        <span class="inline-flex rounded-full border px-3 py-1 text-sm font-bold"
+                              [class]="getGoogleAdsFindingBadgeClass(finding.tone)">
+                          {{ finding.status }}
+                        </span>
+                        <span class="material-symbols-outlined text-outline/60">expand_more</span>
+                      </div>
+                    </div>
+                  </article>
+                }
+              </div>
+            </section>
+          }
+
+          <section class="glass-panel border border-outline-variant/20 rounded-[2rem] overflow-hidden">
+            <div class="border-b border-outline-variant/20 px-6 py-5">
+              <h2 class="text-3xl font-headline font-black text-on-surface">Priorisierter Maßnahmenplan — 7 Handlungsschritte</h2>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full min-w-[860px]">
+                <thead>
+                  <tr class="border-b border-outline-variant/20 bg-surface-container-high/30">
+                    <th class="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-outline">#</th>
+                    <th class="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-outline">Maßnahme</th>
+                    <th class="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-outline">Aufwand</th>
+                    <th class="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-outline">Hebel</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant/10">
+                  @for (action of audit.actionPlan; track action.id) {
+                    <tr class="hover:bg-surface-container-high/20 transition-colors">
+                      <td class="px-6 py-4 text-lg font-headline font-black text-on-surface">{{ action.id }}</td>
+                      <td class="px-6 py-4 text-sm font-semibold text-on-surface">{{ action.title }}</td>
+                      <td class="px-6 py-4">
+                        <span class="inline-flex rounded-full border px-3 py-1 text-sm font-semibold"
+                              [class]="getGoogleAdsActionEffortClass(action.effort)">
+                          {{ action.effort }}
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 text-sm font-black"
+                          [class]="getGoogleAdsActionLeverageClass(action.leverage)">
+                        {{ action.leverage }}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="glass-panel border border-outline-variant/20 rounded-[2rem] p-6 md:p-8">
+            <div class="space-y-6 md:flex md:items-end md:justify-between md:gap-8 md:space-y-0">
+              <div class="space-y-3">
+                <h2 class="text-3xl font-headline font-black text-on-surface">{{ audit.footerTitle }}</h2>
+                <p class="max-w-3xl text-lg leading-relaxed text-on-surface-variant">{{ audit.footerSummary }}</p>
+                <p class="text-base text-on-surface-variant">{{ audit.footerContact }}</p>
+              </div>
+              <a href="/kontakt"
+                 class="inline-flex items-center justify-center gap-2 rounded-xl border border-outline-variant/30 px-6 py-4 text-lg font-semibold text-on-surface transition-all hover:-translate-y-0.5 hover:bg-surface-container-high">
+                {{ audit.footerCtaLabel }}
+                <span class="material-symbols-outlined">north_east</span>
+              </a>
+            </div>
+          </section>
+        </div>
+      }
 
       <!-- ─── EMAIL OUTPUT ─────────────────────────────────────────── -->
       @if (emailOutput(); as email) {

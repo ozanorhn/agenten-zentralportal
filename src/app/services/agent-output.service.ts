@@ -15,6 +15,7 @@ import {
   ContentStrategyOutput,
   ProductTextOutput,
   CsvProductTextOutput,
+  GoogleAdsAuditOutput,
   RunInputData,
 } from '../models/interfaces';
 
@@ -64,6 +65,8 @@ export class AgentOutputService {
         return this.generateProductTextPlaceholder(input.productReference || input.productImageName || 'shop.example.com/produkt');
       case 'csv-produkttext-agent':
         return this.generateCsvProductTextPlaceholder(input.csvFileName || 'produkte.csv');
+      case 'google-ads-audit':
+        return this.generateGoogleAdsAuditOutput();
       default:
         return this.generateColdEmail(audience, url, tone);
     }
@@ -293,6 +296,148 @@ export class AgentOutputService {
       rows: [],
       downloadFileName: 'produkttexte-seo-export.csv',
       generatedAt: new Date().toISOString(),
+    };
+  }
+
+  private generateGoogleAdsAuditOutput(): GoogleAdsAuditOutput {
+    return {
+      type: 'google-ads-audit',
+      title: 'eom.de — Google Ads Audit',
+      domain: 'eom.de',
+      companyName: 'Effektiv Online-Marketing GmbH',
+      companyContext: 'Hannover · Google Premium Partner',
+      createdAt: '28. April 2026',
+      auditedBy: 'EOM Audit System',
+      overallScore: 67,
+      criticalCount: 3,
+      warningCount: 4,
+      potentialLift: '+31%',
+      progressLabel: '67 / 100 — Optimierungsbedarf',
+      sections: [
+        {
+          title: 'Kontostruktur',
+          icon: 'dashboard_customize',
+          score: 62,
+          findings: [
+            {
+              title: 'Brand-Kampagne fehlt vollständig',
+              description: 'Kein Schutz für Suchanfragen wie „EOM Agentur Hannover" oder „EOM Online Marketing". Wettbewerber können auf den Markennamen bieten.',
+              status: 'Kritisch',
+              tone: 'critical',
+            },
+            {
+              title: 'Zu breite Anzeigengruppen-Struktur',
+              description: 'Leistungskampagnen bündeln verschiedene Dienstleistungen (SEO, SEA, Employer Branding) in gemeinsamen Anzeigengruppen — relevance leidet.',
+              status: 'Warnung',
+              tone: 'warning',
+            },
+            {
+              title: 'Geo-Targeting Hannover korrekt gesetzt',
+              description: 'Lokale Ausrichtung auf Hannover und Niedersachsen sauber konfiguriert. Kein Streuverlust in nicht-relevante Regionen.',
+              status: 'Gut',
+              tone: 'good',
+            },
+          ],
+        },
+        {
+          title: 'Tracking & Conversions',
+          icon: 'conversion_path',
+          score: 54,
+          findings: [
+            {
+              title: 'HubSpot-Formular-Conversions nicht in Ads importiert',
+              description: 'Kontaktanfragen über HubSpot Meetings und Formulare werden nicht als Conversions in Google Ads gezählt — Kampagnen optimieren blind.',
+              status: 'Kritisch',
+              tone: 'critical',
+            },
+            {
+              title: 'Telefon-Klick-Tracking fehlt',
+              description: 'Die Nummer 0511 / 390 60 100 ist als reiner Text auf der Website eingebunden — Click-to-Call-Anrufe aus Ads werden nicht gemessen.',
+              status: 'Kritisch',
+              tone: 'critical',
+            },
+            {
+              title: 'GA4 verknüpft, aber Conversion-Modellierung nicht aktiviert',
+              description: 'GA4-Verknüpfung ist vorhanden, jedoch wird Conversion-Modellierung für cookieless-Nutzer (Brevo, reCAPTCHA-Blocker) nicht genutzt.',
+              status: 'Warnung',
+              tone: 'warning',
+            },
+          ],
+        },
+        {
+          title: 'Anzeigen & Keywords',
+          icon: 'timeline',
+          score: 71,
+          findings: [
+            {
+              title: 'Konkurrenz bietet auf „EOM" als Keyword',
+              description: 'Wettbewerber-Domains belegen bezahlte Ergebnisse bei Suche nach Markentermen — ohne Brand-Kampagne ist kein Gegenangebot möglich.',
+              status: 'Warnung',
+              tone: 'warning',
+            },
+            {
+              title: 'RSA-Anzeigen ohne Pinning bei USPs',
+              description: '„Google Premium Partner seit 2009" und „Seit 2009" erscheinen nicht garantiert in Anzeigen — Google rotiert Assets nach eigenem Ermessen.',
+              status: 'Warnung',
+              tone: 'warning',
+            },
+            {
+              title: 'Sitelink-Extensions vorhanden und relevant',
+              description: 'Sitelinks zu Academy, Kontakt und Leistungsseiten sind konfiguriert und erhöhen die Anzeigenfläche sinnvoll.',
+              status: 'Gut',
+              tone: 'good',
+            },
+          ],
+        },
+      ],
+      actionPlan: [
+        {
+          id: '01',
+          title: 'Brand-Kampagne aufsetzen (EOM, eom.de, Effektiv Online Marketing)',
+          effort: 'Niedrig',
+          leverage: 'Sehr hoch',
+        },
+        {
+          id: '02',
+          title: 'HubSpot-Formular-Conversions in Google Ads importieren',
+          effort: 'Niedrig',
+          leverage: 'Sehr hoch',
+        },
+        {
+          id: '03',
+          title: 'Telefon Click-to-Call Tracking aktivieren',
+          effort: 'Niedrig',
+          leverage: 'Hoch',
+        },
+        {
+          id: '04',
+          title: 'Consent Mode v2 implementieren & GA4-Modellierung aktivieren',
+          effort: 'Mittel',
+          leverage: 'Hoch',
+        },
+        {
+          id: '05',
+          title: 'Kampagnen nach Leistungsbereichen aufsplitten',
+          effort: 'Mittel',
+          leverage: 'Mittel',
+        },
+        {
+          id: '06',
+          title: 'RSA-Headlines mit Trust-Signalen pinnen',
+          effort: 'Niedrig',
+          leverage: 'Mittel',
+        },
+        {
+          id: '07',
+          title: 'Geo-Targeting auf überregionale Märkte prüfen & ggf. erweitern',
+          effort: 'Niedrig',
+          leverage: 'Niedrig',
+        },
+      ],
+      footerTitle: 'Audit abgeschlossen — nächsten Schritt gehen',
+      footerSummary: '3 kritische Befunde, 4 Warnungen — geschätztes Potenzial bei konsequenter Umsetzung: +31 % niedrigerer CPA.',
+      footerContact: 'Roxeanne Rieck, Head of Operations, bespricht den Report gern persönlich.',
+      footerCtaLabel: 'Jetzt umsetzen',
     };
   }
 
