@@ -1,4 +1,4 @@
-import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AGENTS_MAP } from '../../data/agents.data';
@@ -167,6 +167,7 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   private readonly router = inject(Router);
   private pollTimeoutId: number | null = null;
   private quickWinsProgressTimerId: number | null = null;
+  private _animRafId: number | null = null;
   private secondaryQuickWinsRequestStarted = false;
   private readonly reportUpdatedListener = ((event: Event) => {
     const updatedId = (event as CustomEvent<{ id?: string }>).detail?.id;
@@ -260,6 +261,8 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   );
   readonly isPolling = signal(false);
   readonly statusErrorMessage = signal('');
+  readonly geoScoreDisplayValue = signal<number>(0);
+  readonly geoScoreBarWidth = signal<string>('0%');
   readonly pendingState = computed<boolean>(() =>
     !this.output() && !!this.jobId && !this.statusErrorMessage(),
   );
@@ -974,12 +977,46 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     if (!this._record() && this.jobId) {
       void this.pollJobStatus();
     }
+
+    effect(() => {
+      const total = this.output()?.score?.total;
+      if (typeof total === 'number') {
+        this.animateGeoScore(total);
+      }
+    });
+  }
+
+  private animateGeoScore(target: number): void {
+    if (this._animRafId !== null) {
+      cancelAnimationFrame(this._animRafId);
+    }
+    const duration = 1500;
+    const start = performance.now();
+    const step = (now: number) => {
+      const elapsed = now - start;
+      const t = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const current = Math.round(eased * target);
+      this.geoScoreDisplayValue.set(current);
+      this.geoScoreBarWidth.set(`${(current / 100) * 100}%`);
+      if (t < 1) {
+        this._animRafId = requestAnimationFrame(step);
+      } else {
+        this._animRafId = null;
+        this.geoScoreDisplayValue.set(target);
+        this.geoScoreBarWidth.set(`${target}%`);
+      }
+    };
+    this._animRafId = requestAnimationFrame(step);
   }
 
   ngOnDestroy(): void {
     this.clearPollTimeout();
     this.resetSecondaryQuickWinsProgress();
     window.removeEventListener(SEO_GEO_REPORT_UPDATED_EVENT, this.reportUpdatedListener);
+    if (this._animRafId !== null) {
+      cancelAnimationFrame(this._animRafId);
+    }
   }
 
   setActiveTab(tab: SeoGeoTabKey): void {
@@ -1071,15 +1108,11 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   }
 
   metricTextClass(score?: number | null): string {
-    if ((score ?? 0) >= 80) {
+    if ((score ?? 0) >= 60) {
       return 'text-emerald-300';
     }
 
-    if ((score ?? 0) >= 65) {
-      return 'text-[#378ADD]';
-    }
-
-    if ((score ?? 0) >= 50) {
+    if ((score ?? 0) >= 30) {
       return 'text-amber-300';
     }
 
@@ -1087,15 +1120,11 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   }
 
   metricBarClass(score?: number | null): string {
-    if ((score ?? 0) >= 80) {
+    if ((score ?? 0) >= 60) {
       return 'bg-[#639922]';
     }
 
-    if ((score ?? 0) >= 65) {
-      return 'bg-[#378ADD]';
-    }
-
-    if ((score ?? 0) >= 50) {
+    if ((score ?? 0) >= 30) {
       return 'bg-[#EF9F27]';
     }
 
