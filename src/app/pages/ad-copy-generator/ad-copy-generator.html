@@ -1,0 +1,225 @@
+<div class="ads-workspace flex min-h-[calc(100vh-56px)] overflow-hidden relative">
+  @if (isAnalyzing()) {
+    <div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-surface/90 backdrop-blur-xl">
+      <div class="relative mb-8">
+        <div class="flex h-24 w-24 items-center justify-center rounded-[1.75rem] bg-violet-500/15 shadow-[0_0_60px_rgba(139,92,246,0.3)]">
+          <span class="material-symbols-outlined text-5xl text-violet-400"
+                style="font-variation-settings:'FILL' 1;">campaign</span>
+        </div>
+        <div class="absolute inset-0 rounded-[1.75rem] border-2 border-violet-400/25 animate-spin"
+             style="animation-duration: 3s;"></div>
+      </div>
+      <h2 class="mb-2 text-2xl font-headline font-black tracking-tight text-on-surface">
+        Anzeigen werden generiert ...
+      </h2>
+      <p class="mb-8 text-sm text-on-surface-variant">{{ progressLabel() }}</p>
+      <div class="w-80 max-w-[80vw]">
+        <div class="mb-2 flex justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-outline">
+          <span>Generierung</span>
+          <span class="text-violet-400">{{ progress() }}%</span>
+        </div>
+        <div class="h-2 overflow-hidden rounded-full bg-surface-container-high">
+          <div class="h-full rounded-full bg-gradient-to-r from-violet-500 via-purple-400 to-pink-400 transition-all duration-300"
+               [style.width.%]="progress()"></div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <section class="ads-sidebar w-[380px] flex-shrink-0 border-r border-outline-variant/20 p-8">
+    <a routerLink="/agents?category=Ads"
+       class="mb-6 flex items-center gap-2 text-sm text-on-surface-variant/60 transition-colors hover:text-on-surface">
+      <span class="material-symbols-outlined text-sm">arrow_back</span>
+      Zurück zu Ads
+    </a>
+
+    <div class="mb-8">
+      <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-violet-300">
+        <span class="h-2 w-2 rounded-full bg-violet-400"></span>
+        Ads Demo-Agent
+      </div>
+      <h1 class="mb-3 text-3xl font-headline font-black tracking-tighter text-on-surface">
+        Ad-Copy-Generator
+      </h1>
+      <p class="text-sm leading-relaxed text-on-surface-variant">
+        Dieser Agent generiert performante Google Ads und Meta Ads — mit drei Varianten pro Channel,
+        Qualitätsscore und Tonalitäts-Analyse.
+      </p>
+    </div>
+
+    <div class="space-y-6">
+      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+        <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Use Case</p>
+        <div class="rounded-[1.25rem] border border-violet-400/20 bg-surface-container-high/60 px-5 py-6">
+          <div class="mb-3 flex items-center gap-3">
+            <span class="material-symbols-outlined text-3xl text-violet-400"
+                  style="font-variation-settings:'FILL' 1;">ads_click</span>
+            <p class="text-sm font-semibold text-on-surface">3 Varianten, ein Klick</p>
+          </div>
+          <p class="text-xs leading-relaxed text-on-surface-variant">
+            Produkt und Zielgruppe eingeben — der Agent liefert testfertige Anzeigen
+            für Google und Meta mit Qualitätsscore und Tonalitätslabel.
+          </p>
+        </div>
+      </div>
+
+      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+        <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Output</p>
+        <div class="flex flex-wrap gap-2">
+          @for (item of ['3× Google Ads', '1× Meta Ad', 'Quality Score', 'Tonalität']; track item) {
+            <span class="rounded-full border border-violet-400/15 bg-violet-400/10 px-3 py-2 text-xs font-medium text-on-surface">
+              {{ item }}
+            </span>
+          }
+        </div>
+      </div>
+
+      <button (click)="startAnalysis()"
+              [disabled]="isAnalyzing()"
+              class="flex w-full items-center justify-center gap-3 rounded-[1.25rem] bg-violet-600 px-6 py-4 text-sm font-bold text-white shadow-[0_18px_40px_rgba(139,92,246,0.22)] transition-all hover:-translate-y-0.5 hover:shadow-[0_22px_48px_rgba(139,92,246,0.28)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0">
+        <span class="material-symbols-outlined">smart_toy</span>
+        Anzeigen generieren
+      </button>
+    </div>
+  </section>
+
+  <section class="ads-canvas flex-1 overflow-y-auto p-8 md:p-10">
+    @if (!hasCompleted()) {
+      <div class="mx-auto max-w-4xl">
+        <div class="hero-panel mb-8 rounded-[2rem] p-8 md:p-10">
+          <div class="mb-4 flex items-center gap-3">
+            <span class="rounded-full border border-violet-400/15 bg-violet-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-violet-300">
+              Performance Advertising
+            </span>
+            <span class="text-[10px] font-bold uppercase tracking-[0.18em] text-outline">Google & Meta in einem Schritt</span>
+          </div>
+          <h2 class="mb-4 max-w-3xl text-4xl font-headline font-black tracking-tight text-on-surface md:text-5xl">
+            Anzeigen, die performen.
+          </h2>
+          <p class="max-w-3xl text-base leading-relaxed text-on-surface-variant">
+            Der Agent erstellt drei getestete Google-Ads-Varianten und eine Meta-Anzeige —
+            mit Qualitätsscore, Tonalitätslabel und zeichengenauer Formatierung.
+          </p>
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-3">
+          <article class="info-card rounded-[1.75rem] p-6">
+            <p class="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">1. Strategie</p>
+            <h3 class="mb-2 text-xl font-headline font-bold text-on-surface">USP & Zielgruppe</h3>
+            <p class="text-sm leading-relaxed text-on-surface-variant">
+              Der Agent analysiert Ihr Produkt und definiert die optimale Ansprachestrategie für jede Plattform.
+            </p>
+          </article>
+          <article class="info-card rounded-[1.75rem] p-6">
+            <p class="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">2. Varianten</p>
+            <h3 class="mb-2 text-xl font-headline font-bold text-on-surface">3× Google Ads</h3>
+            <p class="text-sm leading-relaxed text-on-surface-variant">
+              Nutzen-, Problem- und Social-Proof-Variante — alle zeichengenau nach Google-Ads-Vorgaben.
+            </p>
+          </article>
+          <article class="info-card rounded-[1.75rem] p-6">
+            <p class="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">3. Meta</p>
+            <h3 class="mb-2 text-xl font-headline font-bold text-on-surface">Feed-Anzeige</h3>
+            <p class="text-sm leading-relaxed text-on-surface-variant">
+              Zusätzlich eine fertige Meta-Anzeige mit Primary Text, Headline und CTA.
+            </p>
+          </article>
+        </div>
+      </div>
+    } @else {
+      @if (result(); as r) {
+        <div class="mx-auto max-w-5xl space-y-6">
+
+          <!-- Header -->
+          <div class="hero-panel rounded-[2rem] p-8">
+            <div class="mb-4 flex flex-wrap items-center gap-3">
+              <span class="rounded-full border border-violet-400/20 bg-violet-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-violet-300">
+                Generierung abgeschlossen
+              </span>
+              <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-on-surface-variant">
+                4 Anzeigen ready
+              </span>
+            </div>
+            <h2 class="mb-2 text-3xl font-headline font-black tracking-tight text-on-surface">{{ r.product }}</h2>
+            <p class="text-sm text-on-surface-variant">Zielgruppe: {{ r.targetAudience }}</p>
+          </div>
+
+          <!-- Google Ads -->
+          <div>
+            <div class="mb-4 flex items-center gap-3">
+              <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-400/15">
+                <span class="text-xs font-black text-sky-300">G</span>
+              </div>
+              <p class="text-sm font-bold text-on-surface">Google Ads — 3 Varianten</p>
+            </div>
+
+            <div class="grid gap-4 lg:grid-cols-3">
+              @for (ad of r.googleAds; track trackAd($index, ad)) {
+                <div class="result-card rounded-[1.75rem] p-5">
+                  <div class="mb-4 flex items-center justify-between">
+                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline">{{ ad.label }}</span>
+                    <div class="flex items-center gap-2">
+                      <span class="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em]"
+                            [class]="getToneBadge(ad.tone)">
+                        {{ getToneLabel(ad.tone) }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="google-ad-preview mb-4 rounded-[1rem] p-4">
+                    <p class="mb-1 text-[10px] text-green-400">Anzeige · eom-agentur.de</p>
+                    <p class="mb-1 text-sm font-bold text-sky-300 leading-tight">
+                      {{ ad.headline1 }} | {{ ad.headline2 }} | {{ ad.headline3 }}
+                    </p>
+                    <p class="text-xs leading-relaxed text-on-surface-variant">{{ ad.description1 }}</p>
+                    <p class="mt-1 text-xs leading-relaxed text-on-surface-variant">{{ ad.description2 }}</p>
+                  </div>
+
+                  <div class="flex items-center justify-between">
+                    <p class="text-[10px] text-outline">Quality Score</p>
+                    <p class="text-lg font-headline font-black" [class]="getQualityScoreClass(ad.qualityScore)">
+                      {{ ad.qualityScore }}/10
+                    </p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Meta Ad -->
+          <div>
+            <div class="mb-4 flex items-center gap-3">
+              <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/15">
+                <span class="text-xs font-black text-blue-300">f</span>
+              </div>
+              <p class="text-sm font-bold text-on-surface">Meta Ad — {{ r.metaAd.format }}</p>
+            </div>
+
+            <div class="result-card rounded-[1.75rem] p-6">
+              <div class="meta-ad-preview rounded-[1.25rem] p-5 mb-5">
+                <div class="mb-3 flex items-center gap-3">
+                  <div class="h-8 w-8 rounded-full bg-violet-400/20 flex items-center justify-center text-xs font-bold text-violet-300">E</div>
+                  <div>
+                    <p class="text-xs font-semibold text-on-surface">EOM Agentur</p>
+                    <p class="text-[10px] text-on-surface-variant">Gesponsert</p>
+                  </div>
+                </div>
+                <p class="mb-4 text-sm text-on-surface leading-relaxed">{{ r.metaAd.primaryText }}</p>
+                <div class="meta-ad-cta rounded-[0.75rem] p-4 flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-bold text-on-surface">{{ r.metaAd.headline }}</p>
+                    <p class="text-xs text-on-surface-variant">{{ r.metaAd.description }}</p>
+                  </div>
+                  <button class="rounded-lg bg-primary/80 px-4 py-2 text-xs font-bold text-white">
+                    {{ r.metaAd.cta }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      }
+    }
+  </section>
+</div>

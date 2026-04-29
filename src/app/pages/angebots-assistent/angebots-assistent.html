@@ -1,0 +1,260 @@
+<div class="proposal-workspace flex min-h-[calc(100vh-56px)] overflow-hidden relative">
+  @if (isAnalyzing()) {
+    <div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-surface/90 backdrop-blur-xl">
+      <div class="relative mb-8">
+        <div class="flex h-24 w-24 items-center justify-center rounded-[1.75rem] bg-amber-500/15 shadow-[0_0_60px_rgba(245,158,11,0.3)]">
+          <span class="material-symbols-outlined text-5xl text-amber-400"
+                style="font-variation-settings:'FILL' 1;">request_quote</span>
+        </div>
+        <div class="absolute inset-0 rounded-[1.75rem] border-2 border-amber-400/25 animate-spin"
+             style="animation-duration: 3s;"></div>
+      </div>
+      <h2 class="mb-2 text-2xl font-headline font-black tracking-tight text-on-surface">
+        Angebot wird erstellt ...
+      </h2>
+      <p class="mb-8 text-sm text-on-surface-variant">{{ progressLabel() }}</p>
+      <div class="w-80 max-w-[80vw]">
+        <div class="mb-2 flex justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-outline">
+          <span>Erstellung</span>
+          <span class="text-amber-400">{{ progress() }}%</span>
+        </div>
+        <div class="h-2 overflow-hidden rounded-full bg-surface-container-high">
+          <div class="h-full rounded-full bg-gradient-to-r from-amber-500 via-orange-400 to-yellow-300 transition-all duration-300"
+               [style.width.%]="progress()"></div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <section class="proposal-sidebar w-[380px] flex-shrink-0 border-r border-outline-variant/20 p-8">
+    <a routerLink="/agents?category=Sales"
+       class="mb-6 flex items-center gap-2 text-sm text-on-surface-variant/60 transition-colors hover:text-on-surface">
+      <span class="material-symbols-outlined text-sm">arrow_back</span>
+      Zurück zu Sales
+    </a>
+
+    <div class="mb-8">
+      <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-amber-300">
+        <span class="h-2 w-2 rounded-full bg-amber-400"></span>
+        Sales Demo-Agent
+      </div>
+      <h1 class="mb-3 text-3xl font-headline font-black tracking-tighter text-on-surface">
+        Angebots-Assistent
+      </h1>
+      <p class="text-sm leading-relaxed text-on-surface-variant">
+        Dieser Agent erstellt professionelle B2B-Angebote — strukturiert mit Executive Summary,
+        Leistungsumfang, Preisübersicht und konkreten nächsten Schritten.
+      </p>
+    </div>
+
+    <div class="space-y-6">
+      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+        <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Use Case</p>
+        <div class="rounded-[1.25rem] border border-amber-400/20 bg-surface-container-high/60 px-5 py-6">
+          <div class="mb-3 flex items-center gap-3">
+            <span class="material-symbols-outlined text-3xl text-amber-400"
+                  style="font-variation-settings:'FILL' 1;">description</span>
+            <p class="text-sm font-semibold text-on-surface">Vom Gespräch zum Angebot</p>
+          </div>
+          <p class="text-xs leading-relaxed text-on-surface-variant">
+            Briefing eingeben — der Agent strukturiert ein professionelles Angebot mit
+            Scope, Preistabelle und Nächsten Schritten — versandfertig in Sekunden.
+          </p>
+        </div>
+      </div>
+
+      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+        <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Output</p>
+        <div class="flex flex-wrap gap-2">
+          @for (item of ['Executive Summary', 'Scope', 'Preistabelle', 'Next Steps']; track item) {
+            <span class="rounded-full border border-amber-400/15 bg-amber-400/10 px-3 py-2 text-xs font-medium text-on-surface">
+              {{ item }}
+            </span>
+          }
+        </div>
+      </div>
+
+      <button (click)="startAnalysis()"
+              [disabled]="isAnalyzing()"
+              class="flex w-full items-center justify-center gap-3 rounded-[1.25rem] bg-amber-500 px-6 py-4 text-sm font-bold text-white shadow-[0_18px_40px_rgba(245,158,11,0.22)] transition-all hover:-translate-y-0.5 hover:shadow-[0_22px_48px_rgba(245,158,11,0.28)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0">
+        <span class="material-symbols-outlined">smart_toy</span>
+        Angebot generieren
+      </button>
+    </div>
+  </section>
+
+  <section class="proposal-canvas flex-1 overflow-y-auto p-8 md:p-10">
+    @if (!hasCompleted()) {
+      <div class="mx-auto max-w-4xl">
+        <div class="hero-panel mb-8 rounded-[2rem] p-8 md:p-10">
+          <div class="mb-4 flex items-center gap-3">
+            <span class="rounded-full border border-amber-400/15 bg-amber-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-amber-300">
+              Sales Automation
+            </span>
+            <span class="text-[10px] font-bold uppercase tracking-[0.18em] text-outline">B2B-Angebot in 5 Sekunden</span>
+          </div>
+          <h2 class="mb-4 max-w-3xl text-4xl font-headline font-black tracking-tight text-on-surface md:text-5xl">
+            Briefing rein. Angebot raus.
+          </h2>
+          <p class="max-w-3xl text-base leading-relaxed text-on-surface-variant">
+            Kein leeres Dokument mehr. Der Agent strukturiert Ihr Angebot professionell —
+            mit Executive Summary, klarem Scope, Preistabelle und nächsten Schritten.
+          </p>
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-3">
+          <article class="info-card rounded-[1.75rem] p-6">
+            <p class="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">1. Briefing</p>
+            <h3 class="mb-2 text-xl font-headline font-bold text-on-surface">Kontext eingeben</h3>
+            <p class="text-sm leading-relaxed text-on-surface-variant">
+              Kunde, Leistung, Preisrahmen — der Agent versteht auch unstrukturierte Angaben.
+            </p>
+          </article>
+          <article class="info-card rounded-[1.75rem] p-6">
+            <p class="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">2. Struktur</p>
+            <h3 class="mb-2 text-xl font-headline font-bold text-on-surface">Scope & Preis</h3>
+            <p class="text-sm leading-relaxed text-on-surface-variant">
+              Leistungsphasen, Preistabelle und Executive Summary werden automatisch erstellt.
+            </p>
+          </article>
+          <article class="info-card rounded-[1.75rem] p-6">
+            <p class="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">3. Output</p>
+            <h3 class="mb-2 text-xl font-headline font-bold text-on-surface">Versandfertig</h3>
+            <p class="text-sm leading-relaxed text-on-surface-variant">
+              Das Angebot ist sofort versandfertig — als PDF, Word oder direkt per E-Mail.
+            </p>
+          </article>
+        </div>
+      </div>
+    } @else {
+      @if (result(); as r) {
+        <div class="mx-auto max-w-4xl space-y-6">
+
+          <!-- Header -->
+          <div class="hero-panel rounded-[2rem] p-8">
+            <div class="mb-4 flex flex-wrap items-center gap-3">
+              <span class="rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-amber-300">
+                Angebot erstellt
+              </span>
+              <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-on-surface-variant">
+                Gültig bis {{ r.validUntil }}
+              </span>
+            </div>
+            <h2 class="mb-2 text-3xl font-headline font-black tracking-tight text-on-surface">{{ r.title }}</h2>
+            <div class="mt-4 flex flex-wrap gap-6 text-sm text-on-surface-variant">
+              <span class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-base text-amber-400">business</span>
+                {{ r.client }}
+              </span>
+              <span class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-base text-amber-400">calendar_today</span>
+                {{ r.date }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Executive Summary -->
+          <div class="result-card rounded-[1.75rem] p-6">
+            <div class="mb-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-amber-400"
+                    style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+              <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Executive Summary</p>
+            </div>
+            <p class="text-sm leading-relaxed text-on-surface">{{ r.executiveSummary }}</p>
+          </div>
+
+          <!-- Scope -->
+          <div class="result-card rounded-[1.75rem] p-6">
+            <div class="mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-amber-400"
+                    style="font-variation-settings:'FILL' 1;">checklist</span>
+              <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Leistungsumfang</p>
+            </div>
+            <div class="grid gap-4 md:grid-cols-3">
+              @for (phase of r.scope; track trackScope($index, phase)) {
+                <div class="scope-phase rounded-[1.25rem] p-4">
+                  <p class="mb-3 text-xs font-bold text-amber-300">{{ phase.title }}</p>
+                  <ul class="space-y-2">
+                    @for (point of phase.points; track point) {
+                      <li class="flex items-start gap-2 text-xs text-on-surface-variant">
+                        <span class="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-amber-400/60"></span>
+                        {{ point }}
+                      </li>
+                    }
+                  </ul>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Preisübersicht -->
+          <div class="result-card rounded-[1.75rem] p-6">
+            <div class="mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-amber-400"
+                    style="font-variation-settings:'FILL' 1;">payments</span>
+              <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Preisübersicht</p>
+            </div>
+            <div class="space-y-2 mb-5">
+              @for (item of r.priceItems; track trackPrice($index, item)) {
+                <div class="price-row flex items-center justify-between rounded-[1rem] px-4 py-3"
+                     [class.price-row-highlight]="item.highlight">
+                  <div>
+                    <p class="text-sm font-semibold text-on-surface">{{ item.item }}</p>
+                    <p class="text-xs text-on-surface-variant">{{ item.description }}</p>
+                  </div>
+                  <p class="text-sm font-bold text-on-surface">{{ item.price }}</p>
+                </div>
+              }
+            </div>
+            <div class="price-total rounded-[1.25rem] px-5 py-4 flex items-center justify-between">
+              <div>
+                <p class="text-xs text-on-surface-variant">Netto</p>
+                <p class="text-sm font-semibold text-on-surface">{{ r.totalNet }}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-xs text-on-surface-variant">Brutto (inkl. 19% MwSt.)</p>
+                <p class="text-2xl font-headline font-black text-amber-400">{{ r.totalGross }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nächste Schritte -->
+          <div class="result-card rounded-[1.75rem] p-6">
+            <div class="mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-amber-400"
+                    style="font-variation-settings:'FILL' 1;">rocket_launch</span>
+              <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Nächste Schritte</p>
+            </div>
+            <div class="space-y-3">
+              @for (step of r.nextSteps; track trackStep($index, step); let i = $index) {
+                <div class="next-step-row flex items-center gap-4 rounded-[1rem] px-4 py-3">
+                  <span class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-amber-400/15 text-xs font-bold text-amber-300">
+                    {{ i + 1 }}
+                  </span>
+                  <div class="flex-1">
+                    <p class="text-sm font-semibold text-on-surface">{{ step.step }}</p>
+                    <p class="text-xs text-on-surface-variant">{{ step.owner }}</p>
+                  </div>
+                  <span class="text-xs font-semibold text-amber-300">{{ step.date }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Kontakt -->
+          <div class="contact-panel rounded-[1.75rem] px-6 py-5 flex items-center gap-4">
+            <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-amber-400/20 text-lg font-bold text-amber-300">
+              {{ r.contact.name.charAt(0) }}
+            </div>
+            <div>
+              <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Ihr Ansprechpartner</p>
+              <p class="mt-1 text-sm font-semibold text-on-surface">{{ r.contact.name }}</p>
+              <p class="text-xs text-on-surface-variant">{{ r.contact.email }} · {{ r.contact.phone }}</p>
+            </div>
+          </div>
+
+        </div>
+      }
+    }
+  </section>
+</div>

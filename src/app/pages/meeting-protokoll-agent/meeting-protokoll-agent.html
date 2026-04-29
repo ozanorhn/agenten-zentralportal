@@ -1,0 +1,259 @@
+<div class="meeting-workspace flex min-h-[calc(100vh-56px)] overflow-hidden relative">
+  @if (isAnalyzing()) {
+    <div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-surface/90 backdrop-blur-xl">
+      <div class="relative mb-8">
+        <div class="flex h-24 w-24 items-center justify-center rounded-[1.75rem] bg-cyan-500/15 shadow-[0_0_60px_rgba(6,182,212,0.3)]">
+          <span class="material-symbols-outlined text-5xl text-cyan-400"
+                style="font-variation-settings:'FILL' 1;">summarize</span>
+        </div>
+        <div class="absolute inset-0 rounded-[1.75rem] border-2 border-cyan-400/25 animate-spin"
+             style="animation-duration: 3s;"></div>
+      </div>
+      <h2 class="mb-2 text-2xl font-headline font-black tracking-tight text-on-surface">
+        Protokoll wird erstellt ...
+      </h2>
+      <p class="mb-8 text-sm text-on-surface-variant">{{ progressLabel() }}</p>
+      <div class="w-80 max-w-[80vw]">
+        <div class="mb-2 flex justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-outline">
+          <span>Analyse</span>
+          <span class="text-cyan-400">{{ progress() }}%</span>
+        </div>
+        <div class="h-2 overflow-hidden rounded-full bg-surface-container-high">
+          <div class="h-full rounded-full bg-gradient-to-r from-cyan-500 via-teal-400 to-emerald-300 transition-all duration-300"
+               [style.width.%]="progress()"></div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <section class="meeting-sidebar w-[380px] flex-shrink-0 border-r border-outline-variant/20 p-8">
+    <a routerLink="/agents?category=Data"
+       class="mb-6 flex items-center gap-2 text-sm text-on-surface-variant/60 transition-colors hover:text-on-surface">
+      <span class="material-symbols-outlined text-sm">arrow_back</span>
+      Zurück zu Data
+    </a>
+
+    <div class="mb-8">
+      <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-300">
+        <span class="h-2 w-2 rounded-full bg-cyan-400"></span>
+        Data Demo-Agent
+      </div>
+      <h1 class="mb-3 text-3xl font-headline font-black tracking-tighter text-on-surface">
+        Meeting-Protokoll-Agent
+      </h1>
+      <p class="text-sm leading-relaxed text-on-surface-variant">
+        Dieser Agent wandelt rohe Meeting-Notizen in ein strukturiertes Protokoll um —
+        mit Beschlüssen, Action Items, Verantwortlichen und Deadlines.
+      </p>
+    </div>
+
+    <div class="space-y-6">
+      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+        <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Use Case</p>
+        <div class="rounded-[1.25rem] border border-cyan-400/20 bg-surface-container-high/60 px-5 py-6">
+          <div class="mb-3 flex items-center gap-3">
+            <span class="material-symbols-outlined text-3xl text-cyan-400"
+                  style="font-variation-settings:'FILL' 1;">event_note</span>
+            <p class="text-sm font-semibold text-on-surface">Vom Chaos zum Protokoll</p>
+          </div>
+          <p class="text-xs leading-relaxed text-on-surface-variant">
+            Stichpunkte, E-Mails oder Notizen — der Agent extrahiert Beschlüsse,
+            Action Items und Verantwortliche automatisch und ohne manuelle Aufbereitung.
+          </p>
+        </div>
+      </div>
+
+      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+        <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Output</p>
+        <div class="flex flex-wrap gap-2">
+          @for (item of ['Tagesordnung', 'Beschlüsse', 'Action Items', 'Deadlines']; track item) {
+            <span class="rounded-full border border-cyan-400/15 bg-cyan-400/10 px-3 py-2 text-xs font-medium text-on-surface">
+              {{ item }}
+            </span>
+          }
+        </div>
+      </div>
+
+      <button (click)="startAnalysis()"
+              [disabled]="isAnalyzing()"
+              class="flex w-full items-center justify-center gap-3 rounded-[1.25rem] bg-cyan-500 px-6 py-4 text-sm font-bold text-white shadow-[0_18px_40px_rgba(6,182,212,0.22)] transition-all hover:-translate-y-0.5 hover:shadow-[0_22px_48px_rgba(6,182,212,0.28)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0">
+        <span class="material-symbols-outlined">smart_toy</span>
+        Protokoll erstellen
+      </button>
+    </div>
+  </section>
+
+  <section class="meeting-canvas flex-1 overflow-y-auto p-8 md:p-10">
+    @if (!hasCompleted()) {
+      <div class="mx-auto max-w-4xl">
+        <div class="hero-panel mb-8 rounded-[2rem] p-8 md:p-10">
+          <div class="mb-4 flex items-center gap-3">
+            <span class="rounded-full border border-cyan-400/15 bg-cyan-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-300">
+              Data Operations
+            </span>
+            <span class="text-[10px] font-bold uppercase tracking-[0.18em] text-outline">Automatisches Protokoll in 5 Sekunden</span>
+          </div>
+          <h2 class="mb-4 max-w-3xl text-4xl font-headline font-black tracking-tight text-on-surface md:text-5xl">
+            Notizen rein. Protokoll raus.
+          </h2>
+          <p class="max-w-3xl text-base leading-relaxed text-on-surface-variant">
+            Kein manuelles Nacharbeiten mehr. Der Agent strukturiert Ihre Meeting-Notizen automatisch
+            und liefert ein fertiges Protokoll mit allen Action Items und Verantwortlichen.
+          </p>
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-3">
+          <article class="info-card rounded-[1.75rem] p-6">
+            <p class="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">1. Input</p>
+            <h3 class="mb-2 text-xl font-headline font-bold text-on-surface">Notizen eingeben</h3>
+            <p class="text-sm leading-relaxed text-on-surface-variant">
+              Rohe Stichpunkte, E-Mails oder Audio-Transkripte — der Agent versteht jeden Inputtyp.
+            </p>
+          </article>
+          <article class="info-card rounded-[1.75rem] p-6">
+            <p class="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">2. Analyse</p>
+            <h3 class="mb-2 text-xl font-headline font-bold text-on-surface">Inhalte extrahieren</h3>
+            <p class="text-sm leading-relaxed text-on-surface-variant">
+              Beschlüsse, Action Items, Verantwortliche und Deadlines werden automatisch erkannt.
+            </p>
+          </article>
+          <article class="info-card rounded-[1.75rem] p-6">
+            <p class="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">3. Protokoll</p>
+            <h3 class="mb-2 text-xl font-headline font-bold text-on-surface">Fertig strukturiert</h3>
+            <p class="text-sm leading-relaxed text-on-surface-variant">
+              Das Protokoll ist sofort versandfertig — als PDF, Notion-Export oder E-Mail-Anhang.
+            </p>
+          </article>
+        </div>
+      </div>
+    } @else {
+      @if (result(); as r) {
+        <div class="mx-auto max-w-4xl space-y-6">
+
+          <!-- Header -->
+          <div class="hero-panel rounded-[2rem] p-8">
+            <div class="mb-4 flex flex-wrap items-center gap-3">
+              <span class="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-300">
+                Protokoll erstellt
+              </span>
+              <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-on-surface-variant">
+                {{ r.actionItems.length }} Action Items
+              </span>
+            </div>
+            <h2 class="mb-2 text-3xl font-headline font-black tracking-tight text-on-surface">{{ r.title }}</h2>
+            <div class="mt-4 flex flex-wrap gap-6 text-sm text-on-surface-variant">
+              <span class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-base text-cyan-400">calendar_today</span>
+                {{ r.date }}
+              </span>
+              <span class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-base text-cyan-400">schedule</span>
+                {{ r.duration }}
+              </span>
+              <span class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-base text-cyan-400">location_on</span>
+                {{ r.location }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Teilnehmer + Tagesordnung -->
+          <div class="grid gap-6 md:grid-cols-2">
+            <div class="result-card rounded-[1.75rem] p-6">
+              <p class="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Teilnehmer</p>
+              <div class="space-y-3">
+                @for (person of r.attendees; track person.name) {
+                  <div class="flex items-center gap-3">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-bold text-cyan-300">
+                      {{ person.name.charAt(0) }}
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-on-surface">{{ person.name }}</p>
+                      <p class="text-xs text-on-surface-variant">{{ person.role }}</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="result-card rounded-[1.75rem] p-6">
+              <p class="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Tagesordnung</p>
+              <ol class="space-y-2">
+                @for (item of r.agendaItems; track item; let i = $index) {
+                  <li class="flex items-start gap-3 text-sm text-on-surface">
+                    <span class="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-[10px] font-bold text-cyan-300">
+                      {{ i + 1 }}
+                    </span>
+                    {{ item }}
+                  </li>
+                }
+              </ol>
+            </div>
+          </div>
+
+          <!-- Beschlüsse -->
+          <div class="result-card rounded-[1.75rem] p-6">
+            <div class="mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-cyan-400"
+                    style="font-variation-settings:'FILL' 1;">gavel</span>
+              <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Beschlüsse</p>
+            </div>
+            <div class="space-y-3">
+              @for (decision of r.decisions; track decision; let i = $index) {
+                <div class="decision-item flex items-start gap-4 rounded-[1rem] px-4 py-3">
+                  <span class="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-teal-400/20 text-[10px] font-bold text-teal-300">
+                    ✓
+                  </span>
+                  <p class="text-sm text-on-surface">{{ decision }}</p>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Action Items -->
+          <div class="result-card rounded-[1.75rem] p-6">
+            <div class="mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-cyan-400"
+                    style="font-variation-settings:'FILL' 1;">task_alt</span>
+              <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Action Items</p>
+            </div>
+            <div class="space-y-3">
+              @for (item of r.actionItems; track trackItem($index, item)) {
+                <div class="action-row flex items-start gap-4 rounded-[1rem] px-4 py-4">
+                  <div class="flex-1">
+                    <p class="mb-1 text-sm font-semibold text-on-surface">{{ item.task }}</p>
+                    <div class="flex flex-wrap items-center gap-3 text-xs text-on-surface-variant">
+                      <span class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">person</span>
+                        {{ item.owner }}
+                      </span>
+                      <span class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">event</span>
+                        {{ item.deadline }}
+                      </span>
+                    </div>
+                  </div>
+                  <span class="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.15em]"
+                        [class]="getPriorityClasses(item.priority)">
+                    {{ getPriorityLabel(item.priority) }}
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Nächstes Meeting -->
+          <div class="next-meeting-panel rounded-[1.75rem] px-6 py-5 flex items-center gap-4">
+            <span class="material-symbols-outlined text-2xl text-cyan-400"
+                  style="font-variation-settings:'FILL' 1;">event_upcoming</span>
+            <div>
+              <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Nächstes Meeting</p>
+              <p class="mt-1 text-sm font-semibold text-on-surface">{{ r.nextMeeting }}</p>
+            </div>
+          </div>
+
+        </div>
+      }
+    }
+  </section>
+</div>

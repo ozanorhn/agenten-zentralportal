@@ -132,6 +132,21 @@ export const routes: Routes = [
           import('./pages/pipeline-analyst/pipeline-analyst').then((m) => m.PipelineAnalystComponent),
       },
       {
+        path: 'agents/meeting-protokoll-agent',
+        loadComponent: () =>
+          import('./pages/meeting-protokoll-agent/meeting-protokoll-agent').then((m) => m.MeetingProtokollAgentComponent),
+      },
+      {
+        path: 'agents/ad-copy-generator',
+        loadComponent: () =>
+          import('./pages/ad-copy-generator/ad-copy-generator').then((m) => m.AdCopyGeneratorComponent),
+      },
+      {
+        path: 'agents/angebots-assistent',
+        loadComponent: () =>
+          import('./pages/angebots-assistent/angebots-assistent').then((m) => m.AngebotAssistentComponent),
+      },
+      {
         path: 'agents/:id',
         loadComponent: () =>
           import('./pages/agent-detail/agent-detail').then((m) => m.AgentDetail),

@@ -250,6 +250,36 @@ export class Dashboard implements OnInit, OnDestroy {
       badgeVariant: 'primary',
     },
     {
+      id: 'angebots-assistent',
+      name: 'Angebots-Assistent',
+      description:
+        'Erstellt professionelle B2B-Angebote mit Executive Summary, Leistungsumfang, Preistabelle und nächsten Schritten — versandfertig in Sekunden.',
+      icon: 'request_quote',
+      category: 'Sales',
+      badgeLabel: 'LIVE',
+      badgeVariant: 'primary',
+    },
+    {
+      id: 'meeting-protokoll-agent',
+      name: 'Meeting-Protokoll-Agent',
+      description:
+        'Wandelt rohe Meeting-Notizen in strukturierte Protokolle um — mit Beschlüssen, Action Items, Verantwortlichen und Deadlines.',
+      icon: 'summarize',
+      category: 'Data',
+      badgeLabel: 'LIVE',
+      badgeVariant: 'primary',
+    },
+    {
+      id: 'ad-copy-generator',
+      name: 'Ad-Copy-Generator',
+      description:
+        'Generiert performante Google Ads und Meta Ads — drei Varianten mit Tonalitätslabel und Quality Score, sofort testbereit.',
+      icon: 'campaign',
+      category: 'Ads',
+      badgeLabel: 'LIVE',
+      badgeVariant: 'primary',
+    },
+    {
       id: 'networking-ninja',
       name: 'Event-Follow-up-Agent',
       description:
