@@ -3,7 +3,7 @@ export interface AgentMeta {
   name: string;
   description: string;
   icon: string;
-  category: 'Sales' | 'Content' | 'SEO' | 'Data' | 'Ads';
+  category: 'Sales' | 'Content' | 'SEO' | 'Data' | 'Ads' | 'HR';
   badgeLabel?: string;
   badgeVariant?: 'primary' | 'secondary';
   skills: { label: string; value: number }[];
@@ -258,6 +258,60 @@ export const AGENTS: AgentMeta[] = [
     inputPlaceholder: 'z.B. Künstliche Intelligenz im Marketing',
   },
   {
+    id: 'ai-screening-agent',
+    name: 'AI-Screening-Agent',
+    description: 'Simuliert ein KI-gestütztes CV-Screening mit Upload, festem Analysefenster und Demo-Ergebnissen für fünf Zielrollen.',
+    icon: 'assignment_ind',
+    category: 'HR',
+    badgeLabel: 'LIVE',
+    badgeVariant: 'primary',
+    skills: [
+      { label: 'CV-Screening', value: 96 },
+      { label: 'Role Matching', value: 94 },
+      { label: 'Scorecard', value: 92 },
+      { label: 'Executive Summary', value: 90 },
+    ],
+    tip: 'Der Upload ist in dieser Version ein Demo-Eingang. Nach 5 Sekunden werden feste Screening-Beispiele für alle fünf Rollen angezeigt.',
+    inputLabel: 'Lebenslauf',
+    inputPlaceholder: 'cv-max-mustermann.pdf',
+  },
+  {
+    id: 'interview-scorecard-agent',
+    name: 'Interview-Scorecard-Agent',
+    description: 'Simuliert eine strukturierte KI-Interviewauswertung für drei Finalist:innen inklusive Scores, Risikosignalen und Hiring-Empfehlung.',
+    icon: 'rate_review',
+    category: 'HR',
+    badgeLabel: 'LIVE',
+    badgeVariant: 'primary',
+    skills: [
+      { label: 'Interviewbewertung', value: 95 },
+      { label: 'Signalgewichtung', value: 93 },
+      { label: 'Risk Flags', value: 91 },
+      { label: 'Hiring Decision', value: 94 },
+    ],
+    tip: 'Der Demo-Agent simuliert strukturierte Interview-Reviews für drei Finalist:innen und zeigt eine klare Empfehlung ohne zusätzliche Eingabe.',
+    inputLabel: 'Interview',
+    inputPlaceholder: 'Keine Eingabe erforderlich',
+  },
+  {
+    id: 'hiring-funnel-agent',
+    name: 'Hiring-Funnel-Agent',
+    description: 'Simuliert ein KI-Review für drei Recruiting-Funnels und zeigt Bottlenecks, Prioritäten und Conversion-Hebel direkt im Portal.',
+    icon: 'conversion_path',
+    category: 'HR',
+    badgeLabel: 'LIVE',
+    badgeVariant: 'primary',
+    skills: [
+      { label: 'Funnel-Analyse', value: 96 },
+      { label: 'Bottleneck Detection', value: 94 },
+      { label: 'Priorisierung', value: 92 },
+      { label: 'Time-to-Hire', value: 90 },
+    ],
+    tip: 'Der Agent ist ein Demo für HR-Operations: ein Klick startet die Auswertung und zeigt sofort, wo Recruiting-Strecken ausbremsen.',
+    inputLabel: 'Hiring Funnel',
+    inputPlaceholder: 'Keine Eingabe erforderlich',
+  },
+  {
     id: 'google-ads-audit',
     name: 'Google Ads Audit',
     description: 'Prüft das Setup auf Budgetlecks, fehlende Tracking-Signale und die größten Hebel auf Leads, CPA und ROAS.',
@@ -273,6 +327,24 @@ export const AGENTS: AgentMeta[] = [
     ],
     tip: 'Der Audit ist aktuell ein fester Demo-Report im Portalstil. Er simuliert das Ergebnis bewusst ohne Google-Ads-Login oder API-Anbindung.',
     inputLabel: 'Audit',
+    inputPlaceholder: 'Keine Eingabe erforderlich',
+  },
+  {
+    id: 'ads-health-checker',
+    name: 'Ads Health Checker',
+    description: 'Bewertet Stellenanzeigen-Kampagnen kanalübergreifend und zeigt, wo CPL, CTR und Frequenz gerade kippen.',
+    icon: 'monitoring',
+    category: 'Ads',
+    badgeLabel: 'LIVE',
+    badgeVariant: 'primary',
+    skills: [
+      { label: 'Campaign Health', value: 96 },
+      { label: 'CPL-Analyse', value: 95 },
+      { label: 'Kanalvergleich', value: 92 },
+      { label: 'Hiring Performance', value: 94 },
+    ],
+    tip: 'Der Health Check ist ein fester Demo-Report für Recruiting-Kampagnen. Er simuliert Wochenvergleich, Warnmeldungen und KI-Maßnahmen direkt im Portal.',
+    inputLabel: 'Health Check',
     inputPlaceholder: 'Keine Eingabe erforderlich',
   },
   {
@@ -308,6 +380,24 @@ export const AGENTS: AgentMeta[] = [
     tip: 'Testsync mit wenigen Datensätzen zuerst. Das spart Nacharbeit beim Mapping und verhindert Fehler im Produktivbetrieb.',
     inputLabel: 'Primäre Datenquelle',
     inputPlaceholder: 'z.B. HubSpot CRM',
+  },
+  {
+    id: 'pipeline-analyst',
+    name: 'Pipeline-Analyst',
+    description: 'Bewertet aktive B2B-Deals nach Win-Wahrscheinlichkeit, identifiziert Risikosignale und liefert pro Deal genau eine priorisierte Maßnahme.',
+    icon: 'trending_up',
+    category: 'Sales',
+    badgeLabel: 'LIVE',
+    badgeVariant: 'primary',
+    skills: [
+      { label: 'Deal-Scoring', value: 96 },
+      { label: 'Risikosignale', value: 93 },
+      { label: 'Priorisierung', value: 91 },
+      { label: 'Forecast-Genauigkeit', value: 89 },
+    ],
+    tip: 'Der Agent ist ein Demo-Flow ohne CRM-Anbindung. Ein Klick analysiert vier Beispiel-Deals mit Win Score, Risikosignal und konkreter Next Action direkt im Portal.',
+    inputLabel: 'Pipeline',
+    inputPlaceholder: 'Keine Eingabe erforderlich',
   },
   {
     id: 'firmen-finder',

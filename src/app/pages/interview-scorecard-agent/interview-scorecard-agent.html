@@ -1,0 +1,194 @@
+<div class="hr-workspace flex min-h-[calc(100vh-56px)] overflow-hidden relative">
+  @if (isAnalyzing()) {
+    <div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-surface/90 backdrop-blur-xl">
+      <div class="relative mb-8">
+        <div class="flex h-24 w-24 items-center justify-center rounded-[1.75rem] bg-primary/15 shadow-[0_0_60px_rgba(59,130,246,0.3)]">
+          <span class="material-symbols-outlined text-5xl text-primary"
+                style="font-variation-settings:'FILL' 1;">rate_review</span>
+        </div>
+        <div class="absolute inset-0 rounded-[1.75rem] border-2 border-primary/25 animate-spin"
+             style="animation-duration: 3s;"></div>
+      </div>
+
+      <h2 class="mb-2 text-2xl font-headline font-black tracking-tight text-on-surface">
+        Interview-Scoring läuft ...
+      </h2>
+      <p class="mb-8 text-sm text-on-surface-variant">{{ progressLabel() }}</p>
+
+      <div class="w-80 max-w-[80vw]">
+        <div class="mb-2 flex justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-outline">
+          <span>Analyse</span>
+          <span class="text-primary">{{ progress() }}%</span>
+        </div>
+        <div class="h-2 overflow-hidden rounded-full bg-surface-container-high">
+          <div class="h-full rounded-full bg-gradient-to-r from-primary via-sky-400 to-cyan-300 transition-all duration-300"
+               [style.width.%]="progress()"></div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <section class="hr-sidebar w-[380px] flex-shrink-0 border-r border-outline-variant/20 p-8">
+    <a routerLink="/agents?category=HR"
+       class="mb-6 flex items-center gap-2 text-sm text-on-surface-variant/60 transition-colors hover:text-on-surface">
+      <span class="material-symbols-outlined text-sm">arrow_back</span>
+      Zurück zu HR
+    </a>
+
+    <div class="mb-8">
+      <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
+        <span class="h-2 w-2 rounded-full bg-primary"></span>
+        HR Demo-Agent
+      </div>
+      <h1 class="mb-3 text-3xl font-headline font-black tracking-tighter text-on-surface">
+        Interview-Scorecard-Agent
+      </h1>
+      <p class="text-sm leading-relaxed text-on-surface-variant">
+        Ein Klick startet die Demo-Auswertung für drei Finalist:innen. Nach 5 Sekunden zeigt das System
+        strukturierte Scores, Risiken und eine klare Hiring-Empfehlung.
+      </p>
+    </div>
+
+    <div class="space-y-6">
+      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+        <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Use Case</p>
+        <div class="rounded-[1.25rem] border border-primary/20 bg-surface-container-high/60 px-5 py-6">
+          <div class="mb-3 flex items-center gap-3">
+            <span class="material-symbols-outlined text-3xl text-primary"
+                  style="font-variation-settings:'FILL' 1;">assignment_turned_in</span>
+            <p class="text-sm font-semibold text-on-surface">Interview-Review ohne Excel</p>
+          </div>
+          <p class="text-xs leading-relaxed text-on-surface-variant">
+            Die Demo simuliert, wie Gesprächsnotizen, Kompetenzsignale und Hiring-Risiken in einer kompakten
+            Scorecard zusammenlaufen.
+          </p>
+        </div>
+      </div>
+
+      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+        <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Output</p>
+        <div class="flex flex-wrap gap-2">
+          @for (item of ['3 Finalist:innen', '3 Score-Dimensionen', 'Risk Flags', 'Hiring-Empfehlung']; track item) {
+            <span class="rounded-full border border-primary/15 bg-primary/10 px-3 py-2 text-xs font-medium text-on-surface">
+              {{ item }}
+            </span>
+          }
+        </div>
+      </div>
+
+      <button (click)="startAnalysis()"
+              [disabled]="isAnalyzing()"
+              class="flex w-full items-center justify-center gap-3 rounded-[1.25rem] bg-primary px-6 py-4 text-sm font-bold text-white shadow-[0_18px_40px_rgba(59,130,246,0.22)] transition-all hover:-translate-y-0.5 hover:shadow-[0_22px_48px_rgba(59,130,246,0.28)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0">
+        <span class="material-symbols-outlined">smart_toy</span>
+        Jetzt analysieren
+      </button>
+    </div>
+  </section>
+
+  <section class="hr-canvas flex-1 overflow-y-auto p-8 md:p-10">
+    @if (!hasCompleted()) {
+      <div class="mx-auto max-w-6xl">
+        <div class="hero-panel mb-8 rounded-[2rem] p-8 md:p-10">
+          <div class="mb-4 flex items-center gap-3">
+            <span class="rounded-full border border-amber-400/15 bg-amber-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-amber-300">
+              Hiring Decisions
+            </span>
+            <span class="text-[10px] font-bold uppercase tracking-[0.18em] text-outline">5-Sekunden Scorecard</span>
+          </div>
+          <h2 class="mb-4 max-w-3xl text-4xl font-headline font-black tracking-tight text-on-surface md:text-5xl">
+            Strukturierte Interview-Entscheidungen statt Bauchgefühl.
+          </h2>
+          <p class="max-w-3xl text-base leading-relaxed text-on-surface-variant">
+            Die Demo zeigt, wie Finalist:innen nach Gesprächssignalen sortiert, gewichtet und mit einer klaren
+            Empfehlung für das Hiring-Team aufbereitet werden können.
+          </p>
+        </div>
+      </div>
+    } @else {
+      <div class="mx-auto max-w-7xl">
+        <div class="hero-panel mb-8 rounded-[2rem] p-8 md:p-10">
+          <div class="mb-5 flex flex-wrap items-center gap-3">
+            <span class="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
+              Analyse abgeschlossen
+            </span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-on-surface-variant">
+              Top-Empfehlung: {{ topRecommendation() }}
+            </span>
+          </div>
+
+          <h2 class="mb-4 text-4xl font-headline font-black tracking-tight text-on-surface">
+            Drei Finalist:innen im direkten Vergleich.
+          </h2>
+          <p class="max-w-3xl text-base leading-relaxed text-on-surface-variant">
+            Jede Scorecard verdichtet Interview-Eindruck, Kompetenzsignal und Hiring-Risiken in einer Form,
+            die sich direkt in ein Debriefing oder Management-Update übernehmen lässt.
+          </p>
+        </div>
+
+        <div class="grid gap-6 xl:grid-cols-3">
+          @for (candidate of finalists(); track trackCandidate($index, candidate)) {
+            <article class="result-card rounded-[2rem] p-6 md:p-7">
+              <div class="mb-5 flex items-start justify-between gap-4">
+                <div>
+                  <p class="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Finalist:in</p>
+                  <h3 class="text-2xl font-headline font-black tracking-tight text-on-surface">
+                    {{ candidate.name }}
+                  </h3>
+                </div>
+                <div class="score-pill rounded-[1.1rem] px-4 py-3 text-center">
+                  <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-primary/80">Score</p>
+                  <p class="text-2xl font-headline font-black text-primary">{{ candidate.overallScore }}</p>
+                </div>
+              </div>
+
+              <span class="mb-4 inline-flex rounded-full border border-emerald-300/15 bg-emerald-300/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-200">
+                {{ candidate.recommendation }}
+              </span>
+
+              <p class="mb-5 text-sm leading-relaxed text-on-surface-variant">
+                {{ candidate.summary }}
+              </p>
+
+              <div class="mb-5 grid gap-3">
+                @for (score of candidate.scores; track score.label) {
+                  <div class="rounded-[1.25rem] border border-white/8 bg-white/5 px-4 py-3">
+                    <div class="mb-2 flex items-center justify-between gap-4">
+                      <p class="text-xs font-medium text-on-surface">{{ score.label }}</p>
+                      <p class="text-xs font-bold text-primary">{{ score.value }}</p>
+                    </div>
+                    <div class="h-2 overflow-hidden rounded-full bg-surface-container-high">
+                      <div class="h-full rounded-full bg-gradient-to-r from-primary to-cyan-300"
+                           [style.width.%]="score.value"></div>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <div class="resume-snapshot mb-4 rounded-[1.25rem] px-4 py-4">
+                <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Starke Signale</p>
+                <div class="flex flex-wrap gap-2">
+                  @for (strength of candidate.strengths; track strength) {
+                    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-on-surface-variant">
+                      {{ strength }}
+                    </span>
+                  }
+                </div>
+              </div>
+
+              <div class="resume-snapshot rounded-[1.25rem] px-4 py-4">
+                <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Risiken</p>
+                <div class="flex flex-wrap gap-2">
+                  @for (risk of candidate.risks; track risk) {
+                    <span class="rounded-full border border-rose-300/15 bg-rose-300/10 px-3 py-1 text-xs text-rose-200">
+                      {{ risk }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      </div>
+    }
+  </section>
+</div>

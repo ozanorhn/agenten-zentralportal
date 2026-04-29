@@ -27,7 +27,7 @@ export interface RunRecord {
   agentId: string;
   agentName: string;
   agentIcon: string;
-  agentCategory: 'Sales' | 'Content' | 'SEO' | 'Data' | 'Ads';
+  agentCategory: 'Sales' | 'Content' | 'SEO' | 'Data' | 'Ads' | 'HR';
   timestamp: number;
   inputData: RunInputData;
   outputSummary: string;
@@ -52,7 +52,8 @@ export type AgentOutput =
   | BlogEditorOutput
   | ProductTextOutput
   | CsvProductTextOutput
-  | GoogleAdsAuditOutput;
+  | GoogleAdsAuditOutput
+  | AdsHealthCheckerOutput;
 
 export interface EmailOutput {
   type: 'email';
@@ -319,6 +320,71 @@ export interface GoogleAdsAuditOutput {
   footerSummary: string;
   footerContact: string;
   footerCtaLabel: string;
+}
+
+export type AdsHealthTone = 'critical' | 'warning' | 'good' | 'neutral';
+export type AdsHealthTrend = 'up' | 'down' | 'steady';
+
+export interface AdsHealthSummarySignal {
+  label: string;
+  tone: AdsHealthTone;
+}
+
+export interface AdsHealthMetric {
+  label: string;
+  value: string;
+  delta: string;
+  tone: AdsHealthTone;
+}
+
+export interface AdsHealthSpendPoint {
+  day: string;
+  value: number;
+  highlighted?: boolean;
+}
+
+export interface AdsHealthCampaignRow {
+  role: string;
+  spend: string;
+  ctr: string;
+  cpl: string;
+  spendTrend?: AdsHealthTrend;
+  ctrTrend?: AdsHealthTrend;
+  cplTrend?: AdsHealthTrend;
+}
+
+export interface AdsHealthAlert {
+  icon: string;
+  title: string;
+  summary: string;
+  tone: AdsHealthTone;
+  cause: string;
+  actions: string[];
+  footer: string;
+}
+
+export interface AdsHealthChannelSection {
+  channelKey: 'google' | 'meta';
+  channelLabel: string;
+  channelBadge: string;
+  icon: string;
+  activeCampaignsLabel: string;
+  metrics: AdsHealthMetric[];
+  spendSeries: AdsHealthSpendPoint[];
+  campaigns: AdsHealthCampaignRow[];
+  alerts: AdsHealthAlert[];
+}
+
+export interface AdsHealthCheckerOutput {
+  type: 'ads-health-checker';
+  brand: string;
+  title: string;
+  subtitle: string;
+  periodLabel: string;
+  comparisonLabel: string;
+  syncLabel: string;
+  summarySignals: AdsHealthSummarySignal[];
+  channels: AdsHealthChannelSection[];
 }
 
 export interface BlogEditorSerpResult {

@@ -1,0 +1,49 @@
+:host {
+  display: block;
+}
+
+.sales-workspace {
+  background:
+    radial-gradient(circle at top right, rgba(251, 191, 36, 0.08), transparent 24%),
+    radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.1), transparent 28%),
+    linear-gradient(180deg, rgba(8, 12, 24, 0.98), rgba(12, 17, 29, 0.98));
+}
+
+.sales-sidebar {
+  background:
+    linear-gradient(180deg, rgba(17, 24, 39, 0.94), rgba(12, 17, 29, 0.98)),
+    radial-gradient(circle at top left, rgba(251, 191, 36, 0.06), transparent 28%);
+}
+
+.sales-canvas {
+  background:
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 22%),
+    linear-gradient(180deg, rgba(12, 17, 29, 0.92), rgba(17, 24, 39, 0.94));
+}
+
+.hero-panel,
+.result-card,
+.info-card,
+.stat-card {
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.82), rgba(12, 17, 29, 0.92));
+  box-shadow:
+    0 24px 80px rgba(8, 12, 24, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.score-pill {
+  min-width: 5.25rem;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.18);
+}
+
+.risk-panel {
+  background: rgba(251, 191, 36, 0.05);
+  border: 1px solid rgba(251, 191, 36, 0.15);
+}
+
+.action-panel {
+  background: rgba(52, 211, 153, 0.05);
+  border: 1px solid rgba(52, 211, 153, 0.15);
+}

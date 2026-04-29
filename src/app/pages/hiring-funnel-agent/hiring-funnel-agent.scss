@@ -1,0 +1,43 @@
+:host {
+  display: block;
+}
+
+.hr-workspace {
+  background:
+    radial-gradient(circle at top right, rgba(232, 121, 249, 0.1), transparent 24%),
+    radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.1), transparent 28%),
+    linear-gradient(180deg, rgba(8, 12, 24, 0.98), rgba(12, 17, 29, 0.98));
+}
+
+.hr-sidebar {
+  background:
+    linear-gradient(180deg, rgba(17, 24, 39, 0.94), rgba(12, 17, 29, 0.98)),
+    radial-gradient(circle at top left, rgba(232, 121, 249, 0.08), transparent 28%);
+}
+
+.hr-canvas {
+  background:
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 22%),
+    linear-gradient(180deg, rgba(12, 17, 29, 0.92), rgba(17, 24, 39, 0.94));
+}
+
+.hero-panel,
+.result-card,
+.resume-snapshot {
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.82), rgba(12, 17, 29, 0.92));
+  box-shadow:
+    0 24px 80px rgba(8, 12, 24, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.hero-panel,
+.result-card,
+.resume-snapshot {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.score-pill {
+  min-width: 5.25rem;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.18);
+}

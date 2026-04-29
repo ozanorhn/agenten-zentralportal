@@ -8,7 +8,7 @@ export interface Agent {
   name: string;
   description: string;
   icon: string;
-  category: 'Sales' | 'Content' | 'SEO' | 'Data' | 'Ads';
+  category: 'Sales' | 'Content' | 'SEO' | 'Data' | 'Ads' | 'HR';
   badgeLabel?: string;
   badgeVariant?: 'primary' | 'secondary';
   isComingSoon?: boolean;
@@ -33,7 +33,7 @@ interface HeroContent {
 export class Dashboard implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  readonly categoryOrder: AgentCategory[] = ['Content', 'Sales', 'SEO', 'Ads', 'Data'];
+  readonly categoryOrder: AgentCategory[] = ['Content', 'Sales', 'SEO', 'Ads', 'HR', 'Data'];
   readonly categoryMeta: Record<AgentCategory, { label: string; description: string }> = {
     Content: {
       label: 'Content',
@@ -50,6 +50,10 @@ export class Dashboard implements OnInit, OnDestroy {
     Ads: {
       label: 'Ads',
       description: 'Google-Ads-Audits, Tracking-Prüfungen und klare Hebel auf CPA, Leads und ROAS.',
+    },
+    HR: {
+      label: 'HR',
+      description: 'Recruiting, CV-Screening und Bewerberbewertung mit klarer Rollen-Zuordnung und Management-Summary.',
     },
     Data: {
       label: 'Data',
@@ -107,6 +111,14 @@ export class Dashboard implements OnInit, OnDestroy {
       description:
         'Systeme für Google-Ads-Audits, Tracking-Prüfungen und priorisierte Optimierungen mit Fokus auf Leads, CPA und ROAS.',
     },
+    HR: {
+      eyebrow: 'hr systeme',
+      titlePrefix: 'Recruiting mit ',
+      titleAccent: 'klarer Vorauswahl',
+      titleSuffix: '',
+      description:
+        'Systeme für CV-Screening, Bewerberbewertung und schnelle Erstpriorisierung. Klar strukturiert, präsentationsfähig und direkt im Portal testbar.',
+    },
     Data: {
       eyebrow: 'data systeme',
       titlePrefix: 'Aus Daten wird ',
@@ -134,7 +146,7 @@ export class Dashboard implements OnInit, OnDestroy {
       label: 'Ads',
       icon: 'ads_click',
       description: 'Google-Ads-Audits mit Fokus auf Kontostruktur, Tracking und direkte Effizienzhebel.',
-      ids: ['google-ads-audit'],
+      ids: ['google-ads-audit', 'ads-health-checker'],
     },
   ];
 
@@ -228,6 +240,16 @@ export class Dashboard implements OnInit, OnDestroy {
       isComingSoon: true,
     },
     {
+      id: 'pipeline-analyst',
+      name: 'Pipeline-Analyst',
+      description:
+        'Bewertet aktive B2B-Deals nach Win-Wahrscheinlichkeit, identifiziert Risikosignale und liefert pro Deal genau eine priorisierte Maßnahme.',
+      icon: 'trending_up',
+      category: 'Sales',
+      badgeLabel: 'LIVE',
+      badgeVariant: 'primary',
+    },
+    {
       id: 'networking-ninja',
       name: 'Event-Follow-up-Agent',
       description:
@@ -268,6 +290,36 @@ export class Dashboard implements OnInit, OnDestroy {
       isComingSoon: true,
     },
     {
+      id: 'ai-screening-agent',
+      name: 'AI-Screening-Agent',
+      description:
+        'Simuliert ein KI-CV-Screening mit Upload, 5-Sekunden-Analyse und drei Demo-Kandidat:innen pro Zielrolle.',
+      icon: 'assignment_ind',
+      category: 'HR',
+      badgeLabel: 'LIVE',
+      badgeVariant: 'primary',
+    },
+    {
+      id: 'interview-scorecard-agent',
+      name: 'Interview-Scorecard-Agent',
+      description:
+        'Bewertet drei Demo-Finalist:innen strukturiert nach Interview-Signalen, Risiken und finaler Hiring-Empfehlung.',
+      icon: 'rate_review',
+      category: 'HR',
+      badgeLabel: 'LIVE',
+      badgeVariant: 'primary',
+    },
+    {
+      id: 'hiring-funnel-agent',
+      name: 'Hiring-Funnel-Agent',
+      description:
+        'Analysiert drei Recruiting-Pipelines, priorisiert Engpässe und zeigt, wo Time-to-Hire und Conversion kippen.',
+      icon: 'conversion_path',
+      category: 'HR',
+      badgeLabel: 'LIVE',
+      badgeVariant: 'primary',
+    },
+    {
       id: 'top-ranker-bot',
       name: 'SERP-Optimierungs-Agent',
       description:
@@ -282,6 +334,16 @@ export class Dashboard implements OnInit, OnDestroy {
       description:
         'Prüft das Setup auf Budgetlecks, fehlende Tracking-Signale und die größten Hebel auf Leads, CPA und ROAS.',
       icon: 'ads_click',
+      category: 'Ads',
+      badgeLabel: 'LIVE',
+      badgeVariant: 'primary',
+    },
+    {
+      id: 'ads-health-checker',
+      name: 'Ads Health Checker',
+      description:
+        'Bewertet Stellenanzeigen-Kampagnen kanalübergreifend und zeigt, wo CPL, CTR und Frequenz gerade kippen.',
+      icon: 'monitoring',
       category: 'Ads',
       badgeLabel: 'LIVE',
       badgeVariant: 'primary',

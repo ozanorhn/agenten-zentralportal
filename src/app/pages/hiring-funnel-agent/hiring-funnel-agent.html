@@ -1,0 +1,178 @@
+<div class="hr-workspace flex min-h-[calc(100vh-56px)] overflow-hidden relative">
+  @if (isAnalyzing()) {
+    <div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-surface/90 backdrop-blur-xl">
+      <div class="relative mb-8">
+        <div class="flex h-24 w-24 items-center justify-center rounded-[1.75rem] bg-primary/15 shadow-[0_0_60px_rgba(59,130,246,0.3)]">
+          <span class="material-symbols-outlined text-5xl text-primary"
+                style="font-variation-settings:'FILL' 1;">conversion_path</span>
+        </div>
+        <div class="absolute inset-0 rounded-[1.75rem] border-2 border-primary/25 animate-spin"
+             style="animation-duration: 3s;"></div>
+      </div>
+
+      <h2 class="mb-2 text-2xl font-headline font-black tracking-tight text-on-surface">
+        Hiring-Funnel wird analysiert ...
+      </h2>
+      <p class="mb-8 text-sm text-on-surface-variant">{{ progressLabel() }}</p>
+
+      <div class="w-80 max-w-[80vw]">
+        <div class="mb-2 flex justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-outline">
+          <span>Analyse</span>
+          <span class="text-primary">{{ progress() }}%</span>
+        </div>
+        <div class="h-2 overflow-hidden rounded-full bg-surface-container-high">
+          <div class="h-full rounded-full bg-gradient-to-r from-primary via-sky-400 to-cyan-300 transition-all duration-300"
+               [style.width.%]="progress()"></div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <section class="hr-sidebar w-[380px] flex-shrink-0 border-r border-outline-variant/20 p-8">
+    <a routerLink="/agents?category=HR"
+       class="mb-6 flex items-center gap-2 text-sm text-on-surface-variant/60 transition-colors hover:text-on-surface">
+      <span class="material-symbols-outlined text-sm">arrow_back</span>
+      Zurück zu HR
+    </a>
+
+    <div class="mb-8">
+      <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
+        <span class="h-2 w-2 rounded-full bg-primary"></span>
+        HR Demo-Agent
+      </div>
+      <h1 class="mb-3 text-3xl font-headline font-black tracking-tighter text-on-surface">
+        Hiring-Funnel-Agent
+      </h1>
+      <p class="text-sm leading-relaxed text-on-surface-variant">
+        Dieser Agent priorisiert Recruiting-Engpässe. Nach 5 Sekunden zeigt die Demo, wo Conversion,
+        Time-to-Hire und Kandidatenqualität in drei offenen Rollen aus dem Takt geraten.
+      </p>
+    </div>
+
+    <div class="space-y-6">
+      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+        <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Use Case</p>
+        <div class="rounded-[1.25rem] border border-primary/20 bg-surface-container-high/60 px-5 py-6">
+          <div class="mb-3 flex items-center gap-3">
+            <span class="material-symbols-outlined text-3xl text-primary"
+                  style="font-variation-settings:'FILL' 1;">monitoring</span>
+            <p class="text-sm font-semibold text-on-surface">Recruiting-Pipeline im Blick</p>
+          </div>
+          <p class="text-xs leading-relaxed text-on-surface-variant">
+            Die Demo simuliert einen Funnel-Review über mehrere Rollen und verdichtet ihn auf Engpass,
+            Kennzahlen und konkrete HR-Aktionen.
+          </p>
+        </div>
+      </div>
+
+      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+        <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Output</p>
+        <div class="flex flex-wrap gap-2">
+          @for (item of ['3 Rollen', 'Urgency Score', 'Bottleneck', 'Action List']; track item) {
+            <span class="rounded-full border border-primary/15 bg-primary/10 px-3 py-2 text-xs font-medium text-on-surface">
+              {{ item }}
+            </span>
+          }
+        </div>
+      </div>
+
+      <button (click)="startAnalysis()"
+              [disabled]="isAnalyzing()"
+              class="flex w-full items-center justify-center gap-3 rounded-[1.25rem] bg-primary px-6 py-4 text-sm font-bold text-white shadow-[0_18px_40px_rgba(59,130,246,0.22)] transition-all hover:-translate-y-0.5 hover:shadow-[0_22px_48px_rgba(59,130,246,0.28)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0">
+        <span class="material-symbols-outlined">smart_toy</span>
+        Jetzt analysieren
+      </button>
+    </div>
+  </section>
+
+  <section class="hr-canvas flex-1 overflow-y-auto p-8 md:p-10">
+    @if (!hasCompleted()) {
+      <div class="mx-auto max-w-6xl">
+        <div class="hero-panel mb-8 rounded-[2rem] p-8 md:p-10">
+          <div class="mb-4 flex items-center gap-3">
+            <span class="rounded-full border border-fuchsia-400/15 bg-fuchsia-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-fuchsia-300">
+              HR Operations
+            </span>
+            <span class="text-[10px] font-bold uppercase tracking-[0.18em] text-outline">5-Sekunden Funnel Review</span>
+          </div>
+          <h2 class="mb-4 max-w-3xl text-4xl font-headline font-black tracking-tight text-on-surface md:text-5xl">
+            Recruiting-Funnels lesen wie ein Performance-System.
+          </h2>
+          <p class="max-w-3xl text-base leading-relaxed text-on-surface-variant">
+            Die Demo zeigt, wie offene Rollen nach Dringlichkeit sortiert und mit konkreten Maßnahmen versehen
+            werden können, statt nur auf rohe Bewerbungszahlen zu schauen.
+          </p>
+        </div>
+      </div>
+    } @else {
+      <div class="mx-auto max-w-7xl">
+        <div class="hero-panel mb-8 rounded-[2rem] p-8 md:p-10">
+          <div class="mb-5 flex flex-wrap items-center gap-3">
+            <span class="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
+              Analyse abgeschlossen
+            </span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-on-surface-variant">
+              Höchste Dringlichkeit: {{ maxUrgency() }}
+            </span>
+          </div>
+
+          <h2 class="mb-4 text-4xl font-headline font-black tracking-tight text-on-surface">
+            Drei Recruiting-Strecken mit klaren Prioritäten.
+          </h2>
+          <p class="max-w-3xl text-base leading-relaxed text-on-surface-variant">
+            Jede Karte zeigt, welche Rolle gerade am stärksten unter Druck steht, welcher Engpass bremst
+            und welche Maßnahmen zuerst umgesetzt werden sollten.
+          </p>
+        </div>
+
+        <div class="grid gap-6 xl:grid-cols-3">
+          @for (role of roles(); track trackRole($index, role)) {
+            <article class="result-card rounded-[2rem] p-6 md:p-7">
+              <div class="mb-5 flex items-start justify-between gap-4">
+                <div>
+                  <p class="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Rolle</p>
+                  <h3 class="text-2xl font-headline font-black tracking-tight text-on-surface">
+                    {{ role.title }}
+                  </h3>
+                </div>
+                <div class="score-pill rounded-[1.1rem] px-4 py-3 text-center">
+                  <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-primary/80">Urgency</p>
+                  <p class="text-2xl font-headline font-black text-primary">{{ role.urgencyScore }}</p>
+                </div>
+              </div>
+
+              <p class="mb-5 text-sm leading-relaxed text-on-surface-variant">
+                {{ role.summary }}
+              </p>
+
+              <div class="resume-snapshot mb-4 rounded-[1.25rem] px-4 py-4">
+                <p class="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Haupt-Engpass</p>
+                <p class="text-sm text-on-surface">{{ role.bottleneck }}</p>
+              </div>
+
+              <div class="mb-4 grid gap-3">
+                @for (metric of role.metrics; track metric.label) {
+                  <div class="rounded-[1.25rem] border border-white/8 bg-white/5 px-4 py-3">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-outline">{{ metric.label }}</p>
+                    <p class="mt-1 text-lg font-semibold text-on-surface">{{ metric.value }}</p>
+                  </div>
+                }
+              </div>
+
+              <div class="resume-snapshot rounded-[1.25rem] px-4 py-4">
+                <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Priorisierte Maßnahmen</p>
+                <div class="flex flex-wrap gap-2">
+                  @for (action of role.actions; track action) {
+                    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-on-surface-variant">
+                      {{ action }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      </div>
+    }
+  </section>
+</div>

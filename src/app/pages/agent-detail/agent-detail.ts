@@ -66,6 +66,7 @@ export class AgentDetail {
   readonly isFirmenFinder = this.agentId === 'firmen-finder';
   readonly isGeoSiteAudit = this.agentId === 'geo-site-audit';
   readonly isGoogleAdsAudit = this.agentId === 'google-ads-audit';
+  readonly isAdsHealthChecker = this.agentId === 'ads-health-checker';
   readonly isSocialMediaWizard = this.agentId === 'social-media-wizard';
   readonly isContentStrategyBot = this.agentId === 'content-strategy-bot';
   readonly isBlogRedakteur = this.agentId === 'blog-redakteur';
@@ -141,6 +142,8 @@ export class AgentDetail {
         return 'Sie erhalten priorisierte Analysen, konkrete Maßnahmen und einen Output, der direkt ins nächste SEO-Arbeitspaket überführt werden kann.';
       case 'Data':
         return 'Sie erhalten eine strukturierte Datengrundlage oder Prozesssicht, die sich unmittelbar in operative Systeme zurückspielen lässt.';
+      case 'HR':
+        return 'Sie erhalten eine strukturierte Bewerbervorauswahl mit nachvollziehbaren Scores, Kurzfazit und klarer Rollen-Priorisierung.';
       case 'Ads':
         return 'Sie erhalten einen priorisierten Audit mit klaren Hebeln auf Tracking, Kontoeffizienz und niedrigere Akquisekosten.';
       case 'Content':
@@ -156,6 +159,8 @@ export class AgentDetail {
         return ['Analyse', 'Priorisierung', 'Empfehlungen'];
       case 'Ads':
         return ['Audit', 'Hebel', 'Maßnahmenplan'];
+      case 'HR':
+        return ['Screening', 'Scoring', 'Kurzfazit'];
       case 'Data':
         return ['Datensicht', 'Struktur', 'Nächste Schritte'];
       case 'Content':
@@ -219,6 +224,15 @@ export class AgentDetail {
     'Google Ads Audit bereit',
   ];
 
+  private readonly PROGRESS_LABELS_ADS_HEALTH = [
+    'Health Check startet …',
+    'Synchronisiere Google- und Meta-Signale …',
+    'Prüfe CPL, CTR und Frequenz nach Kampagne …',
+    'Analysiere Job-Performance und Auffälligkeiten …',
+    'Erstelle kanalübergreifende Handlungsempfehlungen …',
+    'Ads Health Check bereit',
+  ];
+
   submitWorkflow(): void {
     if (this.isSubmitting()) return;
     this.isSubmitting.set(true);
@@ -233,6 +247,8 @@ export class AgentDetail {
       this.runGeoSiteAuditWorkflow();
     } else if (this.isGoogleAdsAudit) {
       this.runGoogleAdsAuditWorkflow();
+    } else if (this.isAdsHealthChecker) {
+      this.runAdsHealthCheckerWorkflow();
     } else if (this.isSocialMediaWizard) {
       this.runSocialMediaWizardWorkflow();
     } else if (this.isContentStrategyBot) {
@@ -947,6 +963,35 @@ export class AgentDetail {
     }, minDuration);
   }
 
+  private runAdsHealthCheckerWorkflow(): void {
+    const labels = this.PROGRESS_LABELS_ADS_HEALTH;
+    this.progressLabel.set(labels[0]);
+
+    const startTime = Date.now();
+    const minDuration = 5000;
+
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const pct = Math.min(Math.round((elapsed / minDuration) * 92), 92);
+      this.progress.set(pct);
+      if (pct >= 70) this.progressLabel.set(labels[4]);
+      else if (pct >= 50) this.progressLabel.set(labels[3]);
+      else if (pct >= 28) this.progressLabel.set(labels[2]);
+      else if (pct >= 8) this.progressLabel.set(labels[1]);
+    }, 100);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      this.progress.set(100);
+      this.progressLabel.set(labels[5]);
+
+      const output = this.agentOutput.generateOutput('ads-health-checker', {});
+      setTimeout(() => {
+        this.saveAndNavigate(output, 'Ads Health Check: Stellenanzeigen', {});
+      }, 400);
+    }, minDuration);
+  }
+
   private runContentStrategyWorkflow(): void {
     const labels = [
       'System startet …',
@@ -1432,6 +1477,7 @@ export class AgentDetail {
       case 'product-text':       summary = output.structuredResult?.seo?.title ?? output.structuredResult?.seo?.h1 ?? output.generatedFile?.fileName ?? 'Produkttext generiert'; break;
       case 'csv-product-text':   summary = `${output.rowCount} Produkte verarbeitet`; break;
       case 'google-ads-audit':   summary = `Google Ads Audit: ${output.domain}`; break;
+      case 'ads-health-checker': summary = 'Campaign Health Check: Stellenanzeigen'; break;
     }
 
     this.saveAndNavigate(output, summary, input);

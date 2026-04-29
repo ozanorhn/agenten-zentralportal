@@ -168,6 +168,7 @@ export interface BotAccessibilityCheck {
 }
 
 export interface QuickWin {
+  category?: string;
   titel?: string;
   loesung?: string[];
   beispiel?: string;

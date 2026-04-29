@@ -126,7 +126,7 @@ interface SecondaryQuickWinsResponse {
 }
 
 interface SecondaryQuickWinsRequestResolution {
-  body: GeoWebhookInput | null;
+  body: unknown | null;
   source: string;
 }
 
@@ -1299,9 +1299,12 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   }
 
   currentQuickWins(): QuickWin[] {
-    const secondaryQuickWins = this.output()?.secondaryQuickWins;
-    if (secondaryQuickWins?.length) {
-      return secondaryQuickWins;
+    const secondaryQuickWins = this.output()?.secondaryQuickWins ?? [];
+    if (secondaryQuickWins.length) {
+      const matchedQuickWins = secondaryQuickWins.filter((quickWin) => this.matchesActiveTabCategory(quickWin.category));
+      if (matchedQuickWins.length || this.hasCategorizedQuickWins(secondaryQuickWins)) {
+        return matchedQuickWins;
+      }
     }
 
     return this.currentReport()?.quickWins ?? [];
@@ -1311,9 +1314,30 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     return !!(
       this.isSecondaryQuickWinsLoading() ||
       this.secondaryQuickWinsMeta() ||
+      (this.output()?.secondaryQuickWins?.length ?? 0) > 0 ||
       this.currentQuickWins().length > 0 ||
       (this.agentId === 'seo-geo-analyse-assistent-nollm' && this.secondaryQuickWinsDebug())
     );
+  }
+
+  private hasCategorizedQuickWins(quickWins: QuickWin[]): boolean {
+    return quickWins.some((quickWin) => this.normalizeQuickWinCategory(quickWin.category) !== null);
+  }
+
+  private matchesActiveTabCategory(category: string | undefined): boolean {
+    return this.normalizeQuickWinCategory(category) === this.activeTab();
+  }
+
+  private normalizeQuickWinCategory(category: string | undefined): SeoGeoTabKey | null {
+    const normalizedCategory = category?.trim().toLowerCase();
+    switch (normalizedCategory) {
+      case 'onpage':
+      case 'technik':
+      case 'offpage':
+        return normalizedCategory;
+      default:
+        return null;
+    }
   }
 
   private dimensionIcon(key?: string): string {
@@ -2157,7 +2181,7 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     }
 
     const request = this.resolveSecondaryQuickWinsRequest(record);
-    if (!request.body) {
+    if (request.body === null || request.body === undefined) {
       return;
     }
 
@@ -2190,7 +2214,7 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     const request = this.resolveSecondaryQuickWinsRequest(record);
     const requestBody = request.body;
 
-    if (!targetUrl || !requestBody) {
+    if (!targetUrl || requestBody === null || requestBody === undefined) {
       this.finishSecondaryQuickWins(record, [], true, null, {
         requestSource: request.source,
         error: !targetUrl ? 'Quick-Wins-Webhook URL fehlt.' : 'Kein gültiges Request-Payload gefunden.',
@@ -2389,6 +2413,7 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     }
 
     const raw = item as {
+      category?: unknown;
       titel?: unknown;
       loesung?: unknown;
       beispiel?: unknown;
@@ -2398,6 +2423,7 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     };
 
     return {
+      category: typeof raw.category === 'string' ? raw.category : undefined,
       titel: typeof raw.titel === 'string' ? raw.titel : undefined,
       loesung: Array.isArray(raw.loesung) ? raw.loesung.filter((entry): entry is string => typeof entry === 'string') : undefined,
       beispiel: typeof raw.beispiel === 'string' ? raw.beispiel : undefined,
@@ -2423,8 +2449,8 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   }
 
   private resolveSecondaryQuickWinsRequest(record: StoredSeoGeoReport): SecondaryQuickWinsRequestResolution {
-    const storedRequest = this.extractSecondaryQuickWinsInput(record.payload.secondaryQuickWinsRequestBody);
-    if (storedRequest) {
+    const storedRequest = record.payload.secondaryQuickWinsRequestBody;
+    if (storedRequest !== null && storedRequest !== undefined) {
       return {
         body: storedRequest,
         source: 'secondaryQuickWinsRequestBody',

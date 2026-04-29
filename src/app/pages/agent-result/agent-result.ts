@@ -26,6 +26,11 @@ import {
   GoogleAdsAuditAction,
   GoogleAdsAuditFindingTone,
   GoogleAdsAuditOutput,
+  AdsHealthAlert,
+  AdsHealthCampaignRow,
+  AdsHealthCheckerOutput,
+  AdsHealthMetric,
+  AdsHealthTone,
 } from '../../models/interfaces';
 import { AGENTS_MAP } from '../../data/agents.data';
 import { renderMarkdownToHtml } from '../../utils/markdown.utils';
@@ -114,13 +119,16 @@ export class AgentResult {
   readonly googleAdsAuditOutput = computed(() =>
     this.output()?.type === 'google-ads-audit' ? this.output() as GoogleAdsAuditOutput : null
   );
+  readonly adsHealthCheckerOutput = computed(() =>
+    this.output()?.type === 'ads-health-checker' ? this.output() as AdsHealthCheckerOutput : null
+  );
   readonly blogEditorOutput = computed(() =>
     this.output()?.type === 'blog-editor' ? this.output() as BlogEditorOutput : null
   );
   readonly productTextOutput = computed(() =>
     this.output()?.type === 'product-text' ? this.output() as ProductTextOutput : null
   );
-  readonly isWideResult = computed(() => !!this.geoAuditOutput() || !!this.googleAdsAuditOutput());
+  readonly isWideResult = computed(() => !!this.geoAuditOutput() || !!this.googleAdsAuditOutput() || !!this.adsHealthCheckerOutput());
   readonly renderedContentStrategyBrief = computed((): SafeHtml | null => {
     const brief = this.contentStrategyOutput()?.brief;
     if (!brief) return null;
@@ -249,6 +257,7 @@ export class AgentResult {
       case 'product-text': return output.generatedFile?.fileName ?? 'Produkttext';
       case 'csv-product-text': return `${output.rowCount} Produkte verarbeitet`;
       case 'google-ads-audit': return `Google Ads Audit: ${output.domain}`;
+      case 'ads-health-checker': return output.title;
     }
   }
 
@@ -618,6 +627,41 @@ export class AgentResult {
         });
         lines.push('', out.footerTitle, out.footerSummary, out.footerContact);
         break;
+      case 'ads-health-checker':
+        lines.push(
+          out.brand,
+          out.title,
+          out.subtitle,
+          `Zeitraum: ${out.periodLabel}`,
+          `Vergleich: ${out.comparisonLabel}`,
+          out.syncLabel,
+          '',
+          'Gesamt:',
+          ...out.summarySignals.map((signal) => `- ${signal.label}`),
+          '',
+        );
+        out.channels.forEach((channel) => {
+          lines.push(channel.channelLabel, channel.activeCampaignsLabel, '');
+          channel.metrics.forEach((metric) => {
+            lines.push(`${metric.label}: ${metric.value} (${metric.delta})`);
+          });
+          lines.push('', 'Kampagnen:');
+          channel.campaigns.forEach((campaign) => {
+            lines.push(`- ${campaign.role} | Spend ${campaign.spend} | CTR ${campaign.ctr} | CPL ${campaign.cpl}`);
+          });
+          lines.push('', 'Warnmeldungen:');
+          channel.alerts.forEach((alert) => {
+            lines.push(`- ${alert.title}`);
+            lines.push(`  ${alert.summary}`);
+            lines.push(`  Ursache: ${alert.cause}`);
+            alert.actions.forEach((action, index) => {
+              lines.push(`  ${index + 1}. ${action}`);
+            });
+            lines.push(`  ${alert.footer}`);
+          });
+          lines.push('');
+        });
+        break;
     }
     return lines.join('\n');
   }
@@ -947,6 +991,94 @@ export class AgentResult {
       default:
         return 'text-on-surface-variant';
     }
+  }
+
+  getAdsHealthToneClass(tone: AdsHealthTone): string {
+    switch (tone) {
+      case 'critical':
+        return 'bg-red-500/15 text-red-300 border-red-500/30';
+      case 'warning':
+        return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+      case 'good':
+        return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+      default:
+        return 'bg-[#0070FF]/10 text-[#7DB4FF] border-[#0070FF]/20';
+    }
+  }
+
+  getAdsHealthMetricValueClass(tone: AdsHealthMetric['tone']): string {
+    switch (tone) {
+      case 'critical':
+        return 'text-red-300';
+      case 'warning':
+        return 'text-amber-300';
+      case 'good':
+        return 'text-emerald-300';
+      default:
+        return 'text-on-surface';
+    }
+  }
+
+  getAdsHealthDeltaClass(tone: AdsHealthMetric['tone']): string {
+    switch (tone) {
+      case 'critical':
+        return 'text-red-300';
+      case 'warning':
+        return 'text-amber-300';
+      case 'good':
+        return 'text-emerald-300';
+      default:
+        return 'text-on-surface-variant';
+    }
+  }
+
+  getAdsHealthBarClass(highlighted?: boolean): string {
+    return highlighted ? 'bg-amber-400/80' : 'bg-[#0070FF]/60';
+  }
+
+  getAdsHealthTrendIcon(trend?: AdsHealthCampaignRow['spendTrend']): string {
+    switch (trend) {
+      case 'up':
+        return 'arrow_upward';
+      case 'down':
+        return 'arrow_downward';
+      case 'steady':
+        return 'remove';
+      default:
+        return '';
+    }
+  }
+
+  getAdsHealthTrendClass(trend?: AdsHealthCampaignRow['spendTrend']): string {
+    switch (trend) {
+      case 'up':
+        return 'text-red-300';
+      case 'down':
+        return 'text-amber-300';
+      case 'steady':
+        return 'text-emerald-300';
+      default:
+        return 'text-on-surface-variant';
+    }
+  }
+
+  getAdsHealthAlertContainerClass(tone: AdsHealthAlert['tone']): string {
+    switch (tone) {
+      case 'critical':
+        return 'border-red-500/25 bg-red-500/6';
+      case 'warning':
+        return 'border-amber-500/25 bg-amber-500/6';
+      case 'good':
+        return 'border-emerald-500/25 bg-emerald-500/6';
+      default:
+        return 'border-outline-variant/20 bg-surface-container-high/20';
+    }
+  }
+
+  getAdsHealthChannelBadgeClass(channelKey: 'google' | 'meta'): string {
+    return channelKey === 'google'
+      ? 'bg-[#0070FF]/15 text-[#7DB4FF] border-[#0070FF]/30'
+      : 'bg-sky-500/15 text-sky-300 border-sky-500/30';
   }
 
   formatCompetitorUrl(url: string): string {

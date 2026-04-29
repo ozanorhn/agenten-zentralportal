@@ -129,6 +129,7 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
         throw new RequestError('empty', response.status, rawResponse);
       }
 
+      const secondaryQuickWinsRequestBody = parsedResponse ?? payload;
       const record: StoredSeoGeoReport = {
         id: `seo-geo-nollm-${Date.now()}`,
         createdAt: Date.now(),
@@ -136,7 +137,7 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
           ...payload,
           secondaryQuickWinsLoading: true,
           secondaryQuickWinsRequested: false,
-          secondaryQuickWinsRequestBody: requestBody,
+          secondaryQuickWinsRequestBody,
         },
       };
 

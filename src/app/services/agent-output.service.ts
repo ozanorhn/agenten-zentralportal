@@ -16,6 +16,7 @@ import {
   ProductTextOutput,
   CsvProductTextOutput,
   GoogleAdsAuditOutput,
+  AdsHealthCheckerOutput,
   RunInputData,
 } from '../models/interfaces';
 
@@ -67,6 +68,8 @@ export class AgentOutputService {
         return this.generateCsvProductTextPlaceholder(input.csvFileName || 'produkte.csv');
       case 'google-ads-audit':
         return this.generateGoogleAdsAuditOutput();
+      case 'ads-health-checker':
+        return this.generateAdsHealthCheckerOutput();
       default:
         return this.generateColdEmail(audience, url, tone);
     }
@@ -438,6 +441,152 @@ export class AgentOutputService {
       footerSummary: '3 kritische Befunde, 4 Warnungen — geschätztes Potenzial bei konsequenter Umsetzung: +31 % niedrigerer CPA.',
       footerContact: 'Roxeanne Rieck, Head of Operations, bespricht den Report gern persönlich.',
       footerCtaLabel: 'Jetzt umsetzen',
+    };
+  }
+
+  private generateAdsHealthCheckerOutput(): AdsHealthCheckerOutput {
+    return {
+      type: 'ads-health-checker',
+      brand: 'eom',
+      title: 'Campaign Health Check — Stellenanzeigen',
+      subtitle: 'Effektiv Online-Marketing GmbH · Hannover · eom.de/jobs',
+      periodLabel: 'Letzte 7 Tage',
+      comparisonLabel: 'Vorperiode',
+      syncLabel: 'Live-Sync',
+      summarySignals: [
+        { label: 'CPL +52% — SEA/Ads Manager', tone: 'critical' },
+        { label: 'CTR −41% — AI Engineer (Google)', tone: 'critical' },
+        { label: 'Frequenz 8,1 — Meta Awareness', tone: 'warning' },
+        { label: 'Bewerbungen −28% diese Woche', tone: 'critical' },
+        { label: 'SEO Manager — stabil', tone: 'good' },
+        { label: 'Projektmanager — OK', tone: 'good' },
+      ],
+      channels: [
+        {
+          channelKey: 'google',
+          channelLabel: 'Google Ads',
+          channelBadge: 'G',
+          icon: 'ads_click',
+          activeCampaignsLabel: '4 Stellenanzeigen-Kampagnen aktiv',
+          metrics: [
+            { label: 'Spend', value: '€2.840', delta: '▲ +38% vs. VW', tone: 'warning' },
+            { label: 'CTR', value: '2,1%', delta: '▼ −41% vs. VW', tone: 'critical' },
+            { label: 'CPL (Bew.)', value: '€64', delta: '▲ Ziel €42', tone: 'critical' },
+            { label: 'Bewerbungen', value: '44', delta: '▼ −28% vs. VW', tone: 'critical' },
+          ],
+          spendSeries: [
+            { day: 'Mo', value: 52 },
+            { day: 'Di', value: 61 },
+            { day: 'Mi', value: 68 },
+            { day: 'Do', value: 78 },
+            { day: 'Fr', value: 73 },
+            { day: 'Sa', value: 46 },
+            { day: 'So⚠', value: 39, highlighted: true },
+          ],
+          campaigns: [
+            { role: 'Projektmanager', spend: '€520', ctr: '3,8%', cpl: '€38' },
+            { role: 'SEO Manager', spend: '€490', ctr: '3,2%', cpl: '€41' },
+            { role: 'SEA/Ads Manager', spend: '€1.140', ctr: '1,1%', cpl: '€88', spendTrend: 'up', ctrTrend: 'down' },
+            { role: 'AI Engineer', spend: '€690', ctr: '0,8%', cpl: '€61', ctrTrend: 'down' },
+          ],
+          alerts: [
+            {
+              icon: 'trending_up',
+              title: 'CPL-Explosion — SEA/Ads Manager',
+              summary: '€88 CPL vs. Ziel €42 · Spend +109% bei −71% Klicks',
+              tone: 'critical',
+              cause: 'Der starke Anstieg des CPL bei gleichzeitig eingebrochenem CTR deutet auf ein klassisches Keyword-Mismatch hin: Die Kampagne bietet vermutlich auf zu breite Suchbegriffe wie „Marketing Jobs Hannover" oder „Agentur Stelle", die viele Impressionen erzeugen, aber keine qualifizierten Bewerber anziehen. Da EOM speziell nach jemandem mit tiefem SEA-Know-how sucht, ist die Zielgruppe sehr eng — breite Keywords vernichten hier das Budget ohne Gegenwert.',
+              actions: [
+                'Keywords auf exakte Treffer reduzieren: „SEA Manager Hannover", „Google Ads Spezialist Stelle" — Broad Match pausieren, bis CTR wieder über 2,5% liegt.',
+                'Anzeigentitel konkretisieren: EOM als Absender stärker platzieren — „SEA/Ads Manager bei EOM (Hannover) · 4-Tage-Woche möglich" hebt sich von generischen Jobanzeigen ab.',
+                'Tagesbudget der SEA/Ads-Kampagne um 40% kürzen und freigewordenes Budget in die performante Projektmanager-Kampagne (CPL €38) umschichten, solange der CTR so niedrig ist.',
+              ],
+              footer: 'Analyse basierend auf EOM-Kampagnendaten · eom.de/jobs',
+            },
+            {
+              icon: 'trending_down',
+              title: 'CTR-Einbruch — AI Automation Engineer',
+              summary: '0,8% CTR · 86 Klicks auf €690 Spend · CPL €61',
+              tone: 'warning',
+              cause: '„AI Automation Engineer" ist ein sehr junges Berufsbild — Google Ads hat für diesen Begriff noch wenig Suchvolumen in der DACH-Region, was dazu führt, dass die Kampagne auf verwandte, aber unpassende Begriffe ausgesteuert wird (z.B. „Automatisierung Techniker"). Gleichzeitig ist der Begriff für aktive Jobsuchende zu technisch: Kandidaten suchen eher nach „n8n Entwickler Jobs" oder „No-Code Automation Stelle".',
+              actions: [
+                'Keywords auf Tool-spezifische Begriffe ausrichten: „n8n Jobs", „Make Automatisierung Stelle", „AI Tools Spezialist" — so erreicht man genau die Kandidaten, die EOM sucht.',
+                'Google Jobs (organisch) als Ergänzung aktivieren: Stellenanzeige auf eom.de mit korrektem JobPosting-Schema auszeichnen — AI-Stellen performen organisch oft besser als paid für Nischen-Profile.',
+                'Anzeigentext mit konkreten Tools bereichern: „n8n, Make, Zapier täglich" im Titel signalisiert sofort Relevanz — das erhöht die Klickwahrscheinlichkeit bei der richtigen Zielgruppe messbar.',
+              ],
+              footer: 'Analyse basierend auf EOM-Kampagnendaten · eom.de/jobs',
+            },
+          ],
+        },
+        {
+          channelKey: 'meta',
+          channelLabel: 'Meta Ads',
+          channelBadge: 'f',
+          icon: 'campaign',
+          activeCampaignsLabel: '3 Stellenanzeigen-Kampagnen aktiv',
+          metrics: [
+            { label: 'Spend', value: '€1.620', delta: '▲ +6% stabil', tone: 'neutral' },
+            { label: 'CTR', value: '1,4%', delta: '▼ −18% vs. VW', tone: 'warning' },
+            { label: 'CPL (Bew.)', value: '€71', delta: '▲ Ziel €50', tone: 'critical' },
+            { label: 'Frequenz', value: '8,1', delta: '▲ Max. 5,0', tone: 'critical' },
+          ],
+          spendSeries: [
+            { day: 'Mo', value: 41 },
+            { day: 'Di', value: 45 },
+            { day: 'Mi', value: 48 },
+            { day: 'Do', value: 53 },
+            { day: 'Fr', value: 51 },
+            { day: 'Sa', value: 43 },
+            { day: 'So⚠', value: 38, highlighted: true },
+          ],
+          campaigns: [
+            { role: 'Sales Manager', spend: '€580', ctr: '2,1%', cpl: '€52' },
+            { role: 'Employer Branding (Awareness für alle Jobs)', spend: '€720', ctr: '0,9%', cpl: '€96', ctrTrend: 'down' },
+            { role: 'Junior Trainee', spend: '€320', ctr: '1,8%', cpl: '€48' },
+          ],
+          alerts: [
+            {
+              icon: 'priority_high',
+              title: 'Audience-Fatigue — Employer Branding',
+              summary: 'Frequenz 8,1 · CTR von 2,4% auf 0,9% · Zielgruppe erschöpft',
+              tone: 'critical',
+              cause: 'Die Employer-Branding-Kampagne spielt dieselbe Zielgruppe (Online-Marketing-Fachkräfte im Raum Hannover, 25–40 J.) seit Wochen mit identischen Creatives aus. Bei 8,1 Frequenz hat jede Person die Anzeige im Schnitt über achtmal gesehen — der Effekt kehrt sich um: Die Marke EOM wird nicht mehr positiv wahrgenommen, sondern als aufdringlich empfunden. Das erklärt den drastischen CTR-Rückgang trotz stabilem Spend.',
+              actions: [
+                'Frequency Cap auf 3 pro Woche begrenzen und Zielgruppe auf Lookalike-Audience (basierend auf bisherigen Bewerbern) ausweiten — damit neue Gesichter erreicht werden.',
+                'Creative Rotation: Mindestens 3 neue Anzeigenmotive aufsetzen — EOM-Teamfotos, O-Töne von Mitarbeitenden, oder den „100% würden sich wieder bewerben"-Fact als Bild/Video-Ad.',
+                'Kampagnen-Pause von 5–7 Tagen für die erschöpfte Zielgruppe erwägen, dann mit frischem Creative und erweiterter Audience neu starten — spart Budget und regeneriert die Wahrnehmung.',
+              ],
+              footer: 'Analyse basierend auf EOM-Kampagnendaten · eom.de/jobs',
+            },
+            {
+              icon: 'error',
+              title: 'CPL über Ziel — Junior Trainee',
+              summary: '€48 CPL vs. Ziel €40 · +20% Abweichung · Bewerbungen rückläufig',
+              tone: 'warning',
+              cause: 'Trainee-Stellen konkurrieren auf Meta stark mit anderen Agenturen und Großunternehmen, die auf dieselbe junge Zielgruppe (18–26 J., Marketing-Interesse) bieten. Da EOM als inhabergeführte Agentur mit ~15 Mitarbeitenden geringere Markenbekanntheit als z.B. GroupM oder Accenture hat, müssen die Anzeigen stärker auf emotionale Differenzierung setzen, statt nur die Stelle zu beschreiben — sonst gewinnt immer das bekanntere Unternehmen den Klick.',
+              actions: [
+                'USPs von EOM vorne platzieren: „Kein Lebenslauf nötig", „4-Tage-Woche im Test", „100% würden sich wieder bewerben" — das sind echte Differenzierungsmerkmale gegenüber Großagenturen.',
+                'Video-Ad mit kurzen Testimonials von aktuellen Trainees oder Teamkollegen: Authentizität schlägt auf Meta Hochglanz-Produktion — besonders bei der Zielgruppe unter 25.',
+                'Landing-Page für Trainee-Bewerber optimieren: Der kurze Bewerbungsprozess bei EOM (kein Anschreiben, nur Fragebogen) ist ein echter Vorteil — dieser sollte auf der Zielseite prominenter kommuniziert werden, um Abbrüche zu reduzieren.',
+              ],
+              footer: 'Analyse basierend auf EOM-Kampagnendaten · eom.de/jobs',
+            },
+            {
+              icon: 'check_circle',
+              title: 'Sales Manager — performt im Zielbereich',
+              summary: '€52 CPL · CTR 2,1% · 11 Bewerbungen diese Woche',
+              tone: 'good',
+              cause: 'Die Kampagne liegt im Zielbereich und zeigt aktuell keine strukturellen Warnsignale. Creative, Zielgruppe und Angebot greifen stabil ineinander.',
+              actions: [
+                'Budget nur behutsam erhöhen und auf saubere CPL-Stabilität achten.',
+                'Winning Creative sichern und bei ähnlichen Rollen adaptieren.',
+                'Bewerberqualität weiter mit Hiring-Team spiegeln, bevor skaliert wird.',
+              ],
+              footer: 'Analyse basierend auf EOM-Kampagnendaten · eom.de/jobs',
+            },
+          ],
+        },
+      ],
     };
   }
 
