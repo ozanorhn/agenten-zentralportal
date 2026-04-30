@@ -1,4 +1,4 @@
-import { Component, OnDestroy, computed, effect, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AGENTS_MAP } from '../../data/agents.data';
@@ -162,12 +162,16 @@ class StatusRequestError extends Error {
   standalone: true,
   templateUrl: './seo-geo-assistant-result.html',
 })
-export class SeoGeoAssistantResultComponent implements OnDestroy {
+export class SeoGeoAssistantResultComponent implements AfterViewInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private pollTimeoutId: number | null = null;
   private quickWinsProgressTimerId: number | null = null;
   private _animRafId: number | null = null;
+  private stickyTabsRafId: number | null = null;
+  private stickyTabsScrollHandler: (() => void) | null = null;
+  private stickyTabsResizeHandler: (() => void) | null = null;
+  private stickyTabsResizeObserver: ResizeObserver | null = null;
   private secondaryQuickWinsRequestStarted = false;
   private readonly reportUpdatedListener = ((event: Event) => {
     const updatedId = (event as CustomEvent<{ id?: string }>).detail?.id;
@@ -194,6 +198,9 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     { key: 'technik', label: 'Technische Basis' },
     { key: 'offpage', label: 'Autorität & Offpage' },
   ];
+  readonly reportHeaderRef = viewChild<ElementRef<HTMLElement>>('reportHeader');
+  readonly tabsSentinelRef = viewChild<ElementRef<HTMLElement>>('tabsSentinel');
+  readonly tabsSlotRef = viewChild<ElementRef<HTMLElement>>('tabsSlot');
 
   private readonly _record = signal<StoredSeoGeoReport | null>(findSeoGeoReport(this.reportId));
   private readonly _jobStatus = signal<GeoAnalysisJobStatusResponse | null>(null);
@@ -263,6 +270,11 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   readonly statusErrorMessage = signal('');
   readonly geoScoreDisplayValue = signal<number>(0);
   readonly geoScoreBarWidth = signal<string>('0%');
+  readonly tabsPinned = signal(false);
+  readonly tabsPinnedTop = signal(0);
+  readonly tabsPinnedLeft = signal(0);
+  readonly tabsPinnedWidth = signal(0);
+  readonly tabsPlaceholderHeight = signal(0);
   readonly pendingState = computed<boolean>(() =>
     !this.output() && !!this.jobId && !this.statusErrorMessage(),
   );
@@ -971,7 +983,9 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   readonly freshnessStatuses = computed(() => this.buildStatusItems(this.output()?.report?.freshness));
 
   constructor() {
-    window.addEventListener(SEO_GEO_REPORT_UPDATED_EVENT, this.reportUpdatedListener);
+    if (typeof window !== 'undefined') {
+      window.addEventListener(SEO_GEO_REPORT_UPDATED_EVENT, this.reportUpdatedListener);
+    }
     this.maybeLoadSecondaryQuickWins();
 
     if (!this._record() && this.jobId) {
@@ -984,6 +998,10 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
         this.animateGeoScore(total);
       }
     });
+  }
+
+  ngAfterViewInit(): void {
+    this.attachStickyTabs();
   }
 
   private animateGeoScore(target: number): void {
@@ -1011,9 +1029,12 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.detachStickyTabs();
     this.clearPollTimeout();
     this.resetSecondaryQuickWinsProgress();
-    window.removeEventListener(SEO_GEO_REPORT_UPDATED_EVENT, this.reportUpdatedListener);
+    if (typeof window !== 'undefined') {
+      window.removeEventListener(SEO_GEO_REPORT_UPDATED_EVENT, this.reportUpdatedListener);
+    }
     if (this._animRafId !== null) {
       cancelAnimationFrame(this._animRafId);
     }
@@ -1133,8 +1154,12 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
 
   navClass(tab: SeoGeoTabKey): string {
     return this.activeTab() === tab
-      ? 'bg-surface-container-lowest text-on-surface font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.1)]'
-      : 'text-on-surface-variant hover:text-on-surface';
+      ? 'bg-surface-container-lowest font-semibold text-[#0A66FF] shadow-[0_6px_18px_rgba(15,23,42,0.12)] ring-1 ring-[#0070FF]/15 dark:text-[#93c5fd]'
+      : 'text-on-surface-variant hover:bg-surface-container-low/60 hover:text-on-surface';
+  }
+
+  tabsContainerClass(): string {
+    return this.tabsPinned() ? 'fixed z-40' : 'relative';
   }
 
   statusClass(tone: StatusItem['tone']): string {
@@ -1245,14 +1270,25 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     }
   }
 
-  factClass(tone: DimensionFact['tone']): string {
+  dimensionFactCardClass(tone: DimensionFact['tone']): string {
     switch (tone) {
       case 'bad':
-        return 'text-red-800 dark:text-red-300';
+        return 'bg-red-50 border-red-300 dark:bg-red-500/10 dark:border-red-500/20';
       case 'warn':
-        return 'text-amber-800 dark:text-amber-400';
+        return 'bg-amber-50 border-amber-300 dark:bg-amber-500/10 dark:border-amber-500/20';
       default:
-        return 'text-emerald-800 dark:text-emerald-300';
+        return 'bg-emerald-50 border-emerald-300 dark:bg-emerald-500/10 dark:border-emerald-500/20';
+    }
+  }
+
+  dimensionFactIconBadgeClass(tone: DimensionFact['tone']): string {
+    switch (tone) {
+      case 'bad':
+        return 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300';
+      case 'warn':
+        return 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300';
+      default:
+        return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300';
     }
   }
 
@@ -2065,6 +2101,86 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     return `${summary.accessible}/${summary.total} erreichbar`;
   }
 
+  private attachStickyTabs(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const sync = () => this.scheduleStickyTabsSync();
+    this.stickyTabsScrollHandler = sync;
+    this.stickyTabsResizeHandler = sync;
+
+    window.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', sync);
+
+    this.stickyTabsResizeObserver = new ResizeObserver(() => this.scheduleStickyTabsSync());
+
+    const header = this.reportHeaderRef()?.nativeElement;
+    const slot = this.tabsSlotRef()?.nativeElement;
+    if (header) {
+      this.stickyTabsResizeObserver.observe(header);
+    }
+    if (slot) {
+      this.stickyTabsResizeObserver.observe(slot);
+    }
+
+    this.scheduleStickyTabsSync();
+  }
+
+  private detachStickyTabs(): void {
+    if (typeof window !== 'undefined') {
+      if (this.stickyTabsScrollHandler) {
+        window.removeEventListener('scroll', this.stickyTabsScrollHandler);
+      }
+      if (this.stickyTabsResizeHandler) {
+        window.removeEventListener('resize', this.stickyTabsResizeHandler);
+      }
+      if (this.stickyTabsRafId !== null) {
+        window.cancelAnimationFrame(this.stickyTabsRafId);
+      }
+    }
+
+    this.stickyTabsResizeObserver?.disconnect();
+    this.stickyTabsResizeObserver = null;
+    this.stickyTabsRafId = null;
+    this.stickyTabsScrollHandler = null;
+    this.stickyTabsResizeHandler = null;
+  }
+
+  private scheduleStickyTabsSync(): void {
+    if (typeof window === 'undefined' || this.stickyTabsRafId !== null) {
+      return;
+    }
+
+    this.stickyTabsRafId = window.requestAnimationFrame(() => {
+      this.stickyTabsRafId = null;
+      this.syncStickyTabs();
+    });
+  }
+
+  private syncStickyTabs(): void {
+    const header = this.reportHeaderRef()?.nativeElement;
+    const sentinel = this.tabsSentinelRef()?.nativeElement;
+    const slot = this.tabsSlotRef()?.nativeElement;
+
+    if (!header || !sentinel || !slot || !this.output() || this.isEnvelopeOnlyResult()) {
+      this.tabsPinned.set(false);
+      return;
+    }
+
+    const headerRect = header.getBoundingClientRect();
+    const sentinelRect = sentinel.getBoundingClientRect();
+    const slotRect = slot.getBoundingClientRect();
+    const pinTop = Math.round(headerRect.bottom + 8);
+    const shouldPin = sentinelRect.top <= pinTop;
+
+    this.tabsPinnedTop.set(pinTop);
+    this.tabsPinnedLeft.set(Math.round(slotRect.left));
+    this.tabsPinnedWidth.set(Math.round(slotRect.width));
+    this.tabsPlaceholderHeight.set(Math.round(slotRect.height));
+    this.tabsPinned.set(shouldPin);
+  }
+
   private async pollJobStatus(): Promise<void> {
     if (!this.jobId) {
       return;
@@ -2570,8 +2686,28 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
     }
   }
 
-  private compactUrl(value: string): string {
-    return value.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+  compactUrl(value: string): string {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return '';
+    }
+
+    const normalized = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+
+    try {
+      const parsed = new URL(normalized);
+      const host = parsed.hostname.replace(/^www\./i, '').toLowerCase();
+      const path = parsed.pathname.replace(/\/+$/, '');
+      const search = parsed.search ?? '';
+      const hash = parsed.hash ?? '';
+      return `${host}${path === '/' ? '' : path}${search}${hash}`;
+    } catch {
+      return trimmed
+        .replace(/^https?:\/\//i, '')
+        .replace(/^www\./i, '')
+        .replace(/\/+$/, '')
+        .toLowerCase();
+    }
   }
 
   private isEnvelopeOnlyPayload(payload?: GeoWebhookResult | null): boolean {

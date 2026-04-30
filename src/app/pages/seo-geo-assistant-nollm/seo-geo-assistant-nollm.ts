@@ -1,4 +1,3 @@
-import { NgClass } from '@angular/common';
 import { Component, OnDestroy, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -37,7 +36,7 @@ const ANALYSIS_STEPS = [
 @Component({
   selector: 'app-seo-geo-assistant-nollm',
   standalone: true,
-  imports: [FormsModule, RouterLink, NgClass],
+  imports: [FormsModule, RouterLink],
   templateUrl: './seo-geo-assistant-nollm.html',
 })
 export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
@@ -60,6 +59,70 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
   readonly overlayCompleted = signal(false);
   readonly activeStepIndex = signal(0);
   readonly overlayProgress = signal(0);
+
+  // --- UI KLASSEN FÜR DAS HTML ---
+  readonly inputClass = 'w-full rounded-2xl border-0 bg-surface-container-highest px-4 py-4 pl-12 text-sm text-on-surface placeholder:text-on-surface-variant/30 focus:ring-1 focus:ring-[#0070FF] focus:shadow-[0_0_8px_rgba(0,112,255,0.3)]';
+  readonly labelClass = 'block text-[10px] font-bold uppercase tracking-[0.22em] text-outline';
+  readonly iconClass = 'material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50';
+  readonly panelClass = 'glass-panel kinetic-border rounded-[2rem] border border-outline-variant/20 bg-surface-container';
+
+  // --- STATISCHE OVERLAY KLASSEN ---
+  readonly backdropClass = 'fixed inset-0 z-50 flex items-center justify-center bg-[rgba(241,245,249,0.84)] px-4 py-4 backdrop-blur-md dark:bg-[#041226]/78';
+  readonly modalClass = 'relative w-full max-w-[44rem] overflow-hidden rounded-[2rem] border border-[#d6e2f0] bg-[linear-gradient(180deg,#ffffff_0%,#f3f8ff_100%)] p-4 shadow-[0_24px_80px_rgba(15,23,42,0.16)] dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(4,18,38,0.98),rgba(10,34,67,0.96))] dark:shadow-[0_24px_100px_rgba(0,0,0,0.45)] sm:p-5 md:p-6';
+  readonly glowClass = 'pointer-events-none absolute inset-x-10 top-0 h-32 rounded-full bg-[#0070FF]/12 blur-3xl dark:bg-[#0070FF]/20';
+  readonly progressBarClass = 'h-full rounded-full bg-[linear-gradient(90deg,#60a5fa_0%,#0070FF_55%,#38bdf8_100%)] transition-[width] duration-[1200ms] ease-out';
+
+  // --- DYNAMISCHE OVERLAY LOGIK ---
+  getStepContainerClass(index: number): string {
+    const base = 'flex items-center gap-3 rounded-[1.25rem] border px-3 py-2.5 transition-all duration-500 ';
+    if (index < this.activeStepIndex() || this.overlayCompleted()) {
+      return base + 'border-emerald-200 bg-emerald-50/85 dark:border-[#93c5fd]/45 dark:bg-[#0d3f84]/28';
+    }
+    if (index === this.activeStepIndex() && !this.overlayCompleted()) {
+      return base + 'border-[#9bc5ff] bg-[#eef6ff] shadow-[0_0_0_1px_rgba(0,112,255,0.08),0_14px_30px_rgba(0,112,255,0.12)] dark:border-[#7dd3fc]/60 dark:bg-[#0b4ea8]/28 dark:shadow-[0_0_0_1px_rgba(125,211,252,0.12),0_0_24px_rgba(0,112,255,0.16)]';
+    }
+    return base + 'border-[#d6e2f0] bg-white/72 dark:border-white/10 dark:bg-white/5';
+  }
+
+  getStepIconClass(index: number): string {
+    const base = 'inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-[1rem] border text-xs font-black md:h-8 md:w-8 md:text-sm ';
+    if (index < this.activeStepIndex() || this.overlayCompleted()) {
+      return base + 'border-emerald-200 bg-emerald-100 text-emerald-800 dark:border-[#93c5fd]/50 dark:bg-[#35c2ff]/15 dark:text-[#dbeafe]';
+    }
+    if (index === this.activeStepIndex() && !this.overlayCompleted()) {
+      return base + 'border-[#9bc5ff] bg-[#dcebff] text-[#0A4FB7] dark:border-[#7dd3fc]/65 dark:bg-[#0070FF]/25 dark:text-white';
+    }
+    return base + 'border-[#d6e2f0] bg-white/80 text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-blue-100/55';
+  }
+
+  getTextClass(index: number, isTitle: boolean): string {
+    const isDoneOrActive = index <= this.activeStepIndex() || this.overlayCompleted();
+    if (isTitle) {
+      return isDoneOrActive ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-blue-100/55';
+    }
+    return isDoneOrActive ? 'text-slate-600 dark:text-blue-100/65' : 'text-slate-400 dark:text-blue-100/40';
+  }
+
+  getStepStatusLabel(index: number): string {
+    if (index < this.activeStepIndex() || this.overlayCompleted()) {
+      return 'Fertig';
+    }
+    if (index === this.activeStepIndex()) {
+      return 'Läuft';
+    }
+    return 'Wartet';
+  }
+
+  getStepStatusBadgeClass(index: number): string {
+    const base = 'inline-flex items-center rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] ';
+    if (index < this.activeStepIndex() || this.overlayCompleted()) {
+      return base + 'bg-emerald-100 text-emerald-800 dark:bg-[#35c2ff]/15 dark:text-[#dbeafe]';
+    }
+    if (index === this.activeStepIndex() && !this.overlayCompleted()) {
+      return base + 'bg-[#dcebff] text-[#0A4FB7] dark:bg-[#0070FF]/25 dark:text-white';
+    }
+    return base + 'bg-[#eef2f7] text-[#6b7f99] dark:bg-white/8 dark:text-blue-100/55';
+  }
 
   ngOnDestroy(): void {
     this.resetLoadingOverlay();

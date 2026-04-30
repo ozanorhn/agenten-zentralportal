@@ -37,7 +37,7 @@ interface ChatMessage {
           Reporting <span class="text-[#0070FF]">Bot</span>
         </h1>
         <p class="text-on-surface-variant text-xl max-w-2xl font-light leading-relaxed">
-          Automatische Berichte aus deiner Datenbasis — oder stell einfach eine Frage zum Stand deiner Projekte.
+          Automatische Berichte aus deiner Datenbasis oder stell einfach eine Frage zum Stand deiner Projekte.
         </p>
       </div>
 

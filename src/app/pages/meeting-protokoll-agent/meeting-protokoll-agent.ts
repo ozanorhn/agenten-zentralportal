@@ -30,7 +30,7 @@ const ANALYSIS_STEPS = [
 ];
 
 const MEETING_RESULT: MeetingResult = {
-  title: 'Q2-Planungsmeeting — Produktentwicklung',
+  title: 'Q2-Planungsmeeting: Produktentwicklung',
   date: '29. April 2026',
   duration: '60 Minuten',
   location: 'Konferenzraum B / Remote',
@@ -49,9 +49,9 @@ const MEETING_RESULT: MeetingResult = {
     'Sonstiges',
   ],
   decisions: [
-    'Feature X wird am 15. Mai in Staging deployed — kein weiterer Scope-Creep.',
+    'Feature X wird am 15. Mai in Staging deployed. Kein weiterer Scope-Creep.',
     'Onboarding-Flow wird vor dem Launch überarbeitet (Jana übernimmt Design-Ownership).',
-    'Marketing startet Pre-Launch-Kampagne ab 8. Mai — Tom koordiniert mit Sarah.',
+    'Marketing startet Pre-Launch-Kampagne ab 8. Mai. Tom koordiniert mit Sarah.',
     'Wöchentlicher Sync wird auf Dienstag 10:00 Uhr verlegt.',
   ],
   actionItems: [
@@ -86,7 +86,7 @@ const MEETING_RESULT: MeetingResult = {
       priority: 'medium',
     },
   ],
-  nextMeeting: 'Dienstag, 06. Mai 2026 — 10:00 Uhr',
+  nextMeeting: 'Dienstag, 06. Mai 2026, 10:00 Uhr',
 };
 
 @Component({

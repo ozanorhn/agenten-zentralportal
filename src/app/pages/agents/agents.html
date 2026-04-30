@@ -5,14 +5,14 @@
       {{ label() }}-Systeme
     </h1>
     <p class="text-on-surface-variant text-base mt-2">
-      {{ agents().length }} KI-Agent{{ agents().length === 1 ? '' : 'en' }} verfügbar
+      {{ agents().length }} {{ agents().length === 1 ? 'Automatisierung' : 'Automatisierungen' }} verfügbar
     </p>
   </div>
 
   @if (agents().length === 0) {
     <div class="text-center py-20 text-on-surface-variant/50">
       <span class="material-symbols-outlined text-6xl mb-4 block">search_off</span>
-      <p class="text-lg">Keine Agenten in dieser Kategorie gefunden.</p>
+      <p class="text-lg">Keine Systeme in dieser Kategorie vorhanden.</p>
     </div>
   } @else {
     @for (group of groups(); track group.label) {
@@ -33,7 +33,7 @@
                   <span class="material-symbols-outlined text-[22px]"
                         style="font-variation-settings: 'FILL' 1;">{{ agent.icon }}</span>
                 </div>
-                <h3 class="text-[15px] font-headline font-bold text-on-surface leading-tight">
+                <h3 class="text-[18px] font-headline font-bold text-on-surface leading-tight tracking-tight">
                   {{ agent.name }}
                 </h3>
               </div>
@@ -51,11 +51,11 @@
 
             <button
               (click)="open(agent.id)"
-              class="w-full bg-primary hover:bg-[#2563eb] text-white font-bold py-2.5 text-[13px]
+              class="w-full bg-[#e5e7eb] hover:bg-[#d1d5db] text-on-surface/70 font-semibold py-2.5 text-[13px]
                      flex items-center justify-center gap-2 group/btn transition-all duration-150
-                     rounded-lg shadow-[0_1px_3px_rgba(59,130,246,0.3)]"
+                     rounded-lg"
             >
-              System öffnen
+              Jetzt starten
               <span class="material-symbols-outlined text-[16px] group-hover/btn:translate-x-0.5 transition-transform">
                 arrow_forward
               </span>

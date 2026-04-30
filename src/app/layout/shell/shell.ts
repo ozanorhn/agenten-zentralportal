@@ -1,6 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ThemeService } from '../../services/theme.service';
 import { NotificationService } from '../../services/notification.service';
 import { NotificationDropdown } from '../../components/notification-dropdown/notification-dropdown';
 
@@ -24,7 +23,6 @@ interface NavSection {
   styleUrl: './shell.scss',
 })
 export class Shell {
-  readonly theme = inject(ThemeService);
   readonly notifService = inject(NotificationService);
   readonly router = inject(Router);
 
@@ -50,8 +48,8 @@ export class Shell {
 
   readonly navItemClass = computed(() =>
     this.sidebarCollapsed()
-      ? 'shell-nav-item flex items-center justify-center py-2.5 w-9 mx-auto rounded-lg text-sm transition-all duration-150'
-      : 'shell-nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg font-body font-medium text-[13px] transition-all duration-150'
+      ? 'shell-nav-item flex items-center justify-center py-2 w-9 mx-auto rounded-lg text-sm transition-all duration-150'
+      : 'shell-nav-item flex items-center gap-2 px-3 py-1.5 rounded-lg font-body font-medium text-[12px] transition-all duration-150'
   );
 
   readonly mainClass = computed(() =>
@@ -75,16 +73,19 @@ export class Shell {
     localStorage.setItem('sidebarCollapsed', String(this.sidebarCollapsed()));
   }
 
+  isSectionCollapsed(label: string): boolean {
+    return this.collapsedSections().has(label);
+  }
+
   isCategoryActive(category: string): boolean {
     return this.router.url.includes(`category=${category}`);
   }
 
   navSections: NavSection[] = [
     {
-      label: 'Überblick',
+      label: 'Navigation',
       collapsible: true,
       items: [
-        { label: 'Betrieb', icon: 'bar_chart', route: '/analytics' },
         { label: 'Live KPIs', icon: 'query_stats', route: '/kpi-dashboard' },
         { label: 'Reporting', icon: 'summarize', route: '/reporting-bot' },
         { label: 'Verlauf', icon: 'history', route: '/history' },
@@ -92,7 +93,7 @@ export class Shell {
       ],
     },
     {
-      label: 'KI-Systeme',
+      label: 'Systeme',
       items: [
         { label: 'Marketing', icon: 'campaign', route: '/agents', queryParams: { category: 'Marketing' } },
         { label: 'Sales', icon: 'trending_up', route: '/agents', queryParams: { category: 'Sales' } },

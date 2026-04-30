@@ -3,7 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AGENTS, AgentMeta } from '../../data/agents.data';
 
 const MARKETING_CATS = new Set<AgentMeta['category']>(['Content', 'SEO', 'Ads']);
-const MARKETING_ORDER: AgentMeta['category'][] = ['Content', 'SEO', 'Ads'];
+const MARKETING_ORDER: AgentMeta['category'][] = ['SEO', 'Ads', 'Content'];
 
 export interface AgentGroup { label: string; agents: AgentMeta[]; }
 

@@ -84,7 +84,7 @@ const CALENDLY_URL = ''; // e.g. 'https://calendly.com/your-handle/15min?embed_t
                     Calendly / Cal.com Widget
                   </p>
                   <p class="text-outline text-xs text-center">
-                    Platzhalter — setze <code class="text-secondary/70">CALENDLY_URL</code>
+                    Platzhalter: Setze <code class="text-secondary/70">CALENDLY_URL</code>
                     in <code class="text-secondary/70">booking-modal.ts</code>
                   </p>
                 </div>

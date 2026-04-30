@@ -305,7 +305,7 @@ export class AgentOutputService {
   private generateGoogleAdsAuditOutput(): GoogleAdsAuditOutput {
     return {
       type: 'google-ads-audit',
-      title: 'eom.de — Google Ads Prüfung',
+      title: 'eom.de: Google Ads Audit',
       domain: 'eom.de',
       companyName: 'Effektiv Online-Marketing GmbH',
       companyContext: 'Hannover · Google Premium Partner',
@@ -315,7 +315,7 @@ export class AgentOutputService {
       criticalCount: 3,
       warningCount: 4,
       potentialLift: '+31%',
-      progressLabel: '67 / 100 — Optimierungsbedarf',
+      progressLabel: '67 / 100 · Optimierungsbedarf',
       sections: [
         {
           title: 'Kontostruktur',
@@ -330,7 +330,7 @@ export class AgentOutputService {
             },
             {
               title: 'Zu breite Anzeigengruppen-Struktur',
-              description: 'Leistungskampagnen bündeln verschiedene Dienstleistungen (SEO, SEA, Employer Branding) in gemeinsamen Anzeigengruppen — relevance leidet.',
+              description: 'Leistungskampagnen bündeln verschiedene Dienstleistungen (SEO, SEA, Employer Branding) in gemeinsamen Anzeigengruppen. Relevance leidet.',
               status: 'Warnung',
               tone: 'warning',
             },
@@ -349,13 +349,13 @@ export class AgentOutputService {
           findings: [
             {
               title: 'HubSpot-Formular-Conversions nicht in Ads importiert',
-              description: 'Kontaktanfragen über HubSpot Meetings und Formulare werden nicht als Conversions in Google Ads gezählt — Kampagnen optimieren blind.',
+              description: 'Kontaktanfragen über HubSpot Meetings und Formulare werden nicht als Conversions in Google Ads gezählt. Kampagnen optimieren blind.',
               status: 'Kritisch',
               tone: 'critical',
             },
             {
               title: 'Telefon-Klick-Tracking fehlt',
-              description: 'Die Nummer 0511 / 390 60 100 ist als reiner Text auf der Website eingebunden — Click-to-Call-Anrufe aus Ads werden nicht gemessen.',
+              description: 'Die Nummer 0511 / 390 60 100 ist als reiner Text auf der Website eingebunden. Click-to-Call-Anrufe aus Ads werden nicht gemessen.',
               status: 'Kritisch',
               tone: 'critical',
             },
@@ -374,13 +374,13 @@ export class AgentOutputService {
           findings: [
             {
               title: 'Konkurrenz bietet auf „EOM" als Keyword',
-              description: 'Wettbewerber-Domains belegen bezahlte Ergebnisse bei Suche nach Markentermen — ohne Brand-Kampagne ist kein Gegenangebot möglich.',
+              description: 'Wettbewerber-Domains belegen bezahlte Ergebnisse bei Suche nach Markentermen. Ohne Brand-Kampagne ist kein Gegenangebot möglich.',
               status: 'Warnung',
               tone: 'warning',
             },
             {
               title: 'RSA-Anzeigen ohne Pinning bei USPs',
-              description: '„Google Premium Partner seit 2009" und „Seit 2009" erscheinen nicht garantiert in Anzeigen — Google rotiert Assets nach eigenem Ermessen.',
+              description: '„Google Premium Partner seit 2009" und „Seit 2009" erscheinen nicht garantiert in Anzeigen. Google rotiert Assets nach eigenem Ermessen.',
               status: 'Warnung',
               tone: 'warning',
             },
@@ -437,8 +437,8 @@ export class AgentOutputService {
           leverage: 'Niedrig',
         },
       ],
-      footerTitle: 'Audit abgeschlossen — nächsten Schritt gehen',
-      footerSummary: '3 kritische Befunde, 4 Warnungen — geschätztes Potenzial bei konsequenter Umsetzung: +31 % niedrigerer CPA.',
+      footerTitle: 'Audit abgeschlossen. Nächsten Schritt gehen.',
+      footerSummary: '3 kritische Befunde, 4 Warnungen. Geschätztes Potenzial bei konsequenter Umsetzung: +31 % niedrigerer CPA.',
       footerContact: 'Roxeanne Rieck, Head of Operations, bespricht den Report gern persönlich.',
       footerCtaLabel: 'Jetzt umsetzen',
     };
@@ -448,18 +448,18 @@ export class AgentOutputService {
     return {
       type: 'ads-health-checker',
       brand: 'eom',
-      title: 'Campaign Health Check — Stellenanzeigen',
+      title: 'Campaign Health Check: Stellenanzeigen',
       subtitle: 'Effektiv Online-Marketing GmbH · Hannover · eom.de/jobs',
       periodLabel: 'Letzte 7 Tage',
       comparisonLabel: 'Vorperiode',
       syncLabel: 'Live-Sync',
       summarySignals: [
-        { label: 'CPL +52% — SEA/Ads Manager', tone: 'critical' },
-        { label: 'CTR −41% — AI Engineer (Google)', tone: 'critical' },
-        { label: 'Frequenz 8,1 — Meta Awareness', tone: 'warning' },
+        { label: 'CPL +52%: SEA/Ads Manager', tone: 'critical' },
+        { label: 'CTR −41%: AI Engineer (Google)', tone: 'critical' },
+        { label: 'Frequenz 8,1: Meta Awareness', tone: 'warning' },
         { label: 'Bewerbungen −28% diese Woche', tone: 'critical' },
-        { label: 'SEO Manager — stabil', tone: 'good' },
-        { label: 'Projektmanager — OK', tone: 'good' },
+        { label: 'SEO Manager: stabil', tone: 'good' },
+        { label: 'Projektmanager: OK', tone: 'good' },
       ],
       channels: [
         {
@@ -492,27 +492,27 @@ export class AgentOutputService {
           alerts: [
             {
               icon: 'trending_up',
-              title: 'CPL-Explosion — SEA/Ads Manager',
+              title: 'CPL-Explosion: SEA/Ads Manager',
               summary: '€88 CPL vs. Ziel €42 · Spend +109% bei −71% Klicks',
               tone: 'critical',
-              cause: 'Der starke Anstieg des CPL bei gleichzeitig eingebrochenem CTR deutet auf ein klassisches Keyword-Mismatch hin: Die Kampagne bietet vermutlich auf zu breite Suchbegriffe wie „Marketing Jobs Hannover" oder „Agentur Stelle", die viele Impressionen erzeugen, aber keine qualifizierten Bewerber anziehen. Da EOM speziell nach jemandem mit tiefem SEA-Know-how sucht, ist die Zielgruppe sehr eng — breite Keywords vernichten hier das Budget ohne Gegenwert.',
+              cause: 'Der starke Anstieg des CPL bei gleichzeitig eingebrochenem CTR deutet auf ein klassisches Keyword-Mismatch hin: Die Kampagne bietet vermutlich auf zu breite Suchbegriffe wie „Marketing Jobs Hannover" oder „Agentur Stelle", die viele Impressionen erzeugen, aber keine qualifizierten Bewerber anziehen. Da EOM speziell nach jemandem mit tiefem SEA-Know-how sucht, ist die Zielgruppe sehr eng. Breite Keywords vernichten hier das Budget ohne Gegenwert.',
               actions: [
-                'Keywords auf exakte Treffer reduzieren: „SEA Manager Hannover", „Google Ads Spezialist Stelle" — Broad Match pausieren, bis CTR wieder über 2,5% liegt.',
-                'Anzeigentitel konkretisieren: EOM als Absender stärker platzieren — „SEA/Ads Manager bei EOM (Hannover) · 4-Tage-Woche möglich" hebt sich von generischen Jobanzeigen ab.',
+                'Keywords auf exakte Treffer reduzieren: „SEA Manager Hannover", „Google Ads Spezialist Stelle". Broad Match pausieren, bis CTR wieder über 2,5% liegt.',
+                'Anzeigentitel konkretisieren: EOM als Absender stärker platzieren. „SEA/Ads Manager bei EOM (Hannover) · 4-Tage-Woche möglich" hebt sich von generischen Jobanzeigen ab.',
                 'Tagesbudget der SEA/Ads-Kampagne um 40% kürzen und freigewordenes Budget in die performante Projektmanager-Kampagne (CPL €38) umschichten, solange der CTR so niedrig ist.',
               ],
               footer: 'Analyse basierend auf EOM-Kampagnendaten · eom.de/jobs',
             },
             {
               icon: 'trending_down',
-              title: 'CTR-Einbruch — AI Automation Engineer',
+              title: 'CTR-Einbruch: AI Automation Engineer',
               summary: '0,8% CTR · 86 Klicks auf €690 Spend · CPL €61',
               tone: 'warning',
-              cause: '„AI Automation Engineer" ist ein sehr junges Berufsbild — Google Ads hat für diesen Begriff noch wenig Suchvolumen in der DACH-Region, was dazu führt, dass die Kampagne auf verwandte, aber unpassende Begriffe ausgesteuert wird (z.B. „Automatisierung Techniker"). Gleichzeitig ist der Begriff für aktive Jobsuchende zu technisch: Kandidaten suchen eher nach „n8n Entwickler Jobs" oder „No-Code Automation Stelle".',
+              cause: '„AI Automation Engineer" ist ein sehr junges Berufsbild. Google Ads hat für diesen Begriff noch wenig Suchvolumen in der DACH-Region, was dazu führt, dass die Kampagne auf verwandte, aber unpassende Begriffe ausgesteuert wird (z.B. „Automatisierung Techniker"). Gleichzeitig ist der Begriff für aktive Jobsuchende zu technisch: Kandidaten suchen eher nach „n8n Entwickler Jobs" oder „No-Code Automation Stelle".',
               actions: [
-                'Keywords auf Tool-spezifische Begriffe ausrichten: „n8n Jobs", „Make Automatisierung Stelle", „AI Tools Spezialist" — so erreicht man genau die Kandidaten, die EOM sucht.',
-                'Google Jobs (organisch) als Ergänzung aktivieren: Stellenanzeige auf eom.de mit korrektem JobPosting-Schema auszeichnen — AI-Stellen performen organisch oft besser als paid für Nischen-Profile.',
-                'Anzeigentext mit konkreten Tools bereichern: „n8n, Make, Zapier täglich" im Titel signalisiert sofort Relevanz — das erhöht die Klickwahrscheinlichkeit bei der richtigen Zielgruppe messbar.',
+                'Keywords auf Tool-spezifische Begriffe ausrichten: „n8n Jobs", „Make Automatisierung Stelle", „AI Tools Spezialist". So erreicht man genau die Kandidaten, die EOM sucht.',
+                'Google Jobs (organisch) als Ergänzung aktivieren: Stellenanzeige auf eom.de mit korrektem JobPosting-Schema auszeichnen. AI-Stellen performen organisch oft besser als paid für Nischen-Profile.',
+                'Anzeigentext mit konkreten Tools bereichern: „n8n, Make, Zapier täglich" im Titel signalisiert sofort Relevanz. Das erhöht die Klickwahrscheinlichkeit bei der richtigen Zielgruppe messbar.',
               ],
               footer: 'Analyse basierend auf EOM-Kampagnendaten · eom.de/jobs',
             },

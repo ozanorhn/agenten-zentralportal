@@ -40,7 +40,7 @@ const PROPOSAL_RESULT: ProposalResult = {
     'Wir freuen uns, Ihnen unser Angebot für die Implementierung einer KI-gestützten Marketing-Automatisierungslösung zu unterbreiten. Basierend auf unserem Gespräch vom 22. April schlagen wir einen modularen Ansatz vor, der Ihre bestehenden Prozesse nahtlos integriert und innerhalb von 8 Wochen produktiv ist. Unser Ziel: 40 % weniger manueller Aufwand im Content-Workflow und messbare Steigerung der Lead-Qualität.',
   scope: [
     {
-      title: 'Phase 1 — Analyse & Strategie',
+      title: 'Phase 1: Analyse & Strategie',
       points: [
         'Prozessanalyse und Ist-Stand-Dokumentation',
         'KI-Potenzialanalyse für bestehende Workflows',
@@ -49,7 +49,7 @@ const PROPOSAL_RESULT: ProposalResult = {
       ],
     },
     {
-      title: 'Phase 2 — Implementierung',
+      title: 'Phase 2: Implementierung',
       points: [
         'Setup KI-Automatisierungsplattform (n8n)',
         'Integration CRM, E-Mail und Content-Tools',
@@ -58,7 +58,7 @@ const PROPOSAL_RESULT: ProposalResult = {
       ],
     },
     {
-      title: 'Phase 3 — Launch & Übergabe',
+      title: 'Phase 3: Launch & Übergabe',
       points: [
         'Go-Live-Begleitung und Monitoring (2 Wochen)',
         'Team-Schulung (2 Sessions à 2 Stunden)',
@@ -69,19 +69,19 @@ const PROPOSAL_RESULT: ProposalResult = {
   ],
   priceItems: [
     {
-      item: 'Phase 1 — Analyse & Strategie',
+      item: 'Phase 1: Analyse & Strategie',
       description: '2 Wochen, inkl. Workshop',
       price: '€ 4.800',
       highlight: false,
     },
     {
-      item: 'Phase 2 — Implementierung',
+      item: 'Phase 2: Implementierung',
       description: '4 Wochen, 5 Workflows',
       price: '€ 12.400',
       highlight: true,
     },
     {
-      item: 'Phase 3 — Launch & Übergabe',
+      item: 'Phase 3: Launch & Übergabe',
       description: '2 Wochen inkl. Schulung',
       price: '€ 3.600',
       highlight: false,

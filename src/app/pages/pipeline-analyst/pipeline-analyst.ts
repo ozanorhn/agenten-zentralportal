@@ -31,7 +31,7 @@ const PIPELINE_RESULTS: PipelineDeal[] = [
     stageTone: 'amber',
     dealValue: '€24.000 / Jahr',
     winScore: 78,
-    riskSignal: 'Kein Kontakt seit 9 Tagen — Momentum sinkt',
+    riskSignal: 'Kein Kontakt seit 9 Tagen. Momentum sinkt.',
     nextAction: 'Follow-up-Anruf heute Nachmittag ansetzen',
     metrics: [
       { label: 'ARR', value: '€24.000' },
@@ -63,7 +63,7 @@ const PIPELINE_RESULTS: PipelineDeal[] = [
     stageTone: 'blue',
     dealValue: '€16.000 / Jahr',
     winScore: 41,
-    riskSignal: 'Budget nicht freigegeben — Q2-Entscheidung offen',
+    riskSignal: 'Budget nicht freigegeben. Q2-Entscheidung offen.',
     nextAction: 'ROI-Kalkulation und Business Case bereitstellen',
     metrics: [
       { label: 'ARR', value: '€16.000' },

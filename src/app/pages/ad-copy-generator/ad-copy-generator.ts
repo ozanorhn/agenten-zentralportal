@@ -46,7 +46,7 @@ const AD_RESULT: AdResult = {
       headline1: 'KI-Planung für Agenturen',
       headline2: '30 % weniger Planungsaufwand',
       headline3: 'Jetzt kostenlos testen',
-      description1: 'Automatisierte Projektplanung mit KI — spart Zeit, reduziert Fehler und hält Ihr Team im Takt.',
+      description1: 'Automatisierte Projektplanung mit KI. Spart Zeit, reduziert Fehler, hält Ihr Team im Takt.',
       description2: 'Speziell für Agenturen entwickelt. Keine Einrichtungskosten. 14 Tage gratis.',
       qualityScore: 9,
     },
@@ -56,7 +56,7 @@ const AD_RESULT: AdResult = {
       headline1: 'Schluss mit Planungschaos',
       headline2: 'KI übernimmt Ihre Planung',
       headline3: 'Demo in 5 Minuten buchen',
-      description1: 'Zu viele Tabs, zu viele Mails, zu wenig Überblick? Unsere KI plant für Sie — automatisch und fehlerfrei.',
+      description1: 'Zu viele Tabs, zu viele Mails, zu wenig Überblick? Unsere KI plant automatisch und fehlerfrei.',
       description2: 'Über 200 Agenturen nutzen bereits unsere Lösung. Testen Sie jetzt kostenlos.',
       qualityScore: 8,
     },
@@ -74,9 +74,9 @@ const AD_RESULT: AdResult = {
   metaAd: {
     format: 'Single Image Ad (Feed)',
     primaryText:
-      'Deine Agentur verliert täglich Stunden durch manuelle Planung — KI macht das in Sekunden. Automatisch priorisiert, immer aktuell, immer im Budget.',
+      'Deine Agentur verliert täglich Stunden durch manuelle Planung. KI macht das in Sekunden. Automatisch priorisiert, immer aktuell, immer im Budget.',
     headline: 'KI-Planung für Agenturen',
-    description: '14 Tage kostenlos testen — keine Kreditkarte',
+    description: '14 Tage kostenlos testen. Keine Kreditkarte.',
     cta: 'Jetzt kostenlos starten',
   },
 };

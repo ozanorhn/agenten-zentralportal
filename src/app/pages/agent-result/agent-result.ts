@@ -450,7 +450,7 @@ export class AgentResult {
   private buildTextVersion(): string {
     const out = this.output();
     if (!out) return '';
-    const lines: string[] = [`=== ${this.agentMeta?.name ?? this.agentId} — Output ===\n`];
+    const lines: string[] = [`=== ${this.agentMeta?.name ?? this.agentId}: Output ===\n`];
 
     switch (out.type) {
       case 'email':

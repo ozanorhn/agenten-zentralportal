@@ -30,7 +30,7 @@ const TODOS_KEY = 'dashboard_todos';
 const DEFAULT_TODOS: TodoItem[] = [
   { id: '1', text: 'SEO-Tagesbericht für heute starten', done: false },
   { id: '2', text: 'Google Ads Audit durchführen (ROAS prüfen)', done: false },
-  { id: '3', text: 'Standort-Analyse für 3 neue Domains', done: false },
+  { id: '3', text: 'GEO-Report für 3 neue Domains erstellen', done: false },
   { id: '4', text: 'Content-Strategie Q2 finalisieren', done: false },
   { id: '5', text: 'Wochenbericht vorbereiten', done: false },
 ];
@@ -90,26 +90,26 @@ export class Dashboard {
     {
       id: 'seo-intelligence-dashboard',
       icon: 'query_stats',
-      benefit: 'Tägliches SEO-Briefing — in unter 2 Minuten',
+      benefit: 'Tägliches SEO-Briefing. In unter 2 Minuten.',
       name: 'SEO-Tagesbericht',
       description:
-        'Aktuelle SEO-Prioritäten, SERP-Bewegungen und klare Maßnahmen für heute. Direkt aus dem Workflow — ohne manuelle Interpretation.',
+        'Aktuelle SEO-Prioritäten, SERP-Bewegungen und klare Maßnahmen für heute. Direkt aus dem Workflow, ohne manuelle Interpretation.',
     },
     {
-      id: 'seo-geo-analyse-assistent',
+      id: 'seo-geo-analyse-assistent-nollm',
       icon: 'forum',
-      benefit: 'Vollständiger SEO-Score für jede Domain',
-      name: 'SEO- & Standort-Analyse',
+      benefit: 'GEO-Report für jede Domain. Strukturiert und verwertbar.',
+      name: 'GEO-Report',
       description:
-        'URL, Branche und Standort eingeben — strukturierten Sichtbarkeits-Report mit GEO-Anteil und lokaler Einordnung erhalten.',
+        'URL, Marke und Branche eingeben. Vollständigen Sichtbarkeits-Report mit GEO-Anteil und konkreten Quick Wins direkt im Portal erhalten.',
     },
     {
       id: 'ad-copy-generator',
       icon: 'campaign',
-      benefit: 'Google Ads & Meta Ads — sofort testbereit',
-      name: 'Werbetext-Ersteller',
+      benefit: 'Ad-Copy für Google & Meta. Sofort testbereit.',
+      name: 'Ad-Copy',
       description:
-        'Drei Anzeigen-Varianten mit Tonalitätslabel und Quality Score. Copy-paste in Ihr Konto — keine Nachbearbeitung nötig.',
+        'Drei Anzeigen-Varianten mit Tonalitätslabel und Quality Score. Copy-paste in dein Konto, keine Nachbearbeitung nötig.',
     },
   ];
 

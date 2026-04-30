@@ -5,16 +5,22 @@
 
     <!-- Logo strip — white, width tracks sidebar -->
     <div
-      class="shell-logo-strip hidden md:flex items-center px-5 flex-shrink-0 overflow-hidden
+      class="shell-logo-strip hidden md:flex items-center flex-shrink-0 overflow-hidden
              transition-[width] duration-300"
+      [class.justify-start]="!sidebarCollapsed()"
+      [class.justify-center]="sidebarCollapsed()"
+      [class.px-5]="!sidebarCollapsed()"
+      [class.px-2]="sidebarCollapsed()"
       [class.w-64]="!sidebarCollapsed()"
       [class.w-16]="sidebarCollapsed()"
     >
-      @if (!sidebarCollapsed()) {
-        <a routerLink="/dashboard" class="shell-brand brand-title flex items-baseline">
+      <a routerLink="/dashboard" class="shell-brand brand-title flex items-baseline whitespace-nowrap">
+        @if (!sidebarCollapsed()) {
           <span class="font-headline font-bold text-[1.5rem] lowercase">arcnode</span>&nbsp;<span class="font-headline font-bold text-[1.5rem] capitalize">OS</span>
-        </a>
-      }
+        } @else {
+          <span class="font-headline font-bold text-[1.5rem] uppercase">OS</span>
+        }
+      </a>
     </div>
 
     <!-- Actions strip -->
@@ -25,20 +31,6 @@
       </a>
 
       <div class="flex items-center gap-1 ml-auto">
-        <!-- Theme Toggle -->
-        <button
-          (click)="theme.toggle()"
-          class="shell-action-btn transition-all duration-150 p-2 rounded-lg"
-          [title]="theme.isDark() ? 'Hell-Modus aktivieren' : 'Dunkel-Modus aktivieren'"
-          [attr.aria-label]="theme.isDark() ? 'Hell-Modus aktivieren' : 'Dunkel-Modus aktivieren'"
-        >
-          @if (theme.isDark()) {
-            <span class="shell-icon material-symbols-outlined text-xl">light_mode</span>
-          } @else {
-            <span class="shell-icon material-symbols-outlined text-xl">dark_mode</span>
-          }
-        </button>
-
         <!-- Notification Bell -->
         <div class="relative">
           <button
@@ -78,7 +70,7 @@
     [class.sidebar-collapsed]="sidebarCollapsed()"
   >
     <!-- Toggle button -->
-    <div class="flex py-2 px-2" [class.justify-end]="!sidebarCollapsed()" [class.justify-center]="sidebarCollapsed()">
+    <div class="flex px-2 py-1.5" [class.justify-end]="!sidebarCollapsed()" [class.justify-center]="sidebarCollapsed()">
       <button
         (click)="toggleSidebar()"
         class="shell-sidebar-toggle w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-150"
@@ -91,54 +83,80 @@
       </button>
     </div>
 
-    <!-- Scrollable nav -->
-    <div class="flex-1 overflow-y-auto overflow-x-hidden py-4"
+    <div class="flex-1 overflow-hidden py-2.5"
          [class.px-3]="!sidebarCollapsed()"
          [class.px-2]="sidebarCollapsed()">
       @for (section of navSections; track section.label) {
-        <div class="mb-4">
-          @if (sidebarCollapsed()) {
+        <div class="mb-3">
+          @if (!sidebarCollapsed()) {
+            @if (section.collapsible) {
+              <button
+                type="button"
+                class="shell-section-toggle mb-1.5 flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-left transition-all duration-150"
+                (click)="toggleSection(section.label)"
+                [attr.aria-expanded]="!isSectionCollapsed(section.label)"
+              >
+                <span class="shell-section-label text-[11px] font-semibold uppercase tracking-[0.22em]">
+                  {{ section.label }}
+                </span>
+                <span
+                  class="shell-section-label material-symbols-outlined text-base transition-transform duration-200"
+                  [class.rotate-180]="isSectionCollapsed(section.label)"
+                >
+                  expand_more
+                </span>
+              </button>
+            } @else {
+              <div class="mb-1.5 px-3 py-1.5">
+                <span class="shell-section-label text-[11px] font-semibold uppercase tracking-[0.22em]">
+                  {{ section.label }}
+                </span>
+              </div>
+            }
+          } @else {
             <div class="shell-divider border-t my-2 mx-1"></div>
           }
-          <nav class="space-y-0.5">
-            @for (item of section.items; track item.route + item.label) {
-              @if (item.queryParams) {
-                <a
-                  [routerLink]="item.route"
-                  [queryParams]="item.queryParams"
-                  [class.nav-category-active]="isCategoryActive(item.queryParams['category'])"
-                  [class]="navItemClass()"
-                  (mouseenter)="showTooltip($event, item.label)"
-                  (mouseleave)="hideTooltip()"
-                >
-                  <span class="material-symbols-outlined flex-shrink-0">{{ item.icon }}</span>
-                  @if (!sidebarCollapsed()) {
-                    <span>{{ item.label }}</span>
-                  }
-                </a>
-              } @else {
-                <a
-                  [routerLink]="item.route"
-                  [routerLinkActive]="'text-primary bg-primary/10'"
-                  [routerLinkActiveOptions]="{ exact: false }"
-                  [class]="navItemClass()"
-                  (mouseenter)="showTooltip($event, item.label)"
-                  (mouseleave)="hideTooltip()"
-                >
-                  <span class="material-symbols-outlined flex-shrink-0">{{ item.icon }}</span>
-                  @if (!sidebarCollapsed()) {
-                    <span>{{ item.label }}</span>
-                  }
-                </a>
+          @if (sidebarCollapsed() || !section.collapsible || !isSectionCollapsed(section.label)) {
+            <nav class="space-y-0.5">
+              @for (item of section.items; track item.route + item.label) {
+                @if (item.queryParams) {
+                  <a
+                    [routerLink]="item.route"
+                    [queryParams]="item.queryParams"
+                    [class.nav-category-active]="isCategoryActive(item.queryParams['category'])"
+                    [class]="navItemClass()"
+                    (mouseenter)="showTooltip($event, item.label)"
+                    (mouseleave)="hideTooltip()"
+                  >
+                    <span class="material-symbols-outlined flex-shrink-0">{{ item.icon }}</span>
+                    @if (!sidebarCollapsed()) {
+                      <span>{{ item.label }}</span>
+                    }
+                  </a>
+                } @else {
+                  <a
+                    [routerLink]="item.route"
+                    [routerLinkActive]="'text-primary bg-primary/10'"
+                    [routerLinkActiveOptions]="{ exact: false }"
+                    [class]="navItemClass()"
+                    (mouseenter)="showTooltip($event, item.label)"
+                    (mouseleave)="hideTooltip()"
+                  >
+                    <span class="material-symbols-outlined flex-shrink-0">{{ item.icon }}</span>
+                    @if (!sidebarCollapsed()) {
+                      <span>{{ item.label }}</span>
+                    }
+                  </a>
+                }
               }
-            }
-          </nav>
+            </nav>
+          }
         </div>
       }
     </div>
 
     <!-- Bottom links -->
-    <div class="shell-bottom-links border-t py-4 space-y-1"
+    <div class="shell-bottom-links border-t py-2.5 space-y-0.5"
          [class.px-3]="!sidebarCollapsed()"
          [class.px-2]="sidebarCollapsed()">
       <a href="#"
