@@ -112,9 +112,9 @@ export class InterneVerlinkungVorschlaegeComponent {
   }
 
   fillExample(): void {
-    this.sitemapUrl = 'https://www.sistrix.de/sitemap.xml';
-    this.targetUrl = 'https://www.sistrix.de/ratgeber/seo/';
-    this.mainKeyword = 'seo software';
+    this.sitemapUrl = 'https://www.arcnode.de/sitemap.xml';
+    this.targetUrl = 'https://www.arcnode.de/systeme';
+    this.mainKeyword = 'KI Marketing';
     this.errorMessage.set('');
   }
 

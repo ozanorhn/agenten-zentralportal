@@ -21,7 +21,7 @@
   @if (state() === 'loading') {
     <div class="flex flex-col items-center justify-center py-24 gap-4">
       <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 animate-spin">progress_activity</span>
-      <p class="text-sm text-on-surface-variant/50">Daten werden aus Google Sheets geladen…</p>
+      <p class="text-sm text-on-surface-variant/50">Daten werden geladen…</p>
     </div>
   }
 
@@ -29,7 +29,7 @@
   @if (state() === 'error') {
     <div class="flex flex-col items-center justify-center py-24 gap-4 text-center">
       <div class="w-14 h-14 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-        <span class="material-symbols-outlined text-red-400 text-2xl" style="font-variation-settings:'FILL' 1">error</span>
+        <span class="material-symbols-outlined text-red-600 text-2xl" style="font-variation-settings:'FILL' 1">error</span>
       </div>
       <div>
         <h3 class="text-base font-semibold text-on-surface mb-1">Daten konnten nicht geladen werden</h3>
@@ -75,8 +75,8 @@
         <span
           class="inline-block text-xs font-semibold px-2 py-0.5 rounded-full"
           [ngClass]="{
-            'bg-emerald-500/10 text-emerald-400': kpiExecChange().cls === 'up',
-            'bg-red-500/10 text-red-400': kpiExecChange().cls === 'down',
+            'bg-emerald-500/10 text-emerald-600': kpiExecChange().cls === 'up',
+            'bg-red-500/10 text-red-600': kpiExecChange().cls === 'down',
             'bg-surface-container-high text-on-surface-variant/40': kpiExecChange().cls === 'neutral'
           }"
         >{{ kpiExecChange().label }}</span>
@@ -89,8 +89,8 @@
         <span
           class="inline-block text-xs font-semibold px-2 py-0.5 rounded-full"
           [ngClass]="{
-            'bg-emerald-500/10 text-emerald-400': kpiTimeChange().cls === 'up',
-            'bg-red-500/10 text-red-400': kpiTimeChange().cls === 'down',
+            'bg-emerald-500/10 text-emerald-600': kpiTimeChange().cls === 'up',
+            'bg-red-500/10 text-red-600': kpiTimeChange().cls === 'down',
             'bg-surface-container-high text-on-surface-variant/40': kpiTimeChange().cls === 'neutral'
           }"
         >{{ kpiTimeChange().label }}</span>
@@ -103,8 +103,8 @@
         <span
           class="inline-block text-xs font-semibold px-2 py-0.5 rounded-full"
           [ngClass]="{
-            'bg-emerald-500/10 text-emerald-400': kpiValueChange().cls === 'up',
-            'bg-red-500/10 text-red-400': kpiValueChange().cls === 'down',
+            'bg-emerald-500/10 text-emerald-600': kpiValueChange().cls === 'up',
+            'bg-red-500/10 text-red-600': kpiValueChange().cls === 'down',
             'bg-surface-container-high text-on-surface-variant/40': kpiValueChange().cls === 'neutral'
           }"
         >{{ kpiValueChange().label }}</span>
@@ -117,8 +117,8 @@
         <span
           class="inline-block text-xs font-semibold px-2 py-0.5 rounded-full"
           [ngClass]="{
-            'bg-emerald-500/10 text-emerald-400': kpiAvgChange().cls === 'up',
-            'bg-red-500/10 text-red-400': kpiAvgChange().cls === 'down',
+            'bg-emerald-500/10 text-emerald-600': kpiAvgChange().cls === 'up',
+            'bg-red-500/10 text-red-600': kpiAvgChange().cls === 'down',
             'bg-surface-container-high text-on-surface-variant/40': kpiAvgChange().cls === 'neutral'
           }"
         >{{ kpiAvgChange().label }}</span>

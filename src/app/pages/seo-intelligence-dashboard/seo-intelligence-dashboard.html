@@ -47,7 +47,7 @@
         </div>
 
         @if (state() === 'error') {
-          <p class="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2 w-full text-left break-all">{{ errorMsg() }}</p>
+          <p class="text-xs text-red-600 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2 w-full text-left break-all">{{ errorMsg() }}</p>
         }
 
         <button
@@ -83,7 +83,7 @@
             Aktuelle Maßnahmen · {{ responseItems().length }} URLs
           </p>
           <div class="flex gap-2">
-            <span class="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold">
+            <span class="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 text-xs font-bold">
               {{ ctrCount }}× CTR
             </span>
             <span class="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold">
@@ -111,14 +111,14 @@
                   </span>
                   <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider"
                         [ngClass]="item.fokus === 'CTR'
-                          ? 'bg-amber-500/15 text-amber-400 border border-amber-500/20'
+                          ? 'bg-amber-500/15 text-amber-600 border border-amber-500/20'
                           : 'bg-primary/15 text-primary border border-primary/20'">
                     {{ item.fokus }}
                   </span>
                   <span class="px-2 py-0.5 rounded-full text-[10px] font-bold"
                         [ngClass]="item.prioritaet === 10
-                          ? 'bg-red-500/10 text-red-400 border border-red-500/15'
-                          : 'bg-amber-500/10 text-amber-400 border border-amber-500/15'">
+                          ? 'bg-red-500/10 text-red-600 border border-red-500/15'
+                          : 'bg-amber-500/10 text-amber-600 border border-amber-500/15'">
                     Prio {{ item.prioritaet }}
                   </span>
                   <a [href]="item.url" target="_blank" rel="noopener"
@@ -133,7 +133,7 @@
 
                 <!-- Empfehlung -->
                 <p class="text-xs leading-relaxed mt-auto"
-                   [ngClass]="item.fokus === 'CTR' ? 'text-amber-400/80' : 'text-primary/80'">
+                   [ngClass]="item.fokus === 'CTR' ? 'text-amber-600/80' : 'text-primary/80'">
                   <span class="material-symbols-outlined text-[11px] align-middle mr-0.5" style="font-variation-settings:'FILL' 1">lightbulb</span>
                   {{ item.empfehlung }}
                 </p>

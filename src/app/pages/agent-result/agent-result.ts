@@ -304,32 +304,32 @@ export class AgentResult {
   }
 
   getScoreColor(score: number): string {
-    if (score >= 80) return 'text-emerald-400';
-    if (score >= 65) return 'text-amber-400';
-    return 'text-red-400';
+    if (score >= 80) return 'text-emerald-600';
+    if (score >= 65) return 'text-amber-600';
+    return 'text-red-600';
   }
 
   getStatusColor(status: string): string {
     switch (status) {
-      case 'Hot': return 'bg-red-500/20 text-red-300 border-red-500/30';
-      case 'Warm': return 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+      case 'Hot': return 'bg-red-500/20 text-red-600 border-red-500/30';
+      case 'Warm': return 'bg-amber-500/20 text-amber-600 border-amber-500/30';
       default: return 'bg-surface-container-high text-on-surface-variant border-outline-variant/30';
     }
   }
 
   getOpportunityColor(opp: string): string {
     switch (opp) {
-      case 'Hoch': return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
-      case 'Mittel': return 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+      case 'Hoch': return 'bg-emerald-500/20 text-emerald-700 border-emerald-500/30';
+      case 'Mittel': return 'bg-amber-500/20 text-amber-600 border-amber-500/30';
       default: return 'bg-surface-container-high text-on-surface-variant border-outline-variant/30';
     }
   }
 
   getSyncStatusColor(status: string): string {
     switch (status) {
-      case 'success': return 'text-emerald-400';
-      case 'error': return 'text-red-400';
-      default: return 'text-amber-400';
+      case 'success': return 'text-emerald-600';
+      case 'error': return 'text-red-600';
+      default: return 'text-amber-600';
     }
   }
 
@@ -383,20 +383,20 @@ export class AgentResult {
 
   getGeoStatusBadgeClass(botStatus: GeoAuditBotStatus): string {
     if (botStatus.cloudflareBlocksAll) {
-      return 'bg-red-500/15 text-red-300 border-red-500/30';
+      return 'bg-red-500/15 text-red-600 border-red-500/30';
     }
 
     if (botStatus.firewallBlocked) {
-      return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+      return 'bg-amber-500/15 text-amber-600 border-amber-500/30';
     }
 
-    return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+    return 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
   }
 
   getGeoScoreBadgeClass(score: number): string {
-    if (score >= 85) return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
-    if (score >= 70) return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
-    return 'bg-red-500/15 text-red-300 border-red-500/30';
+    if (score >= 85) return 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
+    if (score >= 70) return 'bg-amber-500/15 text-amber-600 border-amber-500/30';
+    return 'bg-red-500/15 text-red-600 border-red-500/30';
   }
 
   getGeoToneFillClass(tone: GeoAuditDistributionItem['tone']): string {
@@ -421,26 +421,26 @@ export class AgentResult {
 
   getBlogScoreBadgeClass(score: number | null): string {
     if (score === null) return 'bg-surface-container-high text-on-surface-variant border-outline-variant/30';
-    if (score >= 85) return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
-    if (score >= 70) return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
-    return 'bg-red-500/15 text-red-300 border-red-500/30';
+    if (score >= 85) return 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
+    if (score >= 70) return 'bg-amber-500/15 text-amber-600 border-amber-500/30';
+    return 'bg-red-500/15 text-red-600 border-red-500/30';
   }
 
   getBlogVerdictBadgeClass(verdict?: string): string {
     const normalized = verdict?.toLowerCase() ?? '';
     if (normalized.includes('freigegeben') || normalized.includes('stark')) {
-      return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+      return 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
     }
 
     if (normalized.includes('korrektur') || normalized.includes('ueberarbeiten')) {
-      return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+      return 'bg-amber-500/15 text-amber-600 border-amber-500/30';
     }
 
     if (normalized.includes('kritisch') || normalized.includes('ablehnen')) {
-      return 'bg-red-500/15 text-red-300 border-red-500/30';
+      return 'bg-red-500/15 text-red-600 border-red-500/30';
     }
 
-    return 'bg-[#0070FF]/15 text-[#7DB4FF] border-[#0070FF]/30';
+    return 'bg-[#0070FF]/15 text-primary border-[#0070FF]/30';
   }
 
   formatSerpHost(url: string): string {
@@ -864,26 +864,26 @@ export class AgentResult {
 
   getKdColor(kd: number | null): string {
     if (kd === null) return 'text-on-surface-variant';
-    if (kd <= 20) return 'text-emerald-400';
-    if (kd <= 49) return 'text-amber-400';
-    return 'text-red-400';
+    if (kd <= 20) return 'text-emerald-600';
+    if (kd <= 49) return 'text-amber-600';
+    return 'text-red-600';
   }
 
   getKdBg(kd: number | null): string {
     if (kd === null) return 'bg-surface-container-high text-on-surface-variant border-outline-variant/30';
-    if (kd <= 20) return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
-    if (kd <= 49) return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
-    return 'bg-red-500/15 text-red-300 border-red-500/30';
+    if (kd <= 20) return 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
+    if (kd <= 49) return 'bg-amber-500/15 text-amber-600 border-amber-500/30';
+    return 'bg-red-500/15 text-red-600 border-red-500/30';
   }
 
   getIntentBadgeClass(intent: string): string {
     switch (intent) {
       case 'commercial':
-        return 'bg-[#0070FF]/15 text-[#7DB4FF] border-[#0070FF]/30';
+        return 'bg-[#0070FF]/15 text-primary border-[#0070FF]/30';
       case 'transactional':
         return 'bg-violet-500/15 text-violet-300 border-violet-500/30';
       case 'informational':
-        return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+        return 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
       default:
         return 'bg-surface-container-high text-on-surface-variant border-outline-variant/30';
     }
@@ -905,11 +905,11 @@ export class AgentResult {
   getIntentIconColor(intent: string): string {
     switch (intent) {
       case 'commercial':
-        return 'text-[#7DB4FF]';
+        return 'text-primary';
       case 'transactional':
         return 'text-violet-300';
       case 'informational':
-        return 'text-emerald-300';
+        return 'text-emerald-700';
       default:
         return 'text-on-surface-variant';
     }
@@ -944,11 +944,11 @@ export class AgentResult {
   getGoogleAdsFindingBadgeClass(tone: GoogleAdsAuditFindingTone): string {
     switch (tone) {
       case 'critical':
-        return 'bg-red-500/15 text-red-300 border-red-500/30';
+        return 'bg-red-500/15 text-red-600 border-red-500/30';
       case 'warning':
-        return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+        return 'bg-amber-500/15 text-amber-600 border-amber-500/30';
       default:
-        return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+        return 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
     }
   }
 
@@ -964,30 +964,30 @@ export class AgentResult {
   }
 
   getGoogleAdsSectionScoreClass(score: number): string {
-    if (score >= 70) return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
-    if (score >= 60) return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
-    return 'bg-red-500/15 text-red-300 border-red-500/30';
+    if (score >= 70) return 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
+    if (score >= 60) return 'bg-amber-500/15 text-amber-600 border-amber-500/30';
+    return 'bg-red-500/15 text-red-600 border-red-500/30';
   }
 
   getGoogleAdsActionEffortClass(effort: GoogleAdsAuditAction['effort']): string {
     switch (effort) {
       case 'Niedrig':
-        return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+        return 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
       case 'Mittel':
-        return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+        return 'bg-amber-500/15 text-amber-600 border-amber-500/30';
       default:
-        return 'bg-red-500/15 text-red-300 border-red-500/30';
+        return 'bg-red-500/15 text-red-600 border-red-500/30';
     }
   }
 
   getGoogleAdsActionLeverageClass(leverage: GoogleAdsAuditAction['leverage']): string {
     switch (leverage) {
       case 'Sehr hoch':
-        return 'text-red-300';
+        return 'text-red-600';
       case 'Hoch':
-        return 'text-amber-300';
+        return 'text-amber-600';
       case 'Mittel':
-        return 'text-[#7DB4FF]';
+        return 'text-primary';
       default:
         return 'text-on-surface-variant';
     }
@@ -996,24 +996,24 @@ export class AgentResult {
   getAdsHealthToneClass(tone: AdsHealthTone): string {
     switch (tone) {
       case 'critical':
-        return 'bg-red-500/15 text-red-300 border-red-500/30';
+        return 'bg-red-500/15 text-red-600 border-red-500/30';
       case 'warning':
-        return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+        return 'bg-amber-500/15 text-amber-600 border-amber-500/30';
       case 'good':
-        return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+        return 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
       default:
-        return 'bg-[#0070FF]/10 text-[#7DB4FF] border-[#0070FF]/20';
+        return 'bg-[#0070FF]/10 text-primary border-[#0070FF]/20';
     }
   }
 
   getAdsHealthMetricValueClass(tone: AdsHealthMetric['tone']): string {
     switch (tone) {
       case 'critical':
-        return 'text-red-300';
+        return 'text-red-600';
       case 'warning':
-        return 'text-amber-300';
+        return 'text-amber-600';
       case 'good':
-        return 'text-emerald-300';
+        return 'text-emerald-700';
       default:
         return 'text-on-surface';
     }
@@ -1022,11 +1022,11 @@ export class AgentResult {
   getAdsHealthDeltaClass(tone: AdsHealthMetric['tone']): string {
     switch (tone) {
       case 'critical':
-        return 'text-red-300';
+        return 'text-red-600';
       case 'warning':
-        return 'text-amber-300';
+        return 'text-amber-600';
       case 'good':
-        return 'text-emerald-300';
+        return 'text-emerald-700';
       default:
         return 'text-on-surface-variant';
     }
@@ -1052,11 +1052,11 @@ export class AgentResult {
   getAdsHealthTrendClass(trend?: AdsHealthCampaignRow['spendTrend']): string {
     switch (trend) {
       case 'up':
-        return 'text-red-300';
+        return 'text-red-600';
       case 'down':
-        return 'text-amber-300';
+        return 'text-amber-600';
       case 'steady':
-        return 'text-emerald-300';
+        return 'text-emerald-700';
       default:
         return 'text-on-surface-variant';
     }
@@ -1077,7 +1077,7 @@ export class AgentResult {
 
   getAdsHealthChannelBadgeClass(channelKey: 'google' | 'meta'): string {
     return channelKey === 'google'
-      ? 'bg-[#0070FF]/15 text-[#7DB4FF] border-[#0070FF]/30'
+      ? 'bg-[#0070FF]/15 text-primary border-[#0070FF]/30'
       : 'bg-sky-500/15 text-sky-300 border-sky-500/30';
   }
 

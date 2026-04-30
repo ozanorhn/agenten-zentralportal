@@ -2,13 +2,13 @@ import { Injectable, signal } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  private readonly _isDark = signal(true);
+  private readonly _isDark = signal(false);
 
   readonly isDark = this._isDark.asReadonly();
 
   constructor() {
     const saved = localStorage.getItem('theme');
-    const startDark = saved ? saved === 'dark' : true;
+    const startDark = saved ? saved === 'dark' : false;
     this._isDark.set(startDark);
     this.applyClass(startDark);
   }

@@ -1,34 +1,26 @@
-// Agent detail styles
-
 :host {
   display: block;
 }
 
 .agent-workspace {
-  background:
-    radial-gradient(circle at top right, rgba(59, 130, 246, 0.12), transparent 24%),
-    linear-gradient(180deg, rgba(8, 12, 24, 0.98), rgba(12, 17, 29, 0.98));
+  background: #f6f9fc;
 }
 
 .agent-sidebar {
-  background:
-    linear-gradient(180deg, rgba(17, 24, 39, 0.94), rgba(12, 17, 29, 0.98)),
-    radial-gradient(circle at top left, rgba(59, 130, 246, 0.1), transparent 28%);
+  background: #ffffff;
 }
 
 .agent-canvas {
-  background:
-    radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 22%),
-    linear-gradient(180deg, rgba(12, 17, 29, 0.92), rgba(17, 24, 39, 0.94));
+  background: #f6f9fc;
 }
 
 .agent-preview-card {
-  background: linear-gradient(180deg, rgba(17, 24, 39, 0.82), rgba(12, 17, 29, 0.92));
-  box-shadow:
-    0 24px 80px rgba(8, 12, 24, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  background: #ffffff;
+  border: 1px solid #e3e8ee;
+  box-shadow: 0 2px 4px rgba(10, 37, 64, 0.04);
 }
 
 .agent-tip-card {
-  background: linear-gradient(180deg, rgba(17, 24, 39, 0.82), rgba(12, 17, 29, 0.88));
+  background: #ffffff;
+  border: 1px solid #e3e8ee;
 }

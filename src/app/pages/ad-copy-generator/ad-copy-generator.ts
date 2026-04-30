@@ -126,16 +126,16 @@ export class AdCopyGeneratorComponent implements OnDestroy {
   }
 
   getQualityScoreClass(score: number): string {
-    if (score >= 9) return 'text-emerald-400';
-    if (score >= 7) return 'text-amber-400';
-    return 'text-orange-400';
+    if (score >= 9) return 'text-emerald-700';
+    if (score >= 7) return 'text-amber-700';
+    return 'text-orange-700';
   }
 
   getToneBadge(tone: string): string {
     const map: Record<string, string> = {
-      benefit: 'border border-sky-400/20 bg-sky-400/10 text-sky-300',
-      pain: 'border border-rose-400/20 bg-rose-400/10 text-rose-300',
-      social: 'border border-violet-400/20 bg-violet-400/10 text-violet-300',
+      benefit: 'border border-sky-400/20 bg-sky-400/10 text-sky-700',
+      pain: 'border border-rose-400/20 bg-rose-400/10 text-rose-700',
+      social: 'border border-violet-400/20 bg-violet-400/10 text-violet-700',
     };
     return map[tone] ?? '';
   }

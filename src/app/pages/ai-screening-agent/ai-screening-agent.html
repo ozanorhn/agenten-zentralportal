@@ -50,7 +50,7 @@
     </div>
 
     <div class="space-y-6">
-      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+      <div class="rounded-[1.5rem] border border-outline-variant/20 bg-surface-container-low p-5">
         <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Demo-Start</p>
         <div class="rounded-[1.25rem] border border-primary/20 bg-surface-container-high/60 px-5 py-6">
           <div class="mb-3 flex items-center gap-3">
@@ -65,7 +65,7 @@
         </div>
       </div>
 
-      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+      <div class="rounded-[1.5rem] border border-outline-variant/20 bg-surface-container-low p-5">
         <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Zielrollen</p>
         <div class="flex flex-wrap gap-2">
           @for (role of ['Projektmanager (m/w/d)', 'SEO & GEO-Manager (m/w/d)', 'AI Automation Engineer (m/w/d)', 'Web-Analytics Specialist (m/w/d)', 'SEA- / Ads-Manager (m/w/d)']; track role) {
@@ -90,7 +90,7 @@
       <div class="mx-auto max-w-6xl">
         <div class="hero-panel mb-8 rounded-[2rem] p-8 md:p-10">
           <div class="mb-4 flex items-center gap-3">
-            <span class="rounded-full border border-emerald-400/15 bg-emerald-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">
+            <span class="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700">
               Recruiting Demo
             </span>
             <span class="text-[10px] font-bold uppercase tracking-[0.18em] text-outline">5-Sekunden Analysefenster</span>
@@ -137,7 +137,7 @@
             <span class="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
               Analyse abgeschlossen
             </span>
-            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-on-surface-variant">
+            <span class="rounded-full border border-outline-variant/20 bg-surface-container-high px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-on-surface-variant">
               Demo-Auswertung
             </span>
           </div>
@@ -176,7 +176,7 @@
                     {{ role.title }}
                   </h3>
                 </div>
-                <span class="rounded-full border border-cyan-300/15 bg-cyan-300/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-200">
+                <span class="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-700">
                   3 Kandidat:innen
                 </span>
               </div>
@@ -205,7 +205,7 @@
 
                     <div class="flex flex-wrap gap-2">
                       @for (strength of candidate.strengths; track strength) {
-                        <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-on-surface-variant">
+                        <span class="rounded-full border border-outline-variant/20 bg-surface-container-high px-3 py-1 text-xs text-on-surface-variant">
                           {{ strength }}
                         </span>
                       }

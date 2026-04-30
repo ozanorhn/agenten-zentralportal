@@ -134,19 +134,19 @@ export class Dashboard implements OnInit, OnDestroy {
       label: 'Content',
       icon: 'edit_note',
       description: 'Social Posts, Blog-Artikel, Produkttexte und Short-Form-Video.',
-      ids: ['linkedin-ghostwriter', 'blog-redakteur', 'social-media-wizard', 'script-savant'],
+      ids: ['linkedin-ghostwriter', 'blog-redakteur', 'produkttext-agent', 'csv-produkttext-agent', 'social-media-wizard', 'script-savant'],
     },
     {
       label: 'SEO / GEO',
       icon: 'manage_search',
       description: 'Sichtbarkeit, SERP-Analyse, Content-Strategie und KI-Optimierung.',
-      ids: ['seo-intelligence-dashboard', 'top-ranker-bot', 'content-strategy-bot', 'omr-seo-content-strategie', 'seo-geo-analyse-assistent', 'geo-site-audit', 'interne-verlinkung-vorschlaege', 'content-seo-analyzer'],
+      ids: ['seo-intelligence-dashboard', 'top-ranker-bot', 'content-strategy-bot', 'omr-seo-content-strategie', 'seo-geo-analyse-assistent', 'seo-geo-analyse-assistent-nollm', 'geo-report-alternative', 'geo-site-audit', 'interne-verlinkung-vorschlaege', 'content-seo-analyzer'],
     },
     {
       label: 'Ads',
       icon: 'ads_click',
       description: 'Google-Ads-Audits mit Fokus auf Kontostruktur, Tracking und direkte Effizienzhebel.',
-      ids: ['google-ads-audit', 'ads-health-checker'],
+      ids: ['ad-copy-generator', 'google-ads-audit', 'ads-health-checker'],
     },
   ];
 

@@ -34,7 +34,7 @@
     </a>
 
     <div class="mb-8">
-      <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-300">
+      <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-700">
         <span class="h-2 w-2 rounded-full bg-cyan-400"></span>
         Data Demo-Agent
       </div>
@@ -48,7 +48,7 @@
     </div>
 
     <div class="space-y-6">
-      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+      <div class="rounded-[1.5rem] border border-outline-variant/20 bg-surface-container-low p-5">
         <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Use Case</p>
         <div class="rounded-[1.25rem] border border-cyan-400/20 bg-surface-container-high/60 px-5 py-6">
           <div class="mb-3 flex items-center gap-3">
@@ -63,7 +63,7 @@
         </div>
       </div>
 
-      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+      <div class="rounded-[1.5rem] border border-outline-variant/20 bg-surface-container-low p-5">
         <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Output</p>
         <div class="flex flex-wrap gap-2">
           @for (item of ['Tagesordnung', 'Beschlüsse', 'Action Items', 'Deadlines']; track item) {
@@ -88,7 +88,7 @@
       <div class="mx-auto max-w-4xl">
         <div class="hero-panel mb-8 rounded-[2rem] p-8 md:p-10">
           <div class="mb-4 flex items-center gap-3">
-            <span class="rounded-full border border-cyan-400/15 bg-cyan-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-300">
+            <span class="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-700">
               Data Operations
             </span>
             <span class="text-[10px] font-bold uppercase tracking-[0.18em] text-outline">Automatisches Protokoll in 5 Sekunden</span>
@@ -133,10 +133,10 @@
           <!-- Header -->
           <div class="hero-panel rounded-[2rem] p-8">
             <div class="mb-4 flex flex-wrap items-center gap-3">
-              <span class="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-300">
+              <span class="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-700">
                 Protokoll erstellt
               </span>
-              <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-on-surface-variant">
+              <span class="rounded-full border border-outline-variant/20 bg-surface-container-high px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-on-surface-variant">
                 {{ r.actionItems.length }} Action Items
               </span>
             </div>
@@ -164,7 +164,7 @@
               <div class="space-y-3">
                 @for (person of r.attendees; track person.name) {
                   <div class="flex items-center gap-3">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-bold text-cyan-300">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-bold text-cyan-700">
                       {{ person.name.charAt(0) }}
                     </div>
                     <div>
@@ -181,7 +181,7 @@
               <ol class="space-y-2">
                 @for (item of r.agendaItems; track item; let i = $index) {
                   <li class="flex items-start gap-3 text-sm text-on-surface">
-                    <span class="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-[10px] font-bold text-cyan-300">
+                    <span class="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-[10px] font-bold text-cyan-700">
                       {{ i + 1 }}
                     </span>
                     {{ item }}
@@ -201,7 +201,7 @@
             <div class="space-y-3">
               @for (decision of r.decisions; track decision; let i = $index) {
                 <div class="decision-item flex items-start gap-4 rounded-[1rem] px-4 py-3">
-                  <span class="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-teal-400/20 text-[10px] font-bold text-teal-300">
+                  <span class="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-teal-400/20 text-[10px] font-bold text-teal-700">
                     ✓
                   </span>
                   <p class="text-sm text-on-surface">{{ decision }}</p>

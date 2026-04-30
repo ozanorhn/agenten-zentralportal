@@ -56,34 +56,30 @@
       @if (adsHealthCheckerOutput(); as health) {
         <div class="space-y-8 ads-health-checker-view">
           <section class="glass-panel border border-outline-variant/20 rounded-[2rem] overflow-hidden">
-            <div class="p-6 md:p-8 lg:p-10 space-y-8"
-                 style="background:
-                   radial-gradient(circle at top left, rgba(0, 112, 255, 0.16), transparent 30%),
-                   radial-gradient(circle at 85% 10%, rgba(56, 189, 248, 0.12), transparent 22%),
-                   linear-gradient(180deg, rgba(17, 22, 31, 0.99), rgba(19, 24, 32, 0.99));">
+            <div class="p-6 md:p-8 lg:p-10 space-y-8 bg-white border-b border-[#e3e8ee]">
               <div class="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
                 <div class="flex items-start gap-4">
-                  <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-900 shadow-[0_8px_24px_rgba(255,255,255,0.12)]">
+                  <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f6f9fc] border border-[#e3e8ee] text-[#0a2540]">
                     <span class="text-2xl font-black tracking-tight">{{ health.brand }}</span>
                   </div>
                   <div class="space-y-2">
-                    <h1 class="text-2xl md:text-4xl font-headline font-black tracking-tight text-white">{{ health.title }}</h1>
+                    <h1 class="text-2xl md:text-4xl font-headline font-black tracking-tight text-on-surface">{{ health.title }}</h1>
                     <p class="text-sm md:text-base text-on-surface-variant">{{ health.subtitle }}</p>
                   </div>
                 </div>
 
                 <div class="grid gap-3 sm:grid-cols-3">
-                  <div class="rounded-2xl border border-outline-variant/20 bg-surface/45 px-4 py-3">
-                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Zeitraum</p>
+                  <div class="rounded-2xl border border-[#e3e8ee] bg-[#f6f9fc] px-4 py-3">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-on-surface-variant/60">Zeitraum</p>
                     <p class="mt-2 text-sm font-semibold text-on-surface">{{ health.periodLabel }}</p>
                   </div>
-                  <div class="rounded-2xl border border-outline-variant/20 bg-surface/45 px-4 py-3">
-                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Vergleich</p>
+                  <div class="rounded-2xl border border-[#e3e8ee] bg-[#f6f9fc] px-4 py-3">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-on-surface-variant/60">Vergleich</p>
                     <p class="mt-2 text-sm font-semibold text-on-surface">{{ health.comparisonLabel }}</p>
                   </div>
-                  <div class="rounded-2xl border border-emerald-500/20 bg-emerald-500/8 px-4 py-3">
-                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-outline">Live-Sync</p>
-                    <p class="mt-2 text-sm font-semibold text-emerald-300">{{ health.syncLabel }}</p>
+                  <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-on-surface-variant/60">Live-Sync</p>
+                    <p class="mt-2 text-sm font-semibold text-emerald-700">{{ health.syncLabel }}</p>
                   </div>
                 </div>
               </div>
@@ -150,7 +146,7 @@
                              [style.height.%]="point.value"></div>
                       </div>
                       <p class="text-xs font-semibold"
-                         [class]="point.highlighted ? 'text-amber-300' : 'text-on-surface-variant'">
+                         [class]="point.highlighted ? 'text-amber-600' : 'text-on-surface-variant'">
                         {{ point.day }}
                       </p>
                     </div>
@@ -236,21 +232,21 @@
                       <div class="rounded-[1.4rem] border border-outline-variant/20 bg-surface-container-high/20 p-5 space-y-5">
                         <div class="space-y-2">
                           <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-[#7DB4FF] text-base">auto_awesome</span>
-                            <p class="text-sm font-black uppercase tracking-[0.18em] text-[#7DB4FF]">Wahrscheinliche Ursache</p>
+                            <span class="material-symbols-outlined text-primary text-base">auto_awesome</span>
+                            <p class="text-sm font-black uppercase tracking-[0.18em] text-primary">Wahrscheinliche Ursache</p>
                           </div>
                           <p class="text-sm leading-relaxed text-on-surface-variant">{{ alert.cause }}</p>
                         </div>
 
                         <div class="space-y-3">
                           <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-[#7DB4FF] text-base">task_alt</span>
-                            <p class="text-sm font-black uppercase tracking-[0.18em] text-[#7DB4FF]">Empfohlene Maßnahmen</p>
+                            <span class="material-symbols-outlined text-primary text-base">task_alt</span>
+                            <p class="text-sm font-black uppercase tracking-[0.18em] text-primary">Empfohlene Maßnahmen</p>
                           </div>
                           <div class="space-y-3">
                             @for (action of alert.actions; track action) {
                               <div class="flex items-start gap-3 rounded-xl border border-outline-variant/15 bg-surface/35 px-4 py-3">
-                                <span class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#0070FF]/15 text-[11px] font-black text-[#7DB4FF]">
+                                <span class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#0070FF]/15 text-[11px] font-black text-primary">
                                   {{ $index + 1 }}
                                 </span>
                                 <p class="text-sm leading-relaxed text-on-surface">{{ action }}</p>
@@ -275,17 +271,14 @@
         <div class="space-y-8 google-ads-audit-view">
           <section class="glass-panel border border-outline-variant/20 rounded-[2rem] overflow-hidden relative">
             <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#0070FF]/70 to-transparent"></div>
-            <div class="p-6 md:p-8 lg:p-10 space-y-8"
-                 style="background:
-                   radial-gradient(circle at top left, rgba(0, 112, 255, 0.18), transparent 32%),
-                   linear-gradient(180deg, rgba(17, 22, 31, 0.98), rgba(19, 24, 32, 0.98));">
+            <div class="p-6 md:p-8 lg:p-10 space-y-8 bg-white border-b border-[#e3e8ee]">
               <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                 <div class="flex items-start gap-4">
-                  <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-900 shadow-[0_8px_24px_rgba(255,255,255,0.12)]">
+                  <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f6f9fc] border border-[#e3e8ee] text-[#0a2540]">
                     <span class="text-2xl font-black tracking-tight">eom</span>
                   </div>
                   <div class="space-y-2">
-                    <h1 class="text-2xl md:text-4xl font-headline font-black tracking-tight text-white">
+                    <h1 class="text-2xl md:text-4xl font-headline font-black tracking-tight text-on-surface">
                       {{ audit.title }}
                     </h1>
                     <p class="text-sm md:text-base text-on-surface-variant">
@@ -301,22 +294,22 @@
               </div>
 
               <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                <div class="rounded-[1.6rem] border border-outline-variant/20 bg-surface/45 p-5 text-center">
+                <div class="rounded-[1.6rem] border border-[#e3e8ee] bg-[#f6f9fc] p-5 text-center">
                   <p class="text-[11px] font-black uppercase tracking-[0.18em] text-outline">Gesamtscore</p>
-                  <p class="google-ads-score-number mt-3 text-5xl font-headline font-black text-amber-300">{{ audit.overallScore }}</p>
+                  <p class="google-ads-score-number mt-3 text-5xl font-headline font-black text-amber-600">{{ audit.overallScore }}</p>
                   <p class="mt-1 text-sm text-on-surface-variant">von 100</p>
                 </div>
-                <div class="rounded-[1.6rem] border border-outline-variant/20 bg-surface/45 p-5 text-center">
+                <div class="rounded-[1.6rem] border border-[#e3e8ee] bg-[#f6f9fc] p-5 text-center">
                   <p class="text-[11px] font-black uppercase tracking-[0.18em] text-outline">Kritisch</p>
-                  <p class="google-ads-score-number mt-3 text-5xl font-headline font-black text-red-300">{{ audit.criticalCount }}</p>
+                  <p class="google-ads-score-number mt-3 text-5xl font-headline font-black text-red-600">{{ audit.criticalCount }}</p>
                   <p class="mt-1 text-sm text-on-surface-variant">Befunde</p>
                 </div>
-                <div class="rounded-[1.6rem] border border-outline-variant/20 bg-surface/45 p-5 text-center">
+                <div class="rounded-[1.6rem] border border-[#e3e8ee] bg-[#f6f9fc] p-5 text-center">
                   <p class="text-[11px] font-black uppercase tracking-[0.18em] text-outline">Warnungen</p>
-                  <p class="google-ads-score-number mt-3 text-5xl font-headline font-black text-amber-300">{{ audit.warningCount }}</p>
+                  <p class="google-ads-score-number mt-3 text-5xl font-headline font-black text-amber-600">{{ audit.warningCount }}</p>
                   <p class="mt-1 text-sm text-on-surface-variant">Befunde</p>
                 </div>
-                <div class="rounded-[1.6rem] border border-outline-variant/20 bg-surface/45 p-5 text-center">
+                <div class="rounded-[1.6rem] border border-[#e3e8ee] bg-[#f6f9fc] p-5 text-center">
                   <p class="text-[11px] font-black uppercase tracking-[0.18em] text-outline">Potenzial</p>
                   <p class="google-ads-score-number mt-3 text-5xl font-headline font-black text-emerald-300">{{ audit.potentialLift }}</p>
                   <p class="mt-1 text-sm text-on-surface-variant">CPA-Hebel</p>
@@ -326,7 +319,7 @@
               <div class="space-y-3">
                 <div class="flex items-center justify-between gap-4 text-sm">
                   <span class="font-semibold text-on-surface">Score</span>
-                  <span class="font-black text-amber-300">{{ audit.progressLabel }}</span>
+                  <span class="font-black text-amber-600">{{ audit.progressLabel }}</span>
                 </div>
                 <div class="h-3 rounded-full bg-surface-container-high overflow-hidden">
                   <div class="h-full rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400"
@@ -887,8 +880,8 @@
             <div class="glass-panel border border-outline-variant/20 rounded-2xl p-6">
               <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-xl bg-black flex items-center justify-center">
-                    <span class="text-white font-black text-sm">X</span>
+                  <div class="w-9 h-9 rounded-xl border border-outline-variant/30 bg-surface-container-high flex items-center justify-center">
+                    <span class="text-on-surface font-black text-sm">X</span>
                   </div>
                   <span class="text-sm font-bold text-on-surface">Twitter / X</span>
                   <span class="px-2 py-0.5 text-[10px] font-black bg-surface-container-high text-outline rounded-full border border-outline-variant/30 uppercase tracking-widest">
@@ -981,88 +974,79 @@
         <div class="space-y-8 content-strategy-view">
 
           <!-- Hero Section -->
-          <section class="rounded-[2rem] border border-[#0070FF]/20 overflow-hidden relative"
-                   style="background:
-                     radial-gradient(circle at top left, rgba(0, 112, 255, 0.28), transparent 42%),
-                     radial-gradient(circle at 85% 20%, rgba(34, 211, 238, 0.16), transparent 24%),
-                     linear-gradient(135deg, rgba(7, 16, 31, 0.98), rgba(7, 25, 54, 0.94));
-                     box-shadow:
-                     0 28px 90px rgba(6, 13, 28, 0.42),
-                     inset 0 1px 0 rgba(255, 255, 255, 0.04);">
-            <div class="pointer-events-none absolute -right-[10%] -bottom-[35%] h-96 w-96 blur-xl"
-                 style="background: radial-gradient(circle, rgba(0, 112, 255, 0.24), transparent 68%);"></div>
+          <section class="rounded-[2rem] border border-[#e3e8ee] overflow-hidden relative bg-white shadow-[0_2px_8px_rgba(10,37,64,0.06)]">
             <div class="relative p-6 md:p-8 xl:p-10 space-y-8">
               <div class="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
                 <div class="space-y-5">
-                  <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur">
-                    <span class="material-symbols-outlined text-[#7DB4FF] text-base" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
-                    <span class="text-[10px] font-black uppercase tracking-[0.24em] text-[#B8D5FF]">Content Strategy Ready</span>
+                  <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#e3e8ee] bg-primary/8">
+                    <span class="material-symbols-outlined text-primary text-base" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+                    <span class="text-[10px] font-black uppercase tracking-[0.24em] text-primary">Content Strategy Ready</span>
                   </div>
 
                   <div class="space-y-3">
-                    <p class="text-[11px] font-black uppercase tracking-[0.28em] text-[#8FB8FF]">SEO-optimiertes Content Briefing</p>
-                    <h1 class="text-3xl md:text-5xl font-headline font-black tracking-tight text-white max-w-4xl">
+                    <p class="text-[11px] font-black uppercase tracking-[0.28em] text-on-surface-variant/60">SEO-optimiertes Content Briefing</p>
+                    <h1 class="text-3xl md:text-5xl font-headline font-black tracking-tight text-on-surface max-w-4xl">
                       {{ cs.primaryTopic }}
                     </h1>
-                    <p class="max-w-3xl text-sm md:text-base leading-relaxed text-blue-50/80">
+                    <p class="max-w-3xl text-sm md:text-base leading-relaxed text-on-surface-variant">
                       Umfassende Keyword-Strategie mit Suchintentionen, Wettbewerbsanalyse und priorisierten Content-Opportunities.
                     </p>
                   </div>
 
                   <div class="flex flex-wrap gap-3">
-                    <div class="px-4 py-3 rounded-2xl border border-white/10 bg-white/5 backdrop-blur">
-                      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-100/45">Zielgruppe</p>
-                      <p class="text-sm font-semibold text-white truncate max-w-xs">{{ cs.targetAudience }}</p>
+                    <div class="px-4 py-3 rounded-2xl border border-[#e3e8ee] bg-[#f6f9fc]">
+                      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant/60">Zielgruppe</p>
+                      <p class="text-sm font-semibold text-on-surface truncate max-w-xs">{{ cs.targetAudience }}</p>
                     </div>
-                    <div class="px-4 py-3 rounded-2xl border border-white/10 bg-white/5 backdrop-blur">
-                      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-100/45">Content-Typ</p>
-                      <p class="text-sm font-semibold text-white">{{ cs.contentType }}</p>
+                    <div class="px-4 py-3 rounded-2xl border border-[#e3e8ee] bg-[#f6f9fc]">
+                      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant/60">Content-Typ</p>
+                      <p class="text-sm font-semibold text-on-surface">{{ cs.contentType }}</p>
                     </div>
-                    <div class="px-4 py-3 rounded-2xl border border-white/10 bg-white/5 backdrop-blur">
-                      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-100/45">Keyword-Cluster</p>
-                      <p class="text-sm font-semibold text-white">{{ cs.primaryKeywords.length + cs.longTailKeywords.length }}</p>
+                    <div class="px-4 py-3 rounded-2xl border border-[#e3e8ee] bg-[#f6f9fc]">
+                      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant/60">Keyword-Cluster</p>
+                      <p class="text-sm font-semibold text-on-surface">{{ cs.primaryKeywords.length + cs.longTailKeywords.length }}</p>
                     </div>
                   </div>
                 </div>
 
                 <!-- Top Keyword Stats -->
                 <div class="grid gap-3 sm:grid-cols-3 xl:w-[36rem]">
-                  <div class="rounded-3xl border border-white/10 bg-slate-950/35 p-4 backdrop-blur">
-                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-100/45 mb-2">⬆️ Höchstes Volumen</p>
+                  <div class="rounded-3xl border border-[#e3e8ee] bg-[#f6f9fc] p-4">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-on-surface-variant/60 mb-2">⬆️ Höchstes Volumen</p>
                     @if (contentStrategyTopKeyword(); as topKeyword) {
-                      <p class="text-base font-black text-white leading-tight line-clamp-2">{{ topKeyword.keyword }}</p>
-                      <p class="mt-2 text-sm text-blue-50/70">
-                        <span class="font-black text-white">{{ topKeyword.searchVolume | number }}</span>
+                      <p class="text-base font-black text-on-surface leading-tight line-clamp-2">{{ topKeyword.keyword }}</p>
+                      <p class="mt-2 text-sm text-on-surface-variant">
+                        <span class="font-black text-on-surface">{{ topKeyword.searchVolume | number }}</span>
                         <span class="font-light text-[11px]"> Suchanfragen/Mo.</span>
                       </p>
                     } @else {
-                      <p class="text-sm text-blue-50/70">–</p>
+                      <p class="text-sm text-on-surface-variant">–</p>
                     }
                   </div>
 
-                  <div class="rounded-3xl border border-white/10 bg-slate-950/35 p-4 backdrop-blur">
-                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-100/45 mb-2">✓ Beste Chancen</p>
+                  <div class="rounded-3xl border border-[#e3e8ee] bg-[#f6f9fc] p-4">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-on-surface-variant/60 mb-2">✓ Beste Chancen</p>
                     @if (contentStrategyLowestDifficultyKeyword(); as lowKeyword) {
-                      <p class="text-base font-black text-white leading-tight line-clamp-2">{{ lowKeyword.keyword }}</p>
-                      <p class="mt-2 text-sm text-blue-50/70">
-                        <span class="font-black text-white">KD {{ lowKeyword.keywordDifficulty }}</span>
+                      <p class="text-base font-black text-on-surface leading-tight line-clamp-2">{{ lowKeyword.keyword }}</p>
+                      <p class="mt-2 text-sm text-on-surface-variant">
+                        <span class="font-black text-on-surface">KD{{ lowKeyword.keywordDifficulty }}</span>
                         <span class="font-light text-[11px]"> (leicht)</span>
                       </p>
                     } @else {
-                      <p class="text-sm text-blue-50/70">–</p>
+                      <p class="text-sm text-on-surface-variant">–</p>
                     }
                   </div>
 
-                  <div class="rounded-3xl border border-white/10 bg-slate-950/35 p-4 backdrop-blur">
-                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-100/45 mb-2">💰 Höchster CPC</p>
+                  <div class="rounded-3xl border border-[#e3e8ee] bg-[#f6f9fc] p-4">
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-on-surface-variant/60 mb-2">💰 Höchster CPC</p>
                     @if (contentStrategyHighestCpcKeyword(); as cpcKeyword) {
-                      <p class="text-base font-black text-white leading-tight line-clamp-2">{{ cpcKeyword.keyword }}</p>
-                      <p class="mt-2 text-sm text-blue-50/70">
-                        <span class="font-black text-white">{{ cpcKeyword.cpc | number:'1.2-2' }} €</span>
+                      <p class="text-base font-black text-on-surface leading-tight line-clamp-2">{{ cpcKeyword.keyword }}</p>
+                      <p class="mt-2 text-sm text-on-surface-variant">
+                        <span class="font-black text-on-surface">{{ cpcKeyword.cpc | number:'1.2-2' }} €</span>
                         <span class="font-light text-[11px]"> pro Klick</span>
                       </p>
                     } @else {
-                      <p class="text-sm text-blue-50/70">–</p>
+                      <p class="text-sm text-on-surface-variant">–</p>
                     }
                   </div>
                 </div>
@@ -1084,24 +1068,24 @@
 
               <div class="space-y-6 px-6 md:px-8 py-8 md:py-10 max-h-[800px] overflow-y-auto">
                 @if (renderedContentStrategyBrief()) {
-                  <div class="md-content content-strategy-brief prose prose-invert prose-sm max-w-none
+                  <div class="md-content content-strategy-brief prose prose-sm max-w-none
                               prose-headings:font-headline prose-headings:tracking-tight
-                              prose-h1:text-3xl prose-h1:font-black prose-h1:text-white prose-h1:mb-5 prose-h1:mt-6 prose-h1:first:mt-0
-                              prose-h2:text-xl prose-h2:font-black prose-h2:text-white prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-l-4 prose-h2:border-[#0070FF] prose-h2:pl-4
-                              prose-h3:text-base prose-h3:font-bold prose-h3:text-blue-100 prose-h3:mt-6 prose-h3:mb-2 prose-h3:flex prose-h3:items-center prose-h3:gap-2
+                              prose-h1:text-3xl prose-h1:font-black prose-h1:text-[#0a2540] prose-h1:mb-5 prose-h1:mt-6 prose-h1:first:mt-0
+                              prose-h2:text-xl prose-h2:font-black prose-h2:text-[#0a2540] prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-l-4 prose-h2:border-[#0070FF] prose-h2:pl-4
+                              prose-h3:text-base prose-h3:font-bold prose-h3:text-on-surface prose-h3:mt-6 prose-h3:mb-2 prose-h3:flex prose-h3:items-center prose-h3:gap-2
                               prose-h3:before:content-['▸'] prose-h3:before:text-[#0070FF] prose-h3:before:font-black
                               prose-p:text-sm prose-p:leading-relaxed prose-p:text-on-surface-variant prose-p:my-3
-                              prose-strong:text-white prose-strong:font-black prose-strong:bg-[#0070FF]/20 prose-strong:px-1.5 prose-strong:py-0.5 prose-strong:rounded
-                              prose-em:text-[#7DB4FF] prose-em:not-italic prose-em:font-semibold
+                              prose-strong:text-on-surface prose-strong:font-black prose-strong:bg-primary/8 prose-strong:px-1.5 prose-strong:py-0.5 prose-strong:rounded
+                              prose-em:text-primary prose-em:not-italic prose-em:font-semibold
                               prose-li:my-1 prose-li:text-on-surface-variant prose-li:text-sm
                               prose-li:marker:text-[#0070FF] prose-li:marker:font-black
                               prose-ul:my-4 prose-ol:my-4
-                              prose-table:border-outline-variant/20
-                              prose-th:bg-[#0070FF]/10 prose-th:border-outline-variant/20 prose-th:font-black prose-th:text-on-surface
-                              prose-td:border-outline-variant/10 prose-td:py-2
-                              prose-blockquote:border-l-4 prose-blockquote:border-[#0070FF] prose-blockquote:pl-4 prose-blockquote:py-3 prose-blockquote:italic prose-blockquote:text-blue-100/90 prose-blockquote:my-4 prose-blockquote:bg-[#0070FF]/10 prose-blockquote:rounded-r-lg
-                              prose-code:text-[#7DB4FF] prose-code:bg-[#0070FF]/15 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:font-mono prose-code:text-xs
-                              prose-hr:my-6 prose-hr:border-[#0070FF]/30 prose-hr:border-t-2"
+                              prose-table:border-[#e3e8ee]
+                              prose-th:bg-primary/8 prose-th:border-[#e3e8ee] prose-th:font-black prose-th:text-on-surface
+                              prose-td:border-[#e3e8ee] prose-td:py-2
+                              prose-blockquote:border-l-4 prose-blockquote:border-[#0070FF] prose-blockquote:pl-4 prose-blockquote:py-3 prose-blockquote:italic prose-blockquote:text-on-surface-variant prose-blockquote:my-4 prose-blockquote:bg-primary/8 prose-blockquote:rounded-r-lg
+                              prose-code:text-primary prose-code:bg-primary/8 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:font-mono prose-code:text-xs
+                              prose-hr:my-6 prose-hr:border-[#e3e8ee] prose-hr:border-t-2"
                        [innerHTML]="renderedContentStrategyBrief()"></div>
                 } @else {
                   <div class="rounded-2xl border border-dashed border-outline-variant/40 p-8 text-center">
@@ -1144,7 +1128,7 @@
 
                 @if (cs.competitorUrls.length > 0) {
                   <div class="space-y-3 pt-2 border-t border-outline-variant/20">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-[#7DB4FF]">Wettbewerber</p>
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Wettbewerber</p>
                     <div class="flex flex-col gap-2">
                       @for (url of cs.competitorUrls.slice(0, 3); track url) {
                         <a [href]="url"
@@ -1325,7 +1309,7 @@
 
                     <div class="space-y-2 max-h-[350px] overflow-y-auto">
                       @for (item of group.items; track item.keyword) {
-                        <div class="px-3 py-2.5 rounded-lg border border-white/5 bg-white/3 text-sm text-on-surface-variant hover:border-white/10 hover:text-on-surface transition-colors">
+                        <div class="px-3 py-2.5 rounded-lg border border-[#e3e8ee] bg-[#f6f9fc] text-sm text-on-surface-variant hover:border-[#c8d6e5] hover:text-on-surface transition-colors">
                           {{ item.keyword }}
                           <span class="text-[10px] text-outline/60 ml-1">({{ item.intent }})</span>
                         </div>

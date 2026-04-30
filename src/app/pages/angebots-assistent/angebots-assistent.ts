@@ -101,8 +101,8 @@ const PROPOSAL_RESULT: ProposalResult = {
     { step: 'Projektstart Phase 1', date: '12. Mai 2026', owner: 'EOM Agentur' },
   ],
   contact: {
-    name: 'Max Mustermann',
-    email: 'max@eom-agentur.de',
+    name: 'Stefan Fleckenstein',
+    email: 'stefan@arcnode.de',
     phone: '+49 40 123 456 78',
   },
 };

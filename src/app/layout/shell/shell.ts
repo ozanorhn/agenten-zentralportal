@@ -3,7 +3,6 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import { ThemeService } from '../../services/theme.service';
 import { NotificationService } from '../../services/notification.service';
 import { NotificationDropdown } from '../../components/notification-dropdown/notification-dropdown';
-import { BookingModal } from '../../components/booking-modal/booking-modal';
 
 interface NavItem {
   label: string;
@@ -15,11 +14,12 @@ interface NavItem {
 interface NavSection {
   label: string;
   items: NavItem[];
+  collapsible?: boolean;
 }
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NotificationDropdown, BookingModal],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NotificationDropdown],
   templateUrl: './shell.html',
   styleUrl: './shell.scss',
 })
@@ -29,9 +29,8 @@ export class Shell {
   readonly router = inject(Router);
 
   showNotifications = signal(false);
-  showBooking = signal(false);
-  showFeedback = signal(false);
   sidebarCollapsed = signal(localStorage.getItem('sidebarCollapsed') === 'true');
+  collapsedSections = signal<Set<string>>(new Set());
 
   tooltipText = signal('');
   tooltipTop = signal(0);
@@ -51,8 +50,8 @@ export class Shell {
 
   readonly navItemClass = computed(() =>
     this.sidebarCollapsed()
-      ? 'flex items-center justify-center py-3 w-10 mx-auto rounded-full text-sm transition-all duration-300 text-on-surface-variant/70 hover:text-on-surface hover:bg-primary/10'
-      : 'flex items-center gap-3 px-4 py-3 rounded-full font-body font-medium text-sm tracking-wide uppercase transition-all duration-300 text-on-surface-variant/70 hover:text-on-surface hover:bg-primary/10 hover:translate-x-1'
+      ? 'flex items-center justify-center py-2.5 w-9 mx-auto rounded-lg text-sm transition-all duration-150 text-on-surface-variant/60 hover:text-on-surface hover:bg-[#f6f9fc]'
+      : 'flex items-center gap-2.5 px-3 py-2 rounded-lg font-body font-medium text-[13px] transition-all duration-150 text-on-surface-variant/80 hover:text-on-surface hover:bg-[#f6f9fc]'
   );
 
   readonly mainClass = computed(() =>
@@ -61,6 +60,14 @@ export class Shell {
 
   toggleNotifications(): void {
     this.showNotifications.update(v => !v);
+  }
+
+  toggleSection(label: string): void {
+    this.collapsedSections.update(s => {
+      const next = new Set(s);
+      next.has(label) ? next.delete(label) : next.add(label);
+      return next;
+    });
   }
 
   toggleSidebar(): void {
@@ -74,14 +81,27 @@ export class Shell {
 
   navSections: NavSection[] = [
     {
-      label: 'Steuerung',
+      label: 'Überblick',
+      collapsible: true,
       items: [
         { label: 'Betrieb', icon: 'bar_chart', route: '/analytics' },
-        { label: 'Verwaltung', icon: 'tune', route: '/management' },
-        { label: 'Verlauf', icon: 'history', route: '/history' },
         { label: 'ROI Übersicht', icon: 'speed', route: '/ceo-dashboard' },
         { label: 'Live KPIs', icon: 'query_stats', route: '/kpi-dashboard' },
+      ],
+    },
+    {
+      label: 'Berichte',
+      collapsible: true,
+      items: [
         { label: 'Reporting', icon: 'summarize', route: '/reporting-bot' },
+        { label: 'Verlauf', icon: 'history', route: '/history' },
+      ],
+    },
+    {
+      label: 'System',
+      collapsible: true,
+      items: [
+        { label: 'Verwaltung', icon: 'tune', route: '/management' },
       ],
     },
     {

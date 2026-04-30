@@ -1109,14 +1109,14 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
 
   metricTextClass(score?: number | null): string {
     if ((score ?? 0) >= 60) {
-      return 'text-emerald-300';
+      return 'text-emerald-800 dark:text-emerald-300';
     }
 
     if ((score ?? 0) >= 30) {
-      return 'text-amber-300';
+      return 'text-amber-800 dark:text-amber-300';
     }
 
-    return 'text-red-300';
+    return 'text-red-800 dark:text-red-300';
   }
 
   metricBarClass(score?: number | null): string {
@@ -1140,22 +1140,22 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   statusClass(tone: StatusItem['tone']): string {
     switch (tone) {
       case 'ok':
-        return 'border-emerald-500/20 bg-emerald-500/10';
+        return 'border-emerald-300 bg-emerald-50 dark:border-emerald-500/20 dark:bg-emerald-500/10';
       case 'warn':
-        return 'border-amber-500/20 bg-amber-500/10';
+        return 'border-amber-300 bg-amber-50 dark:border-amber-500/20 dark:bg-amber-500/10';
       default:
-        return 'border-red-500/20 bg-red-500/10';
+        return 'border-red-300 bg-red-50 dark:border-red-500/20 dark:bg-red-500/10';
     }
   }
 
   statusIconClass(tone: StatusItem['tone']): string {
     switch (tone) {
       case 'ok':
-        return 'bg-emerald-500/15 text-emerald-300';
+        return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300';
       case 'warn':
-        return 'bg-amber-500/15 text-amber-300';
+        return 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300';
       default:
-        return 'bg-red-500/15 text-red-300';
+        return 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300';
     }
   }
 
@@ -1173,11 +1173,11 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   effortClass(value?: string): string {
     switch ((value ?? '').toLowerCase()) {
       case 'niedrig':
-        return 'bg-emerald-500/10 text-emerald-300';
+        return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-300';
       case 'mittel':
-        return 'bg-amber-500/10 text-amber-300';
+        return 'bg-amber-100 text-amber-800 dark:bg-amber-500/10 dark:text-amber-300';
       case 'hoch':
-        return 'bg-red-500/10 text-red-300';
+        return 'bg-red-100 text-red-800 dark:bg-red-500/10 dark:text-red-300';
       default:
         return 'bg-surface-container-high text-on-surface-variant';
     }
@@ -1185,24 +1185,24 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
 
   botCardClass(card: BotCard): string {
     return card.blocked
-      ? 'border-red-500/20 border-l-[3px]'
-      : 'border-emerald-500/20 border-l-[3px]';
+      ? 'border-red-300 dark:border-red-500/20 border-l-[3px]'
+      : 'border-emerald-300 dark:border-emerald-500/20 border-l-[3px]';
   }
 
   botCategoryChipClass(card: BotCard): string {
     return card.blocked
-      ? 'border border-red-500/20 bg-red-500/10 text-red-300'
-      : 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-300';
+      ? 'border border-red-300 bg-red-50 text-red-800 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300'
+      : 'border border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300';
   }
 
   detailToneClass(tone: MetricListItem['tone']): string {
     switch (tone) {
       case 'ok':
-        return 'text-emerald-300';
+        return 'text-emerald-800 dark:text-emerald-300';
       case 'warn':
-        return 'text-amber-300';
+        return 'text-amber-800 dark:text-amber-300';
       case 'bad':
-        return 'text-red-300';
+        return 'text-red-800 dark:text-red-300';
       default:
         return 'text-on-surface';
     }
@@ -1224,11 +1224,11 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   detailToneBadgeClass(tone: MetricListItem['tone']): string {
     switch (tone) {
       case 'ok':
-        return 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-300';
+        return 'border border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300';
       case 'warn':
-        return 'border border-amber-500/20 bg-amber-500/10 text-amber-300';
+        return 'border border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300';
       case 'bad':
-        return 'border border-red-500/20 bg-red-500/10 text-red-300';
+        return 'border border-red-300 bg-red-50 text-red-800 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300';
       default:
         return 'border border-outline-variant/20 bg-surface-container-high text-on-surface-variant';
     }
@@ -1248,11 +1248,11 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   factClass(tone: DimensionFact['tone']): string {
     switch (tone) {
       case 'bad':
-        return 'text-red-300';
+        return 'text-red-800 dark:text-red-300';
       case 'warn':
-        return 'text-amber-400';
+        return 'text-amber-800 dark:text-amber-400';
       default:
-        return 'text-emerald-300';
+        return 'text-emerald-800 dark:text-emerald-300';
     }
   }
 

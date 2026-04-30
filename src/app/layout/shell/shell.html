@@ -1,71 +1,79 @@
 <div class="flex min-h-screen bg-background text-on-surface font-body overflow-x-hidden">
 
-  <!-- Ambient background glows -->
-  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-    <div class="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-primary/10 blur-[140px] rounded-full"></div>
-    <div class="absolute bottom-[-10%] left-[-5%] w-[35%] h-[35%] bg-primary-container/10 blur-[120px] rounded-full"></div>
-  </div>
-
   <!-- Top Navigation Bar -->
-  <header class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 py-3
-                 bg-surface-container-low/90 backdrop-blur-xl shadow-[0_20px_60px_rgba(8,12,24,0.45)]
-                 border-b border-primary/10">
-    <!-- Logo -->
-    <div class="flex items-center">
-      <a routerLink="/dashboard" class="brand-title text-[1.9rem] font-black text-primary font-headline">
-        arcnode
-      </a>
+  <header class="fixed top-0 left-0 right-0 z-50 flex items-stretch
+                 border-b border-[#e3e8ee] bg-white">
+
+    <!-- Logo strip — white, width tracks sidebar -->
+    <div
+      class="hidden md:flex items-center px-5 bg-white flex-shrink-0 overflow-hidden
+             transition-[width] duration-300 border-r border-[#e3e8ee]"
+      [class.w-64]="!sidebarCollapsed()"
+      [class.w-16]="sidebarCollapsed()"
+    >
+      @if (!sidebarCollapsed()) {
+        <a routerLink="/dashboard" class="brand-title text-[1.5rem] font-black text-[#0a2540] font-headline tracking-tight">
+          arcnode OS
+        </a>
+      }
     </div>
 
-    <!-- Actions + Avatar -->
-    <div class="flex items-center gap-3">
-      <!-- Theme Toggle -->
-      <button
-        (click)="theme.toggle()"
-        class="hover:bg-primary/10 transition-all duration-300 p-2 rounded-full active:scale-95"
-        [title]="theme.isDark() ? 'Hell-Modus aktivieren' : 'Dunkel-Modus aktivieren'"
-        [attr.aria-label]="theme.isDark() ? 'Hell-Modus aktivieren' : 'Dunkel-Modus aktivieren'"
-      >
-        @if (theme.isDark()) {
-          <span class="material-symbols-outlined text-primary-container">light_mode</span>
-        } @else {
-          <span class="material-symbols-outlined text-primary-container">dark_mode</span>
-        }
-      </button>
+    <!-- Actions strip -->
+    <div class="flex-1 flex items-center justify-between px-6 py-2.5 bg-white">
+      <!-- Mobile-only logo -->
+      <a routerLink="/dashboard" class="md:hidden brand-title text-[1.5rem] font-black text-[#0a2540] font-headline tracking-tight">
+        arcnode OS
+      </a>
 
-      <!-- Notification Bell -->
-      <div class="relative">
+      <div class="flex items-center gap-1 ml-auto">
+        <!-- Theme Toggle -->
         <button
-          (click)="toggleNotifications()"
-          class="relative hover:bg-primary/10 transition-all duration-300 p-2 rounded-full active:scale-95"
-          aria-label="Benachrichtigungen öffnen"
+          (click)="theme.toggle()"
+          class="hover:bg-[#f6f9fc] transition-all duration-150 p-2 rounded-lg"
+          [title]="theme.isDark() ? 'Hell-Modus aktivieren' : 'Dunkel-Modus aktivieren'"
+          [attr.aria-label]="theme.isDark() ? 'Hell-Modus aktivieren' : 'Dunkel-Modus aktivieren'"
         >
-          <span class="material-symbols-outlined text-primary-container">notifications</span>
-          @if (notifService.unreadCount() > 0) {
-            <span class="absolute top-1 right-1 w-4 h-4 bg-primary rounded-full text-[9px] font-black text-white
-                         flex items-center justify-center shadow-[0_0_10px_rgba(59,130,246,0.65)]">
-              {{ notifService.unreadCount() > 9 ? '9+' : notifService.unreadCount() }}
-            </span>
+          @if (theme.isDark()) {
+            <span class="material-symbols-outlined text-[#425466] text-xl">light_mode</span>
+          } @else {
+            <span class="material-symbols-outlined text-[#425466] text-xl">dark_mode</span>
           }
         </button>
-        <app-notification-dropdown
-          [visible]="showNotifications()"
-          (close)="showNotifications.set(false)"
-        />
-      </div>
 
-      <button class="hover:bg-primary/10 transition-all duration-300 p-2 rounded-full active:scale-95" aria-label="Einstellungen öffnen">
-        <span class="material-symbols-outlined text-primary-container">settings</span>
-      </button>
-      <div class="w-8 h-8 rounded-full bg-primary/12 border border-primary/20 flex items-center justify-center">
-        <span class="material-symbols-outlined text-primary text-lg">account_circle</span>
+        <!-- Notification Bell -->
+        <div class="relative">
+          <button
+            (click)="toggleNotifications()"
+            class="relative hover:bg-[#f6f9fc] transition-all duration-150 p-2 rounded-lg"
+            aria-label="Benachrichtigungen öffnen"
+          >
+            <span class="material-symbols-outlined text-[#425466] text-xl">notifications</span>
+            @if (notifService.unreadCount() > 0) {
+              <span class="absolute top-1 right-1 w-3.5 h-3.5 bg-primary rounded-full text-[8px] font-black text-white
+                           flex items-center justify-center">
+                {{ notifService.unreadCount() > 9 ? '9+' : notifService.unreadCount() }}
+              </span>
+            }
+          </button>
+          <app-notification-dropdown
+            [visible]="showNotifications()"
+            (close)="showNotifications.set(false)"
+          />
+        </div>
+
+        <button class="hover:bg-[#f6f9fc] transition-all duration-150 p-2 rounded-lg" aria-label="Einstellungen öffnen">
+          <span class="material-symbols-outlined text-[#425466] text-xl">settings</span>
+        </button>
+        <div class="w-7 h-7 rounded-full bg-[#e3e8ee] border border-[#c8d6e5] flex items-center justify-center ml-2">
+          <span class="material-symbols-outlined text-[#425466] text-base">person</span>
+        </div>
       </div>
     </div>
   </header>
 
   <!-- Sidebar -->
   <aside
-    class="h-screen fixed left-0 top-0 pt-[56px] z-40 bg-surface/80 backdrop-blur-3xl border-r border-primary/10 flex-col hidden md:flex overflow-hidden transition-[width] duration-300"
+    class="h-screen fixed left-0 top-0 pt-[56px] z-40 bg-white border-r border-[#e3e8ee] flex-col hidden md:flex overflow-hidden transition-[width] duration-300"
     [class.w-64]="!sidebarCollapsed()"
     [class.w-16]="sidebarCollapsed()"
     [class.sidebar-collapsed]="sidebarCollapsed()"
@@ -74,7 +82,7 @@
     <div class="flex py-2 px-2" [class.justify-end]="!sidebarCollapsed()" [class.justify-center]="sidebarCollapsed()">
       <button
         (click)="toggleSidebar()"
-        class="w-7 h-7 rounded-full border border-primary/20 bg-surface-container flex items-center justify-center hover:bg-primary/10 transition-all duration-300 shadow-sm"
+        class="w-6 h-6 rounded-lg border border-[#e3e8ee] bg-white flex items-center justify-center hover:bg-[#f6f9fc] transition-all duration-150"
         [title]="sidebarCollapsed() ? 'Sidebar erweitern' : 'Sidebar einklappen'"
       >
         <span
@@ -89,15 +97,33 @@
          [class.px-3]="!sidebarCollapsed()"
          [class.px-2]="sidebarCollapsed()">
       @for (section of navSections; track section.label) {
-        <div class="mb-6">
+        <div class="mb-4">
           @if (!sidebarCollapsed()) {
-            <p class="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/55 font-bold px-4 mb-2">
-              {{ section.label }}
-            </p>
+            @if (section.collapsible) {
+              <button
+                (click)="toggleSection(section.label)"
+                class="w-full flex items-center justify-between px-3 py-1 mb-0.5 group"
+              >
+                <span class="text-[11px] uppercase tracking-[0.16em] text-[#a3b1bf] font-bold group-hover:text-[#66788a] transition-colors duration-100">
+                  {{ section.label }}
+                </span>
+                <span
+                  class="material-symbols-outlined text-[13px] text-[#a3b1bf] group-hover:text-[#66788a] transition-all duration-150"
+                  [class.rotate-180]="!collapsedSections().has(section.label)"
+                >expand_more</span>
+              </button>
+            } @else {
+              <p class="text-[11px] uppercase tracking-[0.16em] text-[#a3b1bf] font-bold px-3 mb-0.5">
+                {{ section.label }}
+              </p>
+            }
           } @else {
-            <div class="border-t border-primary/10 my-2 mx-1"></div>
+            <div class="border-t border-slate-200 my-2 mx-1"></div>
           }
-          <nav class="space-y-1">
+          @if (sidebarCollapsed() || !section.collapsible || !collapsedSections().has(section.label)) {
+          <nav [class]="sidebarCollapsed()
+            ? 'space-y-0.5'
+            : 'space-y-0.5'">
             @for (item of section.items; track item.route + item.label) {
               @if (item.queryParams) {
                 <a
@@ -116,9 +142,7 @@
               } @else {
                 <a
                   [routerLink]="item.route"
-                  [routerLinkActive]="sidebarCollapsed()
-                    ? 'text-primary bg-primary/10'
-                    : 'text-primary border-l-2 border-primary bg-primary/10 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.08)]'"
+                  [routerLinkActive]="'text-primary bg-primary/10'"
                   [routerLinkActiveOptions]="{ exact: false }"
                   [class]="navItemClass()"
                   (mouseenter)="showTooltip($event, item.label)"
@@ -132,12 +156,13 @@
               }
             }
           </nav>
+          }
         </div>
       }
     </div>
 
     <!-- Bottom links -->
-    <div class="border-t border-primary/10 py-4 space-y-1"
+    <div class="border-t border-slate-200 py-4 space-y-1"
          [class.px-3]="!sidebarCollapsed()"
          [class.px-2]="sidebarCollapsed()">
       <a href="#"
@@ -150,52 +175,33 @@
         }
       </a>
 
-      <!-- Feedback Dropdown -->
-      <div class="relative" (mouseenter)="showFeedback.set(true); showTooltip($event, 'Feedback')" (mouseleave)="showFeedback.set(false); hideTooltip()">
-        <button
-          [class]="navItemClass() + ' w-full'"
-        >
-          <span class="material-symbols-outlined flex-shrink-0 text-lg">feedback</span>
-          @if (!sidebarCollapsed()) {
-            <span class="flex-1 text-left text-sm">Feedback</span>
-            <span class="material-symbols-outlined text-sm transition-transform" [class.rotate-180]="showFeedback()">expand_less</span>
-          }
-        </button>
-
-        @if (showFeedback()) {
-          <div class="absolute bottom-full mb-1 bg-surface-container border border-primary/10
-                      rounded-3xl shadow-[0_24px_60px_rgba(8,12,24,0.42)] overflow-hidden z-50 py-2 w-48"
-               [class.left-0]="!sidebarCollapsed()"
-               [class.right-0]="!sidebarCollapsed()"
-               [class.left-full]="sidebarCollapsed()"
-               [class.ml-2]="sidebarCollapsed()">
-            <a routerLink="/fehler-melden"
-               class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface-variant/72
-                      hover:text-on-surface hover:bg-primary/10 transition-all">
-              <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings:'FILL' 1">warning</span>
-              </span>
-              Fehler / Risiko melden
-            </a>
-            <a routerLink="/kontakt"
-               class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface-variant/72
-                      hover:text-on-surface hover:bg-primary/10 transition-all">
-              <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings:'FILL' 1">mail</span>
-              </span>
-              Kontakt zum KI-Team
-            </a>
-            <a routerLink="/idee-einreichen"
-               class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface-variant/72
-                      hover:text-on-surface hover:bg-primary/10 transition-all">
-              <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings:'FILL' 1">lightbulb</span>
-              </span>
-              Idee einreichen
-            </a>
-          </div>
+      <a routerLink="/fehler-melden"
+         [class]="navItemClass()"
+         (mouseenter)="showTooltip($event, 'Fehler melden')"
+         (mouseleave)="hideTooltip()">
+        <span class="material-symbols-outlined flex-shrink-0 text-lg">warning</span>
+        @if (!sidebarCollapsed()) {
+          <span class="text-sm">Fehler melden</span>
         }
-      </div>
+      </a>
+      <a routerLink="/kontakt"
+         [class]="navItemClass()"
+         (mouseenter)="showTooltip($event, 'Kontakt')"
+         (mouseleave)="hideTooltip()">
+        <span class="material-symbols-outlined flex-shrink-0 text-lg">mail</span>
+        @if (!sidebarCollapsed()) {
+          <span class="text-sm">Kontakt</span>
+        }
+      </a>
+      <a routerLink="/idee-einreichen"
+         [class]="navItemClass()"
+         (mouseenter)="showTooltip($event, 'Idee einreichen')"
+         (mouseleave)="hideTooltip()">
+        <span class="material-symbols-outlined flex-shrink-0 text-lg">lightbulb</span>
+        @if (!sidebarCollapsed()) {
+          <span class="text-sm">Idee einreichen</span>
+        }
+      </a>
     </div>
   </aside>
 
@@ -206,8 +212,8 @@
 
   <!-- Mobile bottom nav -->
   <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50
-              bg-surface-container-low/95 backdrop-blur-2xl px-4 py-4
-              flex justify-between items-center border-t border-primary/10">
+              bg-[#E7F6FF] px-4 py-4
+              flex justify-between items-center border-t border-slate-200">
     @for (item of mobileNavItems; track item.route + item.label) {
       <a [routerLink]="item.route" [queryParams]="item.queryParams ?? null"
          [class.nav-category-active]="item.queryParams ? isCategoryActive(item.queryParams['category']) : false"
@@ -233,7 +239,5 @@
     </div>
   }
 
-  <!-- Global Modals -->
-  <app-booking-modal [visible]="showBooking()" (close)="showBooking.set(false)" />
 
 </div>

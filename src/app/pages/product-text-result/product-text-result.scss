@@ -37,13 +37,32 @@
   color: rgb(var(--color-on-surface));
 }
 
+.product-result-hero {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(0, 112, 255, 0.14), transparent 34%),
+    radial-gradient(circle at 86% 0%, rgba(34, 197, 94, 0.08), transparent 25%),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, rgb(var(--color-surface-container-low)) 94%, white),
+      color-mix(in srgb, rgb(var(--color-surface-container)) 96%, rgb(var(--color-surface-container-high)))
+    );
+}
+
+.product-result-hero-panel {
+  background: color-mix(in srgb, rgb(var(--color-surface)) 72%, transparent);
+}
+
+.product-result-hero-meta {
+  background: color-mix(in srgb, rgb(var(--color-surface-container-high)) 46%, transparent);
+}
+
 .seo-code-block {
   overflow-x: auto;
   border-radius: 1rem;
   border: 1px solid rgba(var(--color-outline-variant), 0.2);
-  background: #0b1220;
+  background: color-mix(in srgb, rgb(var(--color-surface-container-high)) 72%, rgb(var(--color-surface)));
   padding: 1rem;
-  color: #c8e1ff;
+  color: rgb(var(--color-on-surface));
   font-size: 0.75rem;
   line-height: 1.6;
   white-space: pre-wrap;

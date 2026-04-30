@@ -50,7 +50,7 @@
     </div>
 
     <div class="space-y-6">
-      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+      <div class="rounded-[1.5rem] border border-outline-variant/20 bg-surface-container-low p-5">
         <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Use Case</p>
         <div class="rounded-[1.25rem] border border-primary/20 bg-surface-container-high/60 px-5 py-6">
           <div class="mb-3 flex items-center gap-3">
@@ -65,7 +65,7 @@
         </div>
       </div>
 
-      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+      <div class="rounded-[1.5rem] border border-outline-variant/20 bg-surface-container-low p-5">
         <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Output</p>
         <div class="flex flex-wrap gap-2">
           @for (item of ['3 Finalist:innen', '3 Score-Dimensionen', 'Risk Flags', 'Hiring-Empfehlung']; track item) {
@@ -90,7 +90,7 @@
       <div class="mx-auto max-w-6xl">
         <div class="hero-panel mb-8 rounded-[2rem] p-8 md:p-10">
           <div class="mb-4 flex items-center gap-3">
-            <span class="rounded-full border border-amber-400/15 bg-amber-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-amber-300">
+            <span class="rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-amber-700">
               Hiring Decisions
             </span>
             <span class="text-[10px] font-bold uppercase tracking-[0.18em] text-outline">5-Sekunden Scorecard</span>
@@ -111,7 +111,7 @@
             <span class="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
               Analyse abgeschlossen
             </span>
-            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-on-surface-variant">
+            <span class="rounded-full border border-outline-variant/20 bg-surface-container-high px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-on-surface-variant">
               Top-Empfehlung: {{ topRecommendation() }}
             </span>
           </div>
@@ -141,7 +141,7 @@
                 </div>
               </div>
 
-              <span class="mb-4 inline-flex rounded-full border border-emerald-300/15 bg-emerald-300/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-200">
+              <span class="mb-4 inline-flex rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700">
                 {{ candidate.recommendation }}
               </span>
 
@@ -151,7 +151,7 @@
 
               <div class="mb-5 grid gap-3">
                 @for (score of candidate.scores; track score.label) {
-                  <div class="rounded-[1.25rem] border border-white/8 bg-white/5 px-4 py-3">
+                  <div class="rounded-[1.25rem] border border-outline-variant/20 bg-surface-container-high px-4 py-3">
                     <div class="mb-2 flex items-center justify-between gap-4">
                       <p class="text-xs font-medium text-on-surface">{{ score.label }}</p>
                       <p class="text-xs font-bold text-primary">{{ score.value }}</p>
@@ -168,7 +168,7 @@
                 <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Starke Signale</p>
                 <div class="flex flex-wrap gap-2">
                   @for (strength of candidate.strengths; track strength) {
-                    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-on-surface-variant">
+                    <span class="rounded-full border border-outline-variant/20 bg-surface-container-high px-3 py-1 text-xs text-on-surface-variant">
                       {{ strength }}
                     </span>
                   }
@@ -179,7 +179,7 @@
                 <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Risiken</p>
                 <div class="flex flex-wrap gap-2">
                   @for (risk of candidate.risks; track risk) {
-                    <span class="rounded-full border border-rose-300/15 bg-rose-300/10 px-3 py-1 text-xs text-rose-200">
+                    <span class="rounded-full border border-rose-300/20 bg-rose-300/10 px-3 py-1 text-xs text-rose-700">
                       {{ risk }}
                     </span>
                   }

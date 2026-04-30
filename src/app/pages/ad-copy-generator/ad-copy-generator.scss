@@ -6,42 +6,58 @@
   background:
     radial-gradient(circle at top right, rgba(139, 92, 246, 0.08), transparent 24%),
     radial-gradient(circle at bottom left, rgba(168, 85, 247, 0.07), transparent 28%),
-    linear-gradient(180deg, rgba(8, 12, 24, 0.98), rgba(12, 17, 29, 0.98));
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, rgb(var(--color-surface)) 94%, rgb(var(--color-surface-container-low))),
+      color-mix(in srgb, rgb(var(--color-surface-container-low)) 96%, rgb(var(--color-surface-container)))
+    );
 }
 
 .ads-sidebar {
   background:
-    linear-gradient(180deg, rgba(17, 24, 39, 0.94), rgba(12, 17, 29, 0.98)),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, rgb(var(--color-surface-container-low)) 97%, white),
+      color-mix(in srgb, rgb(var(--color-surface-container)) 96%, rgb(var(--color-surface-container-high)))
+    ),
     radial-gradient(circle at top left, rgba(139, 92, 246, 0.05), transparent 28%);
 }
 
 .ads-canvas {
   background:
     radial-gradient(circle at top right, rgba(168, 85, 247, 0.06), transparent 22%),
-    linear-gradient(180deg, rgba(12, 17, 29, 0.92), rgba(17, 24, 39, 0.94));
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, rgb(var(--color-surface)) 95%, rgb(var(--color-surface-container-low))),
+      color-mix(in srgb, rgb(var(--color-surface-container-low)) 96%, rgb(var(--color-surface-container)))
+    );
 }
 
 .hero-panel,
 .result-card,
 .info-card {
-  background: linear-gradient(180deg, rgba(17, 24, 39, 0.82), rgba(12, 17, 29, 0.92));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, rgb(var(--color-surface-container-low)) 98%, white),
+    color-mix(in srgb, rgb(var(--color-surface-container)) 96%, rgb(var(--color-surface-container-high)))
+  );
   box-shadow:
-    0 24px 80px rgba(8, 12, 24, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+    0 18px 48px rgba(10, 37, 64, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(var(--color-outline-variant), 0.18);
 }
 
 .google-ad-preview {
-  background: rgba(14, 20, 36, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: color-mix(in srgb, rgb(var(--color-surface-container-high)) 62%, white);
+  border: 1px solid rgba(var(--color-outline-variant), 0.16);
 }
 
 .meta-ad-preview {
-  background: rgba(14, 20, 36, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: color-mix(in srgb, rgb(var(--color-surface-container-high)) 62%, white);
+  border: 1px solid rgba(var(--color-outline-variant), 0.16);
 }
 
 .meta-ad-cta {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, rgb(var(--color-surface-container-high)) 58%, white);
+  border: 1px solid rgba(var(--color-outline-variant), 0.16);
 }

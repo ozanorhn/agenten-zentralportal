@@ -50,7 +50,7 @@
     </div>
 
     <div class="space-y-6">
-      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+      <div class="rounded-[1.5rem] border border-outline-variant/20 bg-surface-container-low p-5">
         <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Use Case</p>
         <div class="rounded-[1.25rem] border border-primary/20 bg-surface-container-high/60 px-5 py-6">
           <div class="mb-3 flex items-center gap-3">
@@ -65,7 +65,7 @@
         </div>
       </div>
 
-      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+      <div class="rounded-[1.5rem] border border-outline-variant/20 bg-surface-container-low p-5">
         <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Output</p>
         <div class="flex flex-wrap gap-2">
           @for (item of ['4 Deals', 'Win Score', 'Risikosignal', 'Next Action']; track item) {
@@ -90,7 +90,7 @@
       <div class="mx-auto max-w-6xl">
         <div class="hero-panel mb-8 rounded-[2rem] p-8 md:p-10">
           <div class="mb-4 flex items-center gap-3">
-            <span class="rounded-full border border-amber-400/15 bg-amber-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-amber-300">
+            <span class="rounded-full border border-amber-400/15 bg-amber-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-amber-600">
               Sales Operations
             </span>
             <span class="text-[10px] font-bold uppercase tracking-[0.18em] text-outline">5-Sekunden Pipeline-Review</span>
@@ -137,7 +137,7 @@
             <span class="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
               Analyse abgeschlossen
             </span>
-            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-on-surface-variant">
+            <span class="rounded-full border border-outline-variant/20 bg-surface-container-high px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-on-surface-variant">
               Ø Win Score: {{ avgWinScore() }}
             </span>
           </div>
@@ -195,7 +195,7 @@
 
               <div class="risk-panel mb-4 rounded-[1.25rem] px-4 py-4">
                 <div class="mb-2 flex items-center gap-2">
-                  <span class="material-symbols-outlined text-base text-amber-400"
+                  <span class="material-symbols-outlined text-base text-amber-600"
                         style="font-variation-settings:'FILL' 1;">warning</span>
                   <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Risikosignal</p>
                 </div>
@@ -204,7 +204,7 @@
 
               <div class="action-panel mb-4 rounded-[1.25rem] px-4 py-4">
                 <div class="mb-2 flex items-center gap-2">
-                  <span class="material-symbols-outlined text-base text-emerald-400"
+                  <span class="material-symbols-outlined text-base text-emerald-600"
                         style="font-variation-settings:'FILL' 1;">bolt</span>
                   <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Next Action</p>
                 </div>
@@ -213,7 +213,7 @@
 
               <div class="mb-4 grid grid-cols-3 gap-3">
                 @for (metric of deal.metrics; track metric.label) {
-                  <div class="rounded-[1.25rem] border border-white/8 bg-white/5 px-3 py-3">
+                  <div class="rounded-[1.25rem] border border-outline-variant/20 bg-surface-container-high px-3 py-3">
                     <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-outline">{{ metric.label }}</p>
                     <p class="mt-1 text-sm font-semibold text-on-surface">{{ metric.value }}</p>
                   </div>
@@ -222,7 +222,7 @@
 
               <div class="flex flex-wrap gap-2">
                 @for (tag of deal.tags; track tag) {
-                  <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-on-surface-variant">
+                  <span class="rounded-full border border-outline-variant/20 bg-surface-container-high px-3 py-1 text-xs text-on-surface-variant">
                     {{ tag }}
                   </span>
                 }

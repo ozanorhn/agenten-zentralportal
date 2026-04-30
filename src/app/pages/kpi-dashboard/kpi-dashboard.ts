@@ -32,7 +32,7 @@ Chart.register(
   Tooltip, Legend, Filler,
 );
 
-const WEBHOOK_KPI = 'https://n8n.eom.de/webhook/kpi-dashboard';
+const WEBHOOK_KPI = 'https://n8n.eom.de/webhook/kpi-dashboardd';
 
 const CHART_COLORS = [
   '#3b82f6', '#10b981', '#f59e0b', '#06b6d4',
