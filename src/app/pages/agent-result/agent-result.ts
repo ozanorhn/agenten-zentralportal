@@ -247,7 +247,7 @@ export class AgentResult {
       case 'geo-audit': return this.buildGeoAuditSummary(output);
       case 'markdown':
         if (this.isGeoSiteAudit) {
-          return output.websiteUrl ? `Geo Audit: ${this.toDisplayUrl(output.websiteUrl)}` : 'Geo Site Audit';
+          return output.websiteUrl ? `Regionale SEO-Prüfung: ${this.toDisplayUrl(output.websiteUrl)}` : 'Regionale SEO-Prüfung';
         }
         return output.companyName ? `Sales Briefing: ${output.companyName}` : 'Sales Briefing';
       case 'company-list': return `${output.companies.length} Unternehmen in ${output.city}`;
@@ -256,7 +256,7 @@ export class AgentResult {
       case 'blog-editor': return output.articleTitle ?? `Blog-Artikel: ${output.topic}`;
       case 'product-text': return output.generatedFile?.fileName ?? 'Produkttext';
       case 'csv-product-text': return `${output.rowCount} Produkte verarbeitet`;
-      case 'google-ads-audit': return `Google Ads Audit: ${output.domain}`;
+      case 'google-ads-audit': return `Google Ads Prüfung: ${output.domain}`;
       case 'ads-health-checker': return output.title;
     }
   }

@@ -153,6 +153,7 @@ body {
   padding: 0;
   font-family: 'Inter', sans-serif;
   font-size: 16px;
+  font-weight: 400;
   line-height: 1.6;
   background: rgb(var(--color-background));
   color: rgb(var(--color-on-background));
@@ -201,7 +202,11 @@ textarea {
   font: inherit;
 }
 
-button,
+button {
+  border-radius: 0.75rem;
+}
+
+button[class*='bg-'][class*='px-'],
 a[class*='bg-'][class*='px-'] {
   border-radius: 999px !important;
   font-family: 'Space Grotesk', sans-serif;

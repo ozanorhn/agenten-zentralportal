@@ -1,16 +1,105 @@
+:host {
+  --shell-surface: #101827;
+  --shell-border: #253246;
+  --shell-text: #f8fafc;
+  --shell-text-muted: rgba(226, 232, 240, 0.72);
+  --shell-text-subtle: rgba(191, 203, 221, 0.72);
+  --shell-hover: rgba(148, 163, 184, 0.14);
+  --shell-active-bg: rgba(59, 130, 246, 0.18);
+  --shell-active-text: #93c5fd;
+  --shell-avatar-bg: #172033;
+  --shell-avatar-border: #314156;
+}
+
+.shell-header,
+.shell-header-actions,
+.shell-logo-strip,
+.shell-sidebar,
+.shell-mobile-nav {
+  background: var(--shell-surface);
+}
+
+.shell-header {
+  border-bottom: 1px solid var(--shell-border);
+}
+
+.shell-logo-strip,
+.shell-sidebar {
+  border-right: 1px solid var(--shell-border);
+}
+
+.shell-mobile-nav,
+.shell-bottom-links {
+  border-color: var(--shell-border);
+}
+
+.shell-brand,
+.shell-icon,
+.shell-nav-item,
+.shell-mobile-nav-item {
+  color: var(--shell-text);
+}
+
+.shell-action-btn:hover,
+.shell-sidebar-toggle:hover,
+.shell-nav-item:hover,
+.shell-mobile-nav-item:hover,
+.shell-section-toggle:hover {
+  background: var(--shell-hover);
+}
+
+.shell-avatar {
+  background: var(--shell-avatar-bg);
+  border: 1px solid var(--shell-avatar-border);
+}
+
+.shell-avatar-icon {
+  color: var(--shell-text);
+}
+
+.shell-sidebar-toggle {
+  border: 1px solid var(--shell-border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.shell-section-label {
+  color: var(--shell-text-subtle);
+}
+
+.shell-section-toggle:hover .shell-section-label {
+  color: var(--shell-text);
+}
+
+.shell-divider {
+  border-color: var(--shell-border);
+}
+
+.shell-nav-item {
+  color: var(--shell-text-muted);
+}
+
+.shell-nav-item:hover,
+.shell-mobile-nav-item:hover {
+  color: var(--shell-text);
+}
+
 a.nav-category-active {
-  color: #3b82f6 !important;
-  background: #eff6ff !important;
+  color: var(--shell-active-text) !important;
+  background: var(--shell-active-bg) !important;
   opacity: 1 !important;
 }
 
 :host ::ng-deep a.text-primary {
-  color: #3b82f6 !important;
-  background: #eff6ff !important;
+  color: var(--shell-active-text) !important;
+  background: var(--shell-active-bg) !important;
   opacity: 1 !important;
 }
 
 :host ::ng-deep aside.sidebar-collapsed a.nav-category-active,
 :host ::ng-deep aside.sidebar-collapsed a.text-primary {
-  background: #eff6ff !important;
+  background: var(--shell-active-bg) !important;
+}
+
+.shell-mobile-nav-item {
+  color: var(--shell-text-muted);
 }

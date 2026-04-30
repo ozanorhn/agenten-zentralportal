@@ -193,10 +193,10 @@ export class OmrSeoContentStrategieComponent {
             return 'Der OMR-Webhook hat mit HTTP 500 geantwortet.';
           }
 
-          return 'Die OMR SEO-Content-Strategie konnte nicht gestartet werden. Bitte versuche es erneut.';
+          return 'Der SEO-Strategie-Planer konnte nicht gestartet werden. Bitte versuche es erneut.';
       }
     }
 
-    return 'Die OMR SEO-Content-Strategie konnte nicht gestartet werden. Bitte versuche es erneut.';
+    return 'Der SEO-Strategie-Planer konnte nicht gestartet werden. Bitte versuche es erneut.';
   }
 }

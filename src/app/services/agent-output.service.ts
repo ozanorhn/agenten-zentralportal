@@ -305,7 +305,7 @@ export class AgentOutputService {
   private generateGoogleAdsAuditOutput(): GoogleAdsAuditOutput {
     return {
       type: 'google-ads-audit',
-      title: 'eom.de — Google Ads Audit',
+      title: 'eom.de — Google Ads Prüfung',
       domain: 'eom.de',
       companyName: 'Effektiv Online-Marketing GmbH',
       companyContext: 'Hannover · Google Premium Partner',

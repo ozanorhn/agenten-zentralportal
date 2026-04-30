@@ -1,500 +1,168 @@
-import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Component, inject, signal, computed } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
-export interface Agent {
+interface FeaturedAgent {
   id: string;
+  icon: string;
+  benefit: string;
   name: string;
   description: string;
+}
+
+interface Kpi {
+  label: string;
+  value: string;
+  sub: string;
+  trend: string;
+  trendDown: boolean;
   icon: string;
-  category: 'Sales' | 'Content' | 'SEO' | 'Data' | 'Ads' | 'HR';
-  badgeLabel?: string;
-  badgeVariant?: 'primary' | 'secondary';
-  isComingSoon?: boolean;
 }
 
-type AgentCategory = Agent['category'];
-
-interface HeroContent {
-  eyebrow: string;
-  titlePrefix: string;
-  titleAccent: string;
-  titleSuffix: string;
-  description: string;
+interface TodoItem {
+  id: string;
+  text: string;
+  done: boolean;
 }
+
+const TODOS_KEY = 'dashboard_todos';
+
+const DEFAULT_TODOS: TodoItem[] = [
+  { id: '1', text: 'SEO-Tagesbericht für heute starten', done: false },
+  { id: '2', text: 'Google Ads Audit durchführen (ROAS prüfen)', done: false },
+  { id: '3', text: 'Standort-Analyse für 3 neue Domains', done: false },
+  { id: '4', text: 'Content-Strategie Q2 finalisieren', done: false },
+  { id: '5', text: 'Wochenbericht vorbereiten', done: false },
+];
 
 @Component({
   selector: 'app-dashboard',
-  imports: [NgTemplateOutlet],
+  imports: [FormsModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class Dashboard implements OnInit, OnDestroy {
+export class Dashboard {
   private readonly router = inject(Router);
-  private readonly route = inject(ActivatedRoute);
-  readonly categoryOrder: AgentCategory[] = ['Content', 'Sales', 'SEO', 'Ads', 'HR', 'Data'];
-  readonly categoryMeta: Record<AgentCategory, { label: string; description: string }> = {
-    Content: {
-      label: 'Content',
-      description: 'Redaktion, Posts, Produkttexte und skalierbare Content-Produktion.',
-    },
-    Sales: {
-      label: 'Sales',
-      description: 'Outreach, Event-Nachbereitung und strukturierte Lead-Recherche.',
-    },
-    SEO: {
-      label: 'SEO',
-      description: 'Audits, SERP-Optimierung und Content-Analysen mit konkreten Maßnahmen.',
-    },
-    Ads: {
-      label: 'Ads',
-      description: 'Google-Ads-Audits, Tracking-Prüfungen und klare Hebel auf CPA, Leads und ROAS.',
-    },
-    HR: {
-      label: 'HR',
-      description: 'Recruiting, CV-Screening und Bewerberbewertung mit klarer Rollen-Zuordnung und Management-Summary.',
-    },
-    Data: {
-      label: 'Data',
-      description: 'Synchronisation, Recherche und operative Datenprozesse ohne manuelle Nachpflege.',
-    },
-  };
 
-  activeCategory = signal<string>('Alle');
-  private readonly heroContentByCategory: Record<string, HeroContent> = {
-    Alle: {
-      eyebrow: 'arcnode marketplace',
-      titlePrefix: 'KI-Systeme für ',
-      titleAccent: 'operative Exzellenz',
-      titleSuffix: '',
-      description:
-        'Kuratierte KI-Systeme für Marketing, Sales, SEO und Datenprozesse. Klar im Nutzen, sauber im Output — gebaut für den operativen Alltag.',
-    },
-    Marketing: {
-      eyebrow: 'marketing systeme',
-      titlePrefix: 'Marketing mit ',
-      titleAccent: 'messbarer Wirkung',
-      titleSuffix: '',
-      description:
-        'Content-Produktion und SEO/GEO-Sichtbarkeit in einem System — von LinkedIn-Posts bis zum vollständigen SERP-Audit.',
-    },
-    Sales: {
-      eyebrow: 'sales systeme',
-      titlePrefix: 'Outreach mit ',
-      titleAccent: 'konkreter Relevanz',
-      titleSuffix: '',
-      description:
-        'Systeme für Lead-Recherche, Event-Nachbereitung und strukturierten Outreach — direkt einsetzbar entlang der Vertriebspipeline.',
-    },
-    Content: {
-      eyebrow: 'content systeme',
-      titlePrefix: 'Content, der ',
-      titleAccent: 'schneller fertig wird',
-      titleSuffix: '',
-      description:
-        'Systeme für Produkttexte, LinkedIn-Posts, Short-Form-Video und redaktionelle Produktion. Belastbarer Output, ohne Umwege.',
-    },
-    SEO: {
-      eyebrow: 'seo systeme',
-      titlePrefix: 'Sichtbarkeit mit ',
-      titleAccent: 'klaren Prioritäten',
-      titleSuffix: '',
-      description:
-        'Systeme für Audits, SERP-Optimierung, interne Verlinkung und Content-Analysen — mit konkreten nächsten Schritten, nicht mit abstrakten Empfehlungen.',
-    },
-    Ads: {
-      eyebrow: 'ads systeme',
-      titlePrefix: 'Ads mit ',
-      titleAccent: 'messbaren Hebeln',
-      titleSuffix: '',
-      description:
-        'Systeme für Google-Ads-Audits, Tracking-Prüfungen und priorisierte Optimierungen mit Fokus auf Leads, CPA und ROAS.',
-    },
-    HR: {
-      eyebrow: 'hr systeme',
-      titlePrefix: 'Recruiting mit ',
-      titleAccent: 'klarer Vorauswahl',
-      titleSuffix: '',
-      description:
-        'Systeme für CV-Screening, Bewerberbewertung und schnelle Erstpriorisierung. Klar strukturiert, präsentationsfähig und direkt im Portal testbar.',
-    },
-    Data: {
-      eyebrow: 'data systeme',
-      titlePrefix: 'Aus Daten wird ',
-      titleAccent: 'operative Klarheit',
-      titleSuffix: '',
-      description:
-        'Systeme für Synchronisation, Recherche und Reporting. Operative Informationen dort, wo sie gebraucht werden — ohne manuelle Nachpflege.',
-    },
-  };
+  readonly today = new Date().toLocaleDateString('de-DE', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 
-  readonly marketingGroups: { label: string; icon: string; description: string; ids: string[] }[] = [
+  readonly kpis: Kpi[] = [
     {
-      label: 'Content',
-      icon: 'edit_note',
-      description: 'Social Posts, Blog-Artikel, Produkttexte und Short-Form-Video.',
-      ids: ['linkedin-ghostwriter', 'blog-redakteur', 'produkttext-agent', 'csv-produkttext-agent', 'social-media-wizard', 'script-savant'],
+      label: 'Ausführungen',
+      value: '928',
+      sub: 'Prozesse ausgeführt',
+      trend: '↓ -4%',
+      trendDown: true,
+      icon: 'bolt',
     },
     {
-      label: 'SEO / GEO',
-      icon: 'manage_search',
-      description: 'Sichtbarkeit, SERP-Analyse, Content-Strategie und KI-Optimierung.',
-      ids: ['seo-intelligence-dashboard', 'top-ranker-bot', 'content-strategy-bot', 'omr-seo-content-strategie', 'seo-geo-analyse-assistent', 'seo-geo-analyse-assistent-nollm', 'geo-report-alternative', 'geo-site-audit', 'interne-verlinkung-vorschlaege', 'content-seo-analyzer'],
+      label: 'Zeit gespart',
+      value: '171h 40m',
+      sub: '≈171.7h Netto',
+      trend: '↓ -4%',
+      trendDown: true,
+      icon: 'schedule',
     },
     {
-      label: 'Ads',
-      icon: 'ads_click',
-      description: 'Google-Ads-Audits mit Fokus auf Kontostruktur, Tracking und direkte Effizienzhebel.',
-      ids: ['ad-copy-generator', 'google-ads-audit', 'ads-health-checker'],
+      label: 'Wert erzeugt',
+      value: '9.992 €',
+      sub: 'Netto Wertschöpfung',
+      trend: '↓ -4%',
+      trendDown: true,
+      icon: 'payments',
+    },
+    {
+      label: 'Ø Ausführung',
+      value: '11,1 min',
+      sub: 'Zeit gespart je Lauf',
+      trend: 'Stabil',
+      trendDown: false,
+      icon: 'avg_pace',
     },
   ];
 
-  getMarketingGroupAgents(ids: string[]): Agent[] {
-    return (ids.map(id => this.agents.find(a => a.id === id)).filter(Boolean) as Agent[])
-      .sort((a, b) => (a.isComingSoon ? 1 : 0) - (b.isComingSoon ? 1 : 0));
-  }
-
-  private paramSub!: Subscription;
-
-  ngOnInit(): void {
-    this.paramSub = this.route.queryParamMap.subscribe(params => {
-      const cat = params.get('category');
-      this.activeCategory.set(cat ?? 'Alle');
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.paramSub.unsubscribe();
-  }
-
-  agents: Agent[] = [
+  readonly featuredAgents: FeaturedAgent[] = [
     {
       id: 'seo-intelligence-dashboard',
-      name: 'Daily SEO Intelligence',
-      description:
-        'Startet den täglichen SEO-Intelligence-Workflow und übergibt aktuelle Prioritäten mit Zeitstempel an n8n zur Weiterverarbeitung.',
       icon: 'query_stats',
-      category: 'SEO',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
-    },
-    {
-      id: 'linkedin-ghostwriter',
-      name: 'LinkedIn-Post-Agent',
+      benefit: 'Tägliches SEO-Briefing — in unter 2 Minuten',
+      name: 'SEO-Tagesbericht',
       description:
-        'Verdichtet Erfahrungen, Thesen oder Cases in veröffentlichungsreife LinkedIn-Posts mit klarem Ton und sauberer Struktur.',
-      icon: 'history_edu',
-      category: 'Content',
-      isComingSoon: true,
-    },
-    {
-      id: 'blog-redakteur',
-      name: 'Blog-Redakteur',
-      description:
-        'Erstellt ein vollständiges Blogpaket aus Thema, Keyword, Outline und redaktioneller Qualitätssicherung.',
-      icon: 'edit_note',
-      category: 'Content',
-      badgeLabel: 'NEU',
-      badgeVariant: 'primary',
-      isComingSoon: true,
-    },
-    {
-      id: 'produkttext-agent',
-      name: 'Produkttext-Agent',
-      description:
-        'Erzeugt belastbare Produkttexte aus Produkt-URL, Bild oder Zusatzinformationen für Shop und Kampagne.',
-      icon: 'imagesmode',
-      category: 'Content',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
-    },
-    {
-      id: 'csv-produkttext-agent',
-      name: 'CSV Produkttext-Agent',
-      description:
-        'Verarbeitet Produktlisten als CSV und liefert skalierbare SEO-Produkttexte als sauberen Batch-Output zurück.',
-      icon: 'table_chart',
-      category: 'Content',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
-    },
-    {
-      id: 'social-media-wizard',
-      name: 'Social-Media-Wizard',
-      description:
-        'Erstellt plattformgerechten Social Content für LinkedIn, Instagram, Reddit und weitere Kanäle auf Basis deiner Brand Voice.',
-      icon: 'campaign',
-      category: 'Content',
-      badgeLabel: 'NEU',
-      badgeVariant: 'primary',
-      isComingSoon: true,
-    },
-    {
-      id: 'script-savant',
-      name: 'Short-Form-Video-Agent',
-      description:
-        'Leitet aus Thema oder Content-Piece ein kompaktes Skript für Reels, Shorts und andere Social Clips ab.',
-      icon: 'video_chat',
-      category: 'Content',
-      isComingSoon: true,
-    },
-    {
-      id: 'pipeline-analyst',
-      name: 'Pipeline-Analyst',
-      description:
-        'Bewertet aktive B2B-Deals nach Win-Wahrscheinlichkeit, identifiziert Risikosignale und liefert pro Deal genau eine priorisierte Maßnahme.',
-      icon: 'trending_up',
-      category: 'Sales',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
-    },
-    {
-      id: 'angebots-assistent',
-      name: 'Angebots-Assistent',
-      description:
-        'Erstellt professionelle B2B-Angebote mit Executive Summary, Leistungsumfang, Preistabelle und nächsten Schritten — versandfertig in Sekunden.',
-      icon: 'request_quote',
-      category: 'Sales',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
-    },
-    {
-      id: 'meeting-protokoll-agent',
-      name: 'Meeting-Protokoll-Agent',
-      description:
-        'Wandelt rohe Meeting-Notizen in strukturierte Protokolle um — mit Beschlüssen, Action Items, Verantwortlichen und Deadlines.',
-      icon: 'summarize',
-      category: 'Data',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
-    },
-    {
-      id: 'ad-copy-generator',
-      name: 'Ad-Copy-Generator',
-      description:
-        'Generiert performante Google Ads und Meta Ads — drei Varianten mit Tonalitätslabel und Quality Score, sofort testbereit.',
-      icon: 'campaign',
-      category: 'Ads',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
-    },
-    {
-      id: 'networking-ninja',
-      name: 'Event-Follow-up-Agent',
-      description:
-        'Strukturiert Follow-up-Nachrichten für Event-Kontakte und bereitet den passenden nächsten Schritt im Vertrieb vor.',
-      icon: 'contact_mail',
-      category: 'Sales',
-      badgeLabel: 'EVENT',
-      badgeVariant: 'primary',
-      isComingSoon: true,
-    },
-    {
-      id: 'firmen-finder',
-      name: 'Local-Business-Scraper',
-      description:
-        'Recherchiert lokale Unternehmen nach Branche und Standort und liefert eine belastbare Ausgangsliste für Vertrieb und Marktanalyse.',
-      icon: 'location_city',
-      category: 'Sales',
-      badgeLabel: 'NEU',
-      badgeVariant: 'primary',
-      isComingSoon: true,
-    },
-    {
-      id: 'cold-mail-cyborg',
-      name: 'Outreach-Agent',
-      description:
-        'Erstellt personalisierte Outreach-Nachrichten auf Basis von Zielkunde, Positionierung und Anlass.',
-      icon: 'alternate_email',
-      category: 'Sales',
-      isComingSoon: true,
-    },
-    {
-      id: 'lead-researcher',
-      name: 'Lead-Researcher',
-      description:
-        'Findet belastbare Neukunden-Signale aus Web, Jobmarkt und Unternehmenskommunikation für die Vertriebspriorisierung.',
-      icon: 'biotech',
-      category: 'Data',
-      isComingSoon: true,
-    },
-    {
-      id: 'ai-screening-agent',
-      name: 'AI-Screening-Agent',
-      description:
-        'Simuliert ein KI-CV-Screening mit Upload, 5-Sekunden-Analyse und drei Demo-Kandidat:innen pro Zielrolle.',
-      icon: 'assignment_ind',
-      category: 'HR',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
-    },
-    {
-      id: 'interview-scorecard-agent',
-      name: 'Interview-Scorecard-Agent',
-      description:
-        'Bewertet drei Demo-Finalist:innen strukturiert nach Interview-Signalen, Risiken und finaler Hiring-Empfehlung.',
-      icon: 'rate_review',
-      category: 'HR',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
-    },
-    {
-      id: 'hiring-funnel-agent',
-      name: 'Hiring-Funnel-Agent',
-      description:
-        'Analysiert drei Recruiting-Pipelines, priorisiert Engpässe und zeigt, wo Time-to-Hire und Conversion kippen.',
-      icon: 'conversion_path',
-      category: 'HR',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
-    },
-    {
-      id: 'top-ranker-bot',
-      name: 'SERP-Optimierungs-Agent',
-      description:
-        'Analysiert bestehende Rankings, Wettbewerber und SERP-Muster und priorisiert realistische Optimierungen.',
-      icon: 'manage_search',
-      category: 'SEO',
-      isComingSoon: true,
-    },
-    {
-      id: 'google-ads-audit',
-      name: 'Google Ads Audit',
-      description:
-        'Prüft das Setup auf Budgetlecks, fehlende Tracking-Signale und die größten Hebel auf Leads, CPA und ROAS.',
-      icon: 'ads_click',
-      category: 'Ads',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
-    },
-    {
-      id: 'ads-health-checker',
-      name: 'Ads Health Checker',
-      description:
-        'Bewertet Stellenanzeigen-Kampagnen kanalübergreifend und zeigt, wo CPL, CTR und Frequenz gerade kippen.',
-      icon: 'monitoring',
-      category: 'Ads',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
-    },
-    {
-      id: 'geo-site-audit',
-      name: 'Geo Site Audit',
-      description:
-        'Crawlt die Sitemap und erstellt einen priorisierten Audit zu Struktur, KI-Signalen und technischer Auffindbarkeit.',
-      icon: 'travel_explore',
-      category: 'SEO',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
+        'Aktuelle SEO-Prioritäten, SERP-Bewegungen und klare Maßnahmen für heute. Direkt aus dem Workflow — ohne manuelle Interpretation.',
     },
     {
       id: 'seo-geo-analyse-assistent',
-      name: 'SEO/GEO Analyse Assistent',
-      description:
-        'Erfasst URL, Marke, Branche und Standort und liefert daraus eine strukturierte SEO- und GEO-Auswertung.',
       icon: 'forum',
-      category: 'SEO',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
+      benefit: 'Vollständiger SEO-Score für jede Domain',
+      name: 'SEO- & Standort-Analyse',
+      description:
+        'URL, Branche und Standort eingeben — strukturierten Sichtbarkeits-Report mit GEO-Anteil und lokaler Einordnung erhalten.',
     },
     {
-      id: 'seo-geo-analyse-assistent-nollm',
-      name: 'SEO/GEO Analyse Assistent NoLLM',
-      description:
-        'Nutze denselben Analyse-Flow gegen den NoLLM-Webhook und vergleiche den Output direkt im Portal.',
-      icon: 'forum',
-      category: 'SEO',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
-    },
-    {
-      id: 'geo-report-alternative',
-      name: 'Geo Report Alternative',
-      description:
-        'Sendet eine einzelne URL an den alternativen Webhook und zeigt den gelieferten Report direkt als Markdown-Ansicht an.',
-      icon: 'description',
-      category: 'SEO',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
-    },
-    {
-      id: 'content-seo-analyzer',
-      name: 'Content & SEO Analyzer',
-      description:
-        'Startet eine strukturierte Content- und SEO-Analyse für eine einzelne Domain und bereitet den Workflow direkt im Portal vor.',
-      icon: 'travel_explore',
-      category: 'SEO',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
-    },
-    {
-      id: 'omr-seo-content-strategie',
-      name: 'OMR SEO-Content-Strategie',
-      description:
-        'Leitet Thema, Zielgruppe und Offer an den OMR-Workflow weiter und zeigt die strategische Auswertung direkt im Portal an.',
+      id: 'ad-copy-generator',
       icon: 'campaign',
-      category: 'SEO',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
-    },
-    {
-      id: 'interne-verlinkung-vorschlaege',
-      name: 'Interne Verlinkung - Vorschlaege',
+      benefit: 'Google Ads & Meta Ads — sofort testbereit',
+      name: 'Werbetext-Ersteller',
       description:
-        'Ermittelt interne Verlinkungsansätze aus Sitemap, Zielseite und Hauptkeyword und liefert konkrete Vorschläge zurück.',
-      icon: 'alt_route',
-      category: 'SEO',
-      badgeLabel: 'LIVE',
-      badgeVariant: 'primary',
-    },
-    {
-      id: 'content-strategy-bot',
-      name: 'Content-Strategy-Bot',
-      description:
-        'Erarbeitet zu einem Thema einen belastbaren Content-Plan inklusive Suchvolumen, Difficulty und Wettbewerbsumfeld.',
-      icon: 'article',
-      category: 'SEO',
-      badgeLabel: 'NEU',
-      badgeVariant: 'primary',
-      isComingSoon: true,
-    },
-    {
-      id: 'sync-master',
-      name: 'CRM-Sync-Agent',
-      description:
-        'Hält CRM-, Spreadsheet- und Marketing-Daten konsistent und reduziert Dubletten, Lücken und manuelle Nachpflege.',
-      icon: 'schema',
-      category: 'Data',
-      isComingSoon: true,
+        'Drei Anzeigen-Varianten mit Tonalitätslabel und Quality Score. Copy-paste in Ihr Konto — keine Nachbearbeitung nötig.',
     },
   ];
 
-  readonly visibleCategories = () => {
-    const active = this.activeCategory();
-    return active === 'Alle'
-      ? this.categoryOrder
-      : this.categoryOrder.filter(category => category === active);
-  };
+  // ── Todos ──────────────────────────────────────────────────────────
+  todos = signal<TodoItem[]>(this.loadTodos());
+  newTodoText = signal('');
+  readonly openCount = computed(() => this.todos().filter(t => !t.done).length);
 
-  agentsForCategory(category: AgentCategory): Agent[] {
-    return this.agents
-      .filter(agent => agent.category === category)
-      .sort((a, b) => (a.isComingSoon ? 1 : 0) - (b.isComingSoon ? 1 : 0));
+  private loadTodos(): TodoItem[] {
+    try {
+      const stored = localStorage.getItem(TODOS_KEY);
+      return stored ? JSON.parse(stored) : DEFAULT_TODOS;
+    } catch {
+      return DEFAULT_TODOS;
+    }
   }
 
-  get filteredAgents(): Agent[] {
-    if (this.activeCategory() === 'Alle') return this.agents;
-    return this.agents.filter((a) => a.category === this.activeCategory());
+  private saveTodos(items: TodoItem[]): void {
+    localStorage.setItem(TODOS_KEY, JSON.stringify(items));
   }
 
-  get heroContent(): HeroContent {
-    return this.heroContentByCategory[this.activeCategory()] ?? this.heroContentByCategory['Alle'];
+  toggleTodo(id: string): void {
+    this.todos.update(items => {
+      const updated = items.map(t => t.id === id ? { ...t, done: !t.done } : t);
+      this.saveTodos(updated);
+      return updated;
+    });
+  }
+
+  addTodo(): void {
+    const text = this.newTodoText().trim();
+    if (!text) return;
+    this.todos.update(items => {
+      const updated = [...items, { id: Date.now().toString(), text, done: false }];
+      this.saveTodos(updated);
+      return updated;
+    });
+    this.newTodoText.set('');
+  }
+
+  deleteTodo(id: string): void {
+    this.todos.update(items => {
+      const updated = items.filter(t => t.id !== id);
+      this.saveTodos(updated);
+      return updated;
+    });
+  }
+
+  onNewTodoKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') this.addTodo();
   }
 
   startWorkflow(agentId: string): void {
-    const agent = this.agents.find(a => a.id === agentId);
-    if (agent?.isComingSoon) return;
     this.router.navigate(['/agents', agentId]);
   }
 }

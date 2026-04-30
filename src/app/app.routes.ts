@@ -22,7 +22,7 @@ export const routes: Routes = [
       {
         path: 'agents',
         loadComponent: () =>
-          import('./pages/dashboard/dashboard').then((m) => m.Dashboard),
+          import('./pages/agents/agents').then((m) => m.AgentsPage),
       },
       {
         path: 'agents/produkttext-agent/result',
@@ -171,11 +171,6 @@ export const routes: Routes = [
         path: 'management',
         loadComponent: () =>
           import('./pages/management/management').then((m) => m.Management),
-      },
-      {
-        path: 'ceo-dashboard',
-        loadComponent: () =>
-          import('./pages/ceo-dashboard/ceo-dashboard').then((m) => m.CeoDashboard),
       },
       {
         path: 'kpi-dashboard',

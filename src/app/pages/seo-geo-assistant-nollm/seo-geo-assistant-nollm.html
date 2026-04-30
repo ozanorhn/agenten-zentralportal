@@ -5,7 +5,7 @@
         SEO
       </span>
       <h1 class="mb-5 text-4xl font-black leading-none tracking-tighter text-on-surface font-headline md:text-6xl">
-        SEO/GEO Analyse <span class="text-[#0070FF]">Assistent NoLLM</span>
+         <span class="text-[#0070FF]">(Systemvergleich)</span>
       </h1>
       <p class="max-w-3xl text-lg font-light leading-relaxed text-on-surface-variant md:text-xl">
         Felder ausfüllen, Analyse starten und den fertigen Report direkt im Portal ansehen.
@@ -209,36 +209,36 @@
 
 @if (showLoadingOverlay()) {
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-[#041226]/78 px-4 backdrop-blur-md"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(241,245,249,0.84)] px-4 backdrop-blur-md dark:bg-[#041226]/78"
     role="status"
     aria-live="polite"
     aria-busy="true"
   >
-    <div class="relative w-full max-w-2xl overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(4,18,38,0.98),rgba(10,34,67,0.96))] p-6 shadow-[0_24px_100px_rgba(0,0,0,0.45)] md:p-8">
-      <div class="pointer-events-none absolute inset-x-10 top-0 h-32 rounded-full bg-[#0070FF]/20 blur-3xl"></div>
+    <div class="relative w-full max-w-2xl overflow-hidden rounded-[2rem] border border-[#d6e2f0] bg-[linear-gradient(180deg,#ffffff_0%,#f3f8ff_100%)] p-6 shadow-[0_24px_80px_rgba(15,23,42,0.16)] dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(4,18,38,0.98),rgba(10,34,67,0.96))] dark:shadow-[0_24px_100px_rgba(0,0,0,0.45)] md:p-8">
+      <div class="pointer-events-none absolute inset-x-10 top-0 h-32 rounded-full bg-[#0070FF]/12 blur-3xl dark:bg-[#0070FF]/20"></div>
 
       <div class="relative">
         <div class="flex items-start justify-between gap-4">
           <div>
-            <p class="text-[10px] font-black uppercase tracking-[0.26em] text-[#93c5fd]">
+            <p class="text-[10px] font-black uppercase tracking-[0.26em] text-[#0A66FF] dark:text-[#93c5fd]">
               NoLLM Analyse läuft
             </p>
-            <h2 class="mt-3 text-3xl font-black leading-tight tracking-tight text-white font-headline md:text-4xl">
-              SEO/GEO Analyse wird erstellt
+            <h2 class="mt-3 text-3xl font-black leading-tight tracking-tight text-slate-950 font-headline dark:text-white md:text-4xl">
+              SEO- & GEO-Analyse wird erstellt
             </h2>
-            <p class="mt-3 max-w-xl text-sm leading-relaxed text-blue-100/70 md:text-base">
+            <p class="mt-3 max-w-xl text-sm leading-relaxed text-slate-600 dark:text-blue-100/70 md:text-base">
               Der Report öffnet sich automatisch, sobald alle Prüfschritte abgeschlossen sind.
             </p>
           </div>
 
-          <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-right">
-            <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-blue-100/55">Fortschritt</p>
-            <p class="mt-2 text-2xl font-black text-white">{{ overlayProgress() }}%</p>
+          <div class="rounded-2xl border border-[#d6e2f0] bg-white/85 px-4 py-3 text-right shadow-[0_10px_30px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/5 dark:shadow-none">
+            <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-[#5b7392] dark:text-blue-100/55">Fortschritt</p>
+            <p class="mt-2 text-2xl font-black text-slate-950 dark:text-white">{{ overlayProgress() }}%</p>
           </div>
         </div>
 
         <div class="mt-8">
-          <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-[0.2em] text-blue-100/55">
+          <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-[0.2em] text-[#5b7392] dark:text-blue-100/55">
             <span>Analyse Pipeline</span>
             <span>
               @if (overlayCompleted()) {
@@ -249,9 +249,9 @@
             </span>
           </div>
 
-          <div class="mt-3 h-3 overflow-hidden rounded-full bg-white/10">
+          <div class="mt-3 h-3 overflow-hidden rounded-full bg-[#dbe6f3] dark:bg-white/10">
             <div
-              class="h-full rounded-full bg-[linear-gradient(90deg,#35c2ff_0%,#0070FF_55%,#7dd3fc_100%)] transition-[width] duration-[1200ms] ease-out"
+              class="h-full rounded-full bg-[linear-gradient(90deg,#60a5fa_0%,#0070FF_55%,#38bdf8_100%)] transition-[width] duration-[1200ms] ease-out"
               [style.width.%]="overlayProgress()"
             ></div>
           </div>
@@ -262,17 +262,17 @@
             <div
               class="flex items-start gap-4 rounded-2xl border px-4 py-4 transition-all duration-500"
               [ngClass]="{
-                'border-[#93c5fd]/45 bg-[#0d3f84]/28': $index < activeStepIndex() || overlayCompleted(),
-                'border-[#7dd3fc]/60 bg-[#0b4ea8]/28 shadow-[0_0_0_1px_rgba(125,211,252,0.12),0_0_24px_rgba(0,112,255,0.16)]': $index === activeStepIndex() && !overlayCompleted(),
-                'border-white/10 bg-white/5': $index > activeStepIndex() && !overlayCompleted()
+                'border-emerald-200 bg-emerald-50/85 dark:border-[#93c5fd]/45 dark:bg-[#0d3f84]/28': $index < activeStepIndex() || overlayCompleted(),
+                'border-[#9bc5ff] bg-[#eef6ff] shadow-[0_0_0_1px_rgba(0,112,255,0.08),0_14px_30px_rgba(0,112,255,0.12)] dark:border-[#7dd3fc]/60 dark:bg-[#0b4ea8]/28 dark:shadow-[0_0_0_1px_rgba(125,211,252,0.12),0_0_24px_rgba(0,112,255,0.16)]': $index === activeStepIndex() && !overlayCompleted(),
+                'border-[#d6e2f0] bg-white/72 dark:border-white/10 dark:bg-white/5': $index > activeStepIndex() && !overlayCompleted()
               }"
             >
               <span
                 class="mt-0.5 inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl border text-sm font-black"
                 [ngClass]="{
-                  'border-[#93c5fd]/50 bg-[#35c2ff]/15 text-[#dbeafe]': $index < activeStepIndex() || overlayCompleted(),
-                  'border-[#7dd3fc]/65 bg-[#0070FF]/25 text-white': $index === activeStepIndex() && !overlayCompleted(),
-                  'border-white/10 bg-white/5 text-blue-100/55': $index > activeStepIndex() && !overlayCompleted()
+                  'border-emerald-200 bg-emerald-100 text-emerald-800 dark:border-[#93c5fd]/50 dark:bg-[#35c2ff]/15 dark:text-[#dbeafe]': $index < activeStepIndex() || overlayCompleted(),
+                  'border-[#9bc5ff] bg-[#dcebff] text-[#0A4FB7] dark:border-[#7dd3fc]/65 dark:bg-[#0070FF]/25 dark:text-white': $index === activeStepIndex() && !overlayCompleted(),
+                  'border-[#d6e2f0] bg-white/80 text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-blue-100/55': $index > activeStepIndex() && !overlayCompleted()
                 }"
               >
                 @if ($index < activeStepIndex() || overlayCompleted()) {
@@ -288,8 +288,8 @@
                 <p
                   class="text-sm font-semibold leading-relaxed md:text-[15px]"
                   [ngClass]="{
-                    'text-white': $index <= activeStepIndex() || overlayCompleted(),
-                    'text-blue-100/55': $index > activeStepIndex() && !overlayCompleted()
+                    'text-slate-900 dark:text-white': $index <= activeStepIndex() || overlayCompleted(),
+                    'text-slate-500 dark:text-blue-100/55': $index > activeStepIndex() && !overlayCompleted()
                   }"
                 >
                   {{ step }}
@@ -298,8 +298,8 @@
                 <p
                   class="mt-1 text-xs leading-relaxed"
                   [ngClass]="{
-                    'text-blue-100/65': $index <= activeStepIndex() || overlayCompleted(),
-                    'text-blue-100/40': $index > activeStepIndex() && !overlayCompleted()
+                    'text-slate-600 dark:text-blue-100/65': $index <= activeStepIndex() || overlayCompleted(),
+                    'text-slate-400 dark:text-blue-100/40': $index > activeStepIndex() && !overlayCompleted()
                   }"
                 >
                   @if ($index < activeStepIndex() || overlayCompleted()) {

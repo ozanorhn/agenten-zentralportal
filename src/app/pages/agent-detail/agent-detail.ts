@@ -221,7 +221,7 @@ export class AgentDetail {
     'Analysiere Tracking- und Conversion-Signale …',
     'Bewerte Anzeigen, Keywords und Erweiterungen …',
     'Priorisiere Maßnahmen nach Hebel …',
-    'Google Ads Audit bereit',
+    'Google Ads Prüfung bereit',
   ];
 
   private readonly PROGRESS_LABELS_ADS_HEALTH = [
@@ -230,7 +230,7 @@ export class AgentDetail {
     'Prüfe CPL, CTR und Frequenz nach Kampagne …',
     'Analysiere Job-Performance und Auffälligkeiten …',
     'Erstelle kanalübergreifende Handlungsempfehlungen …',
-    'Ads Health Check bereit',
+    'Anzeigen-Leistungscheck bereit',
   ];
 
   submitWorkflow(): void {
@@ -958,7 +958,7 @@ export class AgentDetail {
 
       const output = this.agentOutput.generateOutput('google-ads-audit', {});
       setTimeout(() => {
-        this.saveAndNavigate(output, 'Google Ads Audit: eom.de', {});
+        this.saveAndNavigate(output, 'Google Ads Prüfung: eom.de', {});
       }, 400);
     }, minDuration);
   }
@@ -987,7 +987,7 @@ export class AgentDetail {
 
       const output = this.agentOutput.generateOutput('ads-health-checker', {});
       setTimeout(() => {
-        this.saveAndNavigate(output, 'Ads Health Check: Stellenanzeigen', {});
+        this.saveAndNavigate(output, 'Anzeigen-Leistungscheck: Stellenanzeigen', {});
       }, 400);
     }, minDuration);
   }
@@ -1476,8 +1476,8 @@ export class AgentDetail {
       case 'social-media':       summary = `Social Media: ${output.topic}`; break;
       case 'product-text':       summary = output.structuredResult?.seo?.title ?? output.structuredResult?.seo?.h1 ?? output.generatedFile?.fileName ?? 'Produkttext generiert'; break;
       case 'csv-product-text':   summary = `${output.rowCount} Produkte verarbeitet`; break;
-      case 'google-ads-audit':   summary = `Google Ads Audit: ${output.domain}`; break;
-      case 'ads-health-checker': summary = 'Campaign Health Check: Stellenanzeigen'; break;
+      case 'google-ads-audit':   summary = `Google Ads Prüfung: ${output.domain}`; break;
+      case 'ads-health-checker': summary = 'Anzeigen-Leistungscheck: Stellenanzeigen'; break;
     }
 
     this.saveAndNavigate(output, summary, input);

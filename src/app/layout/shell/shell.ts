@@ -50,8 +50,8 @@ export class Shell {
 
   readonly navItemClass = computed(() =>
     this.sidebarCollapsed()
-      ? 'flex items-center justify-center py-2.5 w-9 mx-auto rounded-lg text-sm transition-all duration-150 text-on-surface-variant/60 hover:text-on-surface hover:bg-[#f6f9fc]'
-      : 'flex items-center gap-2.5 px-3 py-2 rounded-lg font-body font-medium text-[13px] transition-all duration-150 text-on-surface-variant/80 hover:text-on-surface hover:bg-[#f6f9fc]'
+      ? 'shell-nav-item flex items-center justify-center py-2.5 w-9 mx-auto rounded-lg text-sm transition-all duration-150'
+      : 'shell-nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg font-body font-medium text-[13px] transition-all duration-150'
   );
 
   readonly mainClass = computed(() =>
@@ -85,22 +85,9 @@ export class Shell {
       collapsible: true,
       items: [
         { label: 'Betrieb', icon: 'bar_chart', route: '/analytics' },
-        { label: 'ROI Übersicht', icon: 'speed', route: '/ceo-dashboard' },
         { label: 'Live KPIs', icon: 'query_stats', route: '/kpi-dashboard' },
-      ],
-    },
-    {
-      label: 'Berichte',
-      collapsible: true,
-      items: [
         { label: 'Reporting', icon: 'summarize', route: '/reporting-bot' },
         { label: 'Verlauf', icon: 'history', route: '/history' },
-      ],
-    },
-    {
-      label: 'System',
-      collapsible: true,
-      items: [
         { label: 'Verwaltung', icon: 'tune', route: '/management' },
       ],
     },

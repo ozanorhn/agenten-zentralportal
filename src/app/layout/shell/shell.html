@@ -1,42 +1,41 @@
 <div class="flex min-h-screen bg-background text-on-surface font-body overflow-x-hidden">
 
   <!-- Top Navigation Bar -->
-  <header class="fixed top-0 left-0 right-0 z-50 flex items-stretch
-                 border-b border-[#e3e8ee] bg-white">
+  <header class="shell-header fixed top-0 left-0 right-0 z-50 flex items-stretch">
 
     <!-- Logo strip — white, width tracks sidebar -->
     <div
-      class="hidden md:flex items-center px-5 bg-white flex-shrink-0 overflow-hidden
-             transition-[width] duration-300 border-r border-[#e3e8ee]"
+      class="shell-logo-strip hidden md:flex items-center px-5 flex-shrink-0 overflow-hidden
+             transition-[width] duration-300"
       [class.w-64]="!sidebarCollapsed()"
       [class.w-16]="sidebarCollapsed()"
     >
       @if (!sidebarCollapsed()) {
-        <a routerLink="/dashboard" class="brand-title text-[1.5rem] font-black text-[#0a2540] font-headline tracking-tight">
-          arcnode OS
+        <a routerLink="/dashboard" class="shell-brand brand-title flex items-baseline">
+          <span class="font-headline font-bold text-[1.5rem] lowercase">arcnode</span>&nbsp;<span class="font-headline font-bold text-[1.5rem] capitalize">OS</span>
         </a>
       }
     </div>
 
     <!-- Actions strip -->
-    <div class="flex-1 flex items-center justify-between px-6 py-2.5 bg-white">
+    <div class="shell-header-actions flex-1 flex items-center justify-between px-6 py-2.5">
       <!-- Mobile-only logo -->
-      <a routerLink="/dashboard" class="md:hidden brand-title text-[1.5rem] font-black text-[#0a2540] font-headline tracking-tight">
-        arcnode OS
+      <a routerLink="/dashboard" class="shell-brand md:hidden brand-title flex items-baseline">
+        <span class="font-headline font-bold text-[1.5rem] lowercase">arcnode</span>&nbsp;<span class="font-headline font-bold text-[1.5rem] capitalize">OS</span>
       </a>
 
       <div class="flex items-center gap-1 ml-auto">
         <!-- Theme Toggle -->
         <button
           (click)="theme.toggle()"
-          class="hover:bg-[#f6f9fc] transition-all duration-150 p-2 rounded-lg"
+          class="shell-action-btn transition-all duration-150 p-2 rounded-lg"
           [title]="theme.isDark() ? 'Hell-Modus aktivieren' : 'Dunkel-Modus aktivieren'"
           [attr.aria-label]="theme.isDark() ? 'Hell-Modus aktivieren' : 'Dunkel-Modus aktivieren'"
         >
           @if (theme.isDark()) {
-            <span class="material-symbols-outlined text-[#425466] text-xl">light_mode</span>
+            <span class="shell-icon material-symbols-outlined text-xl">light_mode</span>
           } @else {
-            <span class="material-symbols-outlined text-[#425466] text-xl">dark_mode</span>
+            <span class="shell-icon material-symbols-outlined text-xl">dark_mode</span>
           }
         </button>
 
@@ -44,10 +43,10 @@
         <div class="relative">
           <button
             (click)="toggleNotifications()"
-            class="relative hover:bg-[#f6f9fc] transition-all duration-150 p-2 rounded-lg"
+            class="shell-action-btn relative transition-all duration-150 p-2 rounded-lg"
             aria-label="Benachrichtigungen öffnen"
           >
-            <span class="material-symbols-outlined text-[#425466] text-xl">notifications</span>
+            <span class="shell-icon material-symbols-outlined text-xl">notifications</span>
             @if (notifService.unreadCount() > 0) {
               <span class="absolute top-1 right-1 w-3.5 h-3.5 bg-primary rounded-full text-[8px] font-black text-white
                            flex items-center justify-center">
@@ -61,11 +60,11 @@
           />
         </div>
 
-        <button class="hover:bg-[#f6f9fc] transition-all duration-150 p-2 rounded-lg" aria-label="Einstellungen öffnen">
-          <span class="material-symbols-outlined text-[#425466] text-xl">settings</span>
+        <button class="shell-action-btn transition-all duration-150 p-2 rounded-lg" aria-label="Einstellungen öffnen">
+          <span class="shell-icon material-symbols-outlined text-xl">settings</span>
         </button>
-        <div class="w-7 h-7 rounded-full bg-[#e3e8ee] border border-[#c8d6e5] flex items-center justify-center ml-2">
-          <span class="material-symbols-outlined text-[#425466] text-base">person</span>
+        <div class="shell-avatar w-7 h-7 rounded-full flex items-center justify-center ml-2">
+          <span class="shell-avatar-icon material-symbols-outlined text-base">person</span>
         </div>
       </div>
     </div>
@@ -73,7 +72,7 @@
 
   <!-- Sidebar -->
   <aside
-    class="h-screen fixed left-0 top-0 pt-[56px] z-40 bg-white border-r border-[#e3e8ee] flex-col hidden md:flex overflow-hidden transition-[width] duration-300"
+    class="shell-sidebar h-screen fixed left-0 top-0 pt-[56px] z-40 flex-col hidden md:flex overflow-hidden transition-[width] duration-300"
     [class.w-64]="!sidebarCollapsed()"
     [class.w-16]="sidebarCollapsed()"
     [class.sidebar-collapsed]="sidebarCollapsed()"
@@ -82,11 +81,11 @@
     <div class="flex py-2 px-2" [class.justify-end]="!sidebarCollapsed()" [class.justify-center]="sidebarCollapsed()">
       <button
         (click)="toggleSidebar()"
-        class="w-6 h-6 rounded-lg border border-[#e3e8ee] bg-white flex items-center justify-center hover:bg-[#f6f9fc] transition-all duration-150"
+        class="shell-sidebar-toggle w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-150"
         [title]="sidebarCollapsed() ? 'Sidebar erweitern' : 'Sidebar einklappen'"
       >
         <span
-          class="material-symbols-outlined text-base text-primary-container transition-transform duration-300"
+          class="shell-icon material-symbols-outlined text-base transition-transform duration-300"
           [class.rotate-180]="sidebarCollapsed()"
         >chevron_left</span>
       </button>
@@ -98,32 +97,10 @@
          [class.px-2]="sidebarCollapsed()">
       @for (section of navSections; track section.label) {
         <div class="mb-4">
-          @if (!sidebarCollapsed()) {
-            @if (section.collapsible) {
-              <button
-                (click)="toggleSection(section.label)"
-                class="w-full flex items-center justify-between px-3 py-1 mb-0.5 group"
-              >
-                <span class="text-[11px] uppercase tracking-[0.16em] text-[#a3b1bf] font-bold group-hover:text-[#66788a] transition-colors duration-100">
-                  {{ section.label }}
-                </span>
-                <span
-                  class="material-symbols-outlined text-[13px] text-[#a3b1bf] group-hover:text-[#66788a] transition-all duration-150"
-                  [class.rotate-180]="!collapsedSections().has(section.label)"
-                >expand_more</span>
-              </button>
-            } @else {
-              <p class="text-[11px] uppercase tracking-[0.16em] text-[#a3b1bf] font-bold px-3 mb-0.5">
-                {{ section.label }}
-              </p>
-            }
-          } @else {
-            <div class="border-t border-slate-200 my-2 mx-1"></div>
+          @if (sidebarCollapsed()) {
+            <div class="shell-divider border-t my-2 mx-1"></div>
           }
-          @if (sidebarCollapsed() || !section.collapsible || !collapsedSections().has(section.label)) {
-          <nav [class]="sidebarCollapsed()
-            ? 'space-y-0.5'
-            : 'space-y-0.5'">
+          <nav class="space-y-0.5">
             @for (item of section.items; track item.route + item.label) {
               @if (item.queryParams) {
                 <a
@@ -156,13 +133,12 @@
               }
             }
           </nav>
-          }
         </div>
       }
     </div>
 
     <!-- Bottom links -->
-    <div class="border-t border-slate-200 py-4 space-y-1"
+    <div class="shell-bottom-links border-t py-4 space-y-1"
          [class.px-3]="!sidebarCollapsed()"
          [class.px-2]="sidebarCollapsed()">
       <a href="#"
@@ -211,14 +187,13 @@
   </main>
 
   <!-- Mobile bottom nav -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50
-              bg-[#E7F6FF] px-4 py-4
-              flex justify-between items-center border-t border-slate-200">
+  <nav class="shell-mobile-nav md:hidden fixed bottom-0 left-0 right-0 z-50
+              px-4 py-4 flex justify-between items-center border-t">
     @for (item of mobileNavItems; track item.route + item.label) {
       <a [routerLink]="item.route" [queryParams]="item.queryParams ?? null"
          [class.nav-category-active]="item.queryParams ? isCategoryActive(item.queryParams['category']) : false"
          routerLinkActive="text-primary"
-         class="flex flex-col items-center gap-1 text-on-surface-variant/55">
+         class="shell-mobile-nav-item flex flex-col items-center gap-1">
         <span class="material-symbols-outlined text-xl">{{ item.icon }}</span>
         <span class="text-[9px] uppercase tracking-widest font-bold">{{ item.label }}</span>
       </a>

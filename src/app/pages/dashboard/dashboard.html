@@ -1,118 +1,225 @@
-<div class="px-8 py-10 pb-24 md:pb-10">
+<div class="px-6 md:px-10 py-10 pb-24 md:pb-14 max-w-6xl">
 
-  <!-- Hero Header -->
-  <div class="mb-12 max-w-3xl">
-    <p class="text-[11px] font-bold tracking-[0.2em] uppercase text-on-surface-variant/50 mb-3">
-      {{ heroContent.eyebrow }}
+  <!-- ── Greeting ─────────────────────────────────────────────────── -->
+  <div class="mb-11">
+    <p class="text-[10.5px] font-bold tracking-[0.22em] uppercase text-on-surface-variant/40 mb-2.5">
+      arcnode OS · {{ today }}
     </p>
-    <h1 class="text-3xl md:text-4xl font-bold font-headline text-on-surface mb-3 leading-tight">
-      {{ heroContent.titlePrefix }}<span class="text-primary">{{ heroContent.titleAccent }}</span>{{ heroContent.titleSuffix }}
+    <h1 class="text-[2.5rem] md:text-[3.25rem] font-bold font-headline text-on-surface leading-[1.1] mb-3">
+      Guten Tag, <span class="text-primary">EOM.</span>
     </h1>
-    <p class="text-on-surface-variant text-base max-w-2xl leading-relaxed">
-      {{ heroContent.description }}
+    <p class="text-[15px] text-on-surface-variant leading-relaxed max-w-md">
+      Ihre KI-Systeme laufen. Hier ist der aktuelle Stand — und die nächsten Hebel.
     </p>
   </div>
 
-  <!-- Marketing view: sub-groups -->
-  @if (activeCategory() === 'Marketing') {
-    @for (group of marketingGroups; track group.label) {
-      <section class="mb-14">
-        <div class="mb-6 flex items-end justify-between gap-6">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-primary text-lg">{{ group.icon }}</span>
-            </div>
-            <div>
-              <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant/60 mb-1">Marketing</p>
-              <h2 class="text-2xl md:text-3xl font-headline font-bold text-on-surface">{{ group.label }}</h2>
-            </div>
-          </div>
-          <p class="hidden md:block text-sm text-on-surface-variant max-w-md text-right">
-            {{ group.description }}
+  <!-- ── Live KPIs ─────────────────────────────────────────────────── -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+    @for (kpi of kpis; track kpi.label) {
+      <div class="bg-white border border-[#e3e8ee] rounded-2xl p-5
+                  shadow-[0_1px_4px_rgba(10,37,64,0.04)]
+                  hover:border-primary/20 hover:shadow-[0_4px_16px_rgba(10,37,64,0.07)]
+                  transition-all duration-200">
+        <div class="flex items-start justify-between mb-3.5">
+          <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-on-surface-variant/50 pt-0.5">
+            {{ kpi.label }}
           </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          @for (agent of getMarketingGroupAgents(group.ids); track agent.id) {
-            <ng-container *ngTemplateOutlet="agentCard; context: { $implicit: agent }"></ng-container>
-          }
-        </div>
-      </section>
-    }
-  } @else {
-    <!-- Default category view -->
-    @for (category of visibleCategories(); track category) {
-      <section class="mb-14">
-        <div class="mb-6 flex items-end justify-between gap-6">
-          <div>
-            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant/60 mb-2">
-              {{ categoryMeta[category].label }}
-            </p>
-            <h2 class="text-2xl md:text-3xl font-headline font-bold text-on-surface">
-              {{ categoryMeta[category].label }}-Systeme
-            </h2>
+          <div class="w-7 h-7 rounded-lg bg-primary/8 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-primary text-[15px]"
+                  style="font-variation-settings: 'FILL' 1;">{{ kpi.icon }}</span>
           </div>
-          <p class="hidden md:block text-sm text-on-surface-variant max-w-md text-right">
-            {{ categoryMeta[category].description }}
-          </p>
         </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          @for (agent of agentsForCategory(category); track agent.id) {
-            <ng-container *ngTemplateOutlet="agentCard; context: { $implicit: agent }"></ng-container>
-          }
-        </div>
-      </section>
+        <p class="text-[1.9rem] md:text-[2.15rem] font-bold font-headline text-on-surface leading-none mb-1.5 tabular-nums tracking-tight">
+          {{ kpi.value }}
+        </p>
+        <p class="text-[11.5px] text-on-surface-variant/55 mb-3.5">{{ kpi.sub }}</p>
+        @if (kpi.trendDown) {
+          <span class="inline-flex items-center gap-1 text-[10.5px] font-semibold
+                       bg-amber-50 text-amber-700 rounded-full px-2.5 py-0.5">
+            <span class="material-symbols-outlined text-[12px]">trending_down</span>
+            {{ kpi.trend }}
+          </span>
+        } @else {
+          <span class="inline-flex items-center gap-1 text-[10.5px] font-semibold
+                       bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5">
+            <span class="material-symbols-outlined text-[12px]">check_circle</span>
+            {{ kpi.trend }}
+          </span>
+        }
+      </div>
     }
-  }
+  </div>
 
-  <!-- Shared agent card template -->
-  <ng-template #agentCard let-agent>
-    <div class="agent-card-wrapper" [class.coming-soon]="agent.isComingSoon">
-      @if (agent.isComingSoon) {
-        <div class="coming-soon-overlay" aria-hidden="true">
-          <span class="coming-soon-badge">Demnächst verfügbar</span>
+  <!-- ── Todos ─────────────────────────────────────────────────────── -->
+  <div class="bg-white border border-[#e3e8ee] rounded-2xl overflow-hidden
+              shadow-[0_2px_8px_rgba(10,37,64,0.05)] mb-10">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between px-6 py-4 border-b border-[#f0f3f7]">
+      <div class="flex items-center gap-2.5">
+        <span class="material-symbols-outlined text-primary text-[18px]"
+              style="font-variation-settings: 'FILL' 1;">checklist</span>
+        <h2 class="text-[15px] font-headline font-bold text-on-surface">Meine Todos</h2>
+        @if (openCount() > 0) {
+          <span class="inline-flex items-center justify-center min-w-[20px] h-5 rounded-full
+                       bg-primary/10 text-primary text-[10.5px] font-bold px-1.5">
+            {{ openCount() }}
+          </span>
+        }
+      </div>
+      <p class="text-[11.5px] text-on-surface-variant/40 hidden sm:block">
+        Enter zum Hinzufügen
+      </p>
+    </div>
+
+    <!-- Todo items — 2-column grid on md+ -->
+    <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 divide-[#f0f3f7]">
+      @for (todo of todos(); track todo.id; let i = $index) {
+        <div class="flex items-center gap-3 px-6 py-3.5 group/item transition-colors hover:bg-[#fafbfc]
+                    border-b border-[#f0f3f7]"
+             [class.md:border-r]="i % 2 === 0"
+             [class.md:border-b-0]="i >= todos().length - (todos().length % 2 === 0 ? 2 : 1)">
+
+          <!-- Custom checkbox -->
+          <button
+            (click)="toggleTodo(todo.id)"
+            class="flex-shrink-0 w-[18px] h-[18px] rounded-[5px] border-2 flex items-center justify-center
+                   transition-all duration-150"
+            [class]="todo.done ? 'bg-primary border-primary' : 'border-[#c8d6e5] hover:border-primary/60'"
+            [attr.aria-label]="todo.done ? 'Als offen markieren' : 'Als erledigt markieren'"
+          >
+            @if (todo.done) {
+              <span class="material-symbols-outlined text-white text-[11px]"
+                    style="font-variation-settings: 'FILL' 1;">check</span>
+            }
+          </button>
+
+          <!-- Text -->
+          <span class="flex-1 text-[13px] leading-snug transition-colors duration-150"
+                [class]="todo.done ? 'line-through text-on-surface-variant/30' : 'text-on-surface'">
+            {{ todo.text }}
+          </span>
+
+          <!-- Delete -->
+          <button
+            (click)="deleteTodo(todo.id)"
+            class="flex-shrink-0 opacity-0 group-hover/item:opacity-100 transition-opacity
+                   w-6 h-6 rounded-lg flex items-center justify-center
+                   hover:bg-red-50 text-on-surface-variant/35 hover:text-red-500"
+            aria-label="Todo löschen"
+          >
+            <span class="material-symbols-outlined text-[13px]">close</span>
+          </button>
         </div>
       }
-      <article class="bg-white border border-[#e3e8ee] rounded-xl p-6
-                      shadow-[0_2px_4px_rgba(10,37,64,0.04)] transition-all duration-200
-                      hover:shadow-[0_6px_20px_rgba(10,37,64,0.08)] hover:border-[#c8d6e5]">
-        <div class="flex items-start justify-between gap-4 mb-5">
-          <div class="flex items-center gap-3">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/8 text-primary flex-shrink-0">
-              <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">{{ agent.icon }}</span>
+
+      @if (todos().length === 0) {
+        <div class="md:col-span-2 px-6 py-10 text-center">
+          <span class="material-symbols-outlined text-3xl text-on-surface-variant/20 block mb-2">task_alt</span>
+          <p class="text-[13px] text-on-surface-variant/35">Alle Aufgaben erledigt.</p>
+        </div>
+      }
+    </div>
+
+    <!-- Add input -->
+    <div class="border-t border-[#f0f3f7] px-6 py-3.5 flex items-center gap-3">
+      <span class="material-symbols-outlined text-on-surface-variant/25 text-[18px] flex-shrink-0">add</span>
+      <input
+        type="text"
+        placeholder="Neue Aufgabe hinzufügen …"
+        [ngModel]="newTodoText()"
+        (ngModelChange)="newTodoText.set($event)"
+        (keydown)="onNewTodoKeydown($event)"
+        class="flex-1 text-[13px] text-on-surface bg-transparent outline-none
+               placeholder:text-on-surface-variant/30"
+      />
+      @if (newTodoText().trim()) {
+        <button
+          (click)="addTodo()"
+          class="flex-shrink-0 w-7 h-7 rounded-lg bg-primary flex items-center justify-center
+                 hover:bg-[#2563eb] transition-colors"
+          aria-label="Aufgabe hinzufügen"
+        >
+          <span class="material-symbols-outlined text-white text-[15px]">arrow_upward</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- ── Divider ────────────────────────────────────────────────────── -->
+  <div class="border-t border-[#e3e8ee] mb-10"></div>
+
+  <!-- ── Featured Agents ───────────────────────────────────────────── -->
+  <div class="mb-7">
+    <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-on-surface-variant/40 mb-2">
+      Empfohlene Systeme
+    </p>
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
+      <h2 class="text-2xl font-headline font-bold text-on-surface leading-tight">
+        Direkt starten — die stärksten Hebel
+      </h2>
+      <p class="text-[13px] text-on-surface-variant/60 hidden md:block">
+        Weitere Systeme über die Navigation erreichbar.
+      </p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
+    @for (agent of featuredAgents; track agent.id) {
+      <article class="bg-white border border-[#e3e8ee] rounded-2xl overflow-hidden flex flex-col
+                      shadow-[0_2px_8px_rgba(10,37,64,0.05)]
+                      hover:border-primary/25 hover:shadow-[0_8px_28px_rgba(10,37,64,0.1)]
+                      transition-all duration-200 group">
+
+        <!-- Card Header -->
+        <div class="px-6 pt-6 pb-5 border-b border-[#eef1f6]"
+             style="background: linear-gradient(135deg, rgba(59,130,246,0.045) 0%, rgba(59,130,246,0.01) 100%)">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary text-[22px]"
+                    style="font-variation-settings: 'FILL' 1;">{{ agent.icon }}</span>
             </div>
-            <div>
-              <p class="text-[10px] uppercase tracking-[0.16em] text-on-surface-variant/50 font-bold mb-0.5">
-                {{ agent.category }}
-              </p>
-              <h3 class="text-[15px] font-headline font-bold text-on-surface leading-tight">
-                {{ agent.name }}
-              </h3>
-            </div>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full
+                         bg-emerald-50 text-emerald-700 text-[9.5px] font-bold uppercase tracking-wider">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              LIVE
+            </span>
           </div>
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full border border-[#e3e8ee] text-[10px] font-bold tracking-[0.12em] uppercase text-on-surface-variant/60 flex-shrink-0">
-            {{ agent.badgeLabel || 'Tool' }}
-          </span>
+          <h3 class="text-[16px] font-headline font-bold text-on-surface leading-snug">
+            {{ agent.benefit }}
+          </h3>
         </div>
 
-        <p class="min-h-[72px] text-[13px] leading-relaxed text-on-surface-variant/80 mb-5">
-          {{ agent.description }}
-        </p>
-
-        <button
-          (click)="startWorkflow(agent.id)"
-          [attr.tabindex]="agent.isComingSoon ? -1 : null"
-          class="w-full bg-primary hover:bg-[#2563eb] text-white font-bold py-2.5 text-[13px]
-                 flex items-center justify-center gap-2 group/btn transition-all duration-150
-                 shadow-[0_1px_3px_rgba(59,130,246,0.3)]"
-        >
-          System öffnen
-          <span class="material-symbols-outlined text-[16px] group-hover/btn:translate-x-0.5 transition-transform">arrow_forward</span>
-        </button>
+        <!-- Card Body -->
+        <div class="px-6 py-5 flex flex-col flex-1">
+          <p class="text-[13px] text-on-surface-variant/80 leading-relaxed flex-1 mb-4">
+            {{ agent.description }}
+          </p>
+          <p class="text-[9.5px] font-bold uppercase tracking-[0.18em] text-on-surface-variant/35 mb-4">
+            {{ agent.name }}
+          </p>
+          <button
+            (click)="startWorkflow(agent.id)"
+            class="w-full bg-primary text-white font-bold py-3 text-[13px]
+                   flex items-center justify-center gap-2 rounded-xl
+                   transition-all duration-150
+                   shadow-[0_2px_8px_rgba(59,130,246,0.28)]
+                   hover:bg-[#2563eb] hover:shadow-[0_4px_18px_rgba(59,130,246,0.42)]
+                   group/btn"
+          >
+            Jetzt starten
+            <span class="material-symbols-outlined text-[16px] group-hover/btn:translate-x-0.5 transition-transform">
+              arrow_forward
+            </span>
+          </button>
+        </div>
       </article>
-    </div>
-  </ng-template>
+    }
+  </div>
 
+  <!-- ── Bottom hint ───────────────────────────────────────────────── -->
+  <p class="text-center text-[12.5px] text-on-surface-variant/40">
+    Alle weiteren Systeme sind über die Navigation auf der linken Seite erreichbar.
+  </p>
 
 </div>

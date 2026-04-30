@@ -270,7 +270,7 @@ export class SeoGeoAssistantResultComponent implements OnDestroy {
   readonly currentJobStep = computed<string>(() => this.jobStatus()?.step ?? 'Analyse gestartet');
   readonly currentJobUrl = computed<string>(() => {
     const url = this.jobStatus()?.input?.url;
-    return url ? this.compactUrl(url) : 'SEO/GEO Analyse';
+    return url ? this.compactUrl(url) : 'SEO- & Standort-Analyse';
   });
   readonly currentJobStatusLabel = computed<string>(() =>
     this.toStatusLabel(this.jobStatus()?.status),

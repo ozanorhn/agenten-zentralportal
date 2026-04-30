@@ -41,7 +41,7 @@
       <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div class="max-w-3xl">
-            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">OMR SEO-Content-Strategie</p>
+            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">SEO-Strategie-Planer</p>
             <h1 class="mt-2 font-headline text-2xl font-black tracking-tight text-on-surface md:text-4xl">
               {{ report.input.topic }}
             </h1>
@@ -136,25 +136,6 @@
         </div>
       }
 
-      <section class="mt-4 rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
-        <div class="flex items-start gap-3">
-          <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
-            <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">data_object</span>
-          </div>
-          <div>
-            <h2 class="text-base font-semibold text-on-surface">Raw Response</h2>
-            <p class="mt-1 text-sm leading-relaxed text-on-surface-variant">
-              Vollstaendige Webhook-Antwort zur Kontrolle und fuer Debugging.
-            </p>
-          </div>
-        </div>
-
-        @if (rawJson()) {
-          <pre class="mt-5 overflow-x-auto rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-4 text-xs leading-relaxed text-on-surface-variant">{{ rawJson() }}</pre>
-        } @else {
-          <pre class="mt-5 overflow-x-auto whitespace-pre-wrap rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-4 text-xs leading-relaxed text-on-surface-variant">{{ rawText() }}</pre>
-        }
-      </section>
     } @else {
       <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-8 text-center md:px-6">
         <div class="mx-auto max-w-xl">
