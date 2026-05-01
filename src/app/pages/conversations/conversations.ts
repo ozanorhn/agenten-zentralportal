@@ -87,6 +87,9 @@ export class Conversations {
     if (mins < 60) return `Vor ${mins} Min.`;
     const hours = Math.floor(mins / 60);
     if (hours < 24) return `Vor ${hours} Std.`;
-    return 'Gestern';
+    const days = Math.floor(hours / 24);
+    if (days === 1) return 'Gestern';
+    if (days < 7) return `Vor ${days} Tagen`;
+    return new Date(ts).toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
   }
 }

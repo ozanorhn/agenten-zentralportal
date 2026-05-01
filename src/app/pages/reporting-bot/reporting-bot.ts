@@ -173,7 +173,7 @@ interface ChatMessage {
                               : row.status === 'at-risk'
                                 ? 'bg-error/10 text-error'
                                 : 'bg-[#0070FF]/10 text-[#0070FF]'">
-                        {{ row.status === 'done' ? 'Fertig' : row.status === 'at-risk' ? 'Risiko' : 'Im Plan' }}
+                        {{ row.status === 'done' ? 'Abgeschlossen' : row.status === 'at-risk' ? 'Risiko' : 'Im Plan' }}
                       </span>
                     </td>
                   </tr>
@@ -365,7 +365,7 @@ export class ReportingBot {
       return 'KPIs diese Woche: 312 eingesparte Stunden, 4.820 € Kostenersparnis, 480 Outreach-Mails versendet (8,4 % Conversion), 12 LinkedIn-Posts (6,2 % Engagement). Sehr starke Woche.';
     }
     if (lower.includes('xyz') || lower.includes('projekt')) {
-      return 'Ich habe 5 aktive Projekte in der Datenbank. Meinen Sie „Website-Relaunch", „Q2-Sales-Kampagne", „CRM-Migration", „LinkedIn-Strategie" oder „SEO-Audit 2025"? Bitte präzisieren Sie, zu welchem ich Ihnen mehr Details geben soll.';
+      return 'Ich habe 5 aktive Projekte in der Datenbank. Meinen Sie „Website-Relaunch", „Q2-Sales-Kampagne", „CRM-Migration", „LinkedIn-Strategie" oder „SEO-Audit 2026"? Bitte präzisieren Sie, zu welchem ich Ihnen mehr Details geben soll.';
     }
     return 'Auf Basis der aktuellen Datenbasis konnte ich keine spezifische Antwort finden. Möchten Sie einen vollständigen Bericht erstellen oder die Frage präzisieren?';
   }

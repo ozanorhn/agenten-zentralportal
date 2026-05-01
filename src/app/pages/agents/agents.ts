@@ -22,6 +22,21 @@ export class AgentsPage {
 
   readonly label = computed(() => this.category());
 
+  readonly subline = computed(() => {
+    switch (this.category()) {
+      case 'Marketing':
+        return 'Ihre KI-Systeme für Sichtbarkeit, Akquise und Content.';
+      case 'Sales':
+        return 'Ihre KI-Systeme für Lead-Pipeline und Vertrieb.';
+      case 'HR':
+        return 'Ihre KI-Systeme für Recruiting und Personal.';
+      case 'Data':
+        return 'Ihre KI-Systeme für Auswertung und Reporting.';
+      default:
+        return 'Ihre KI-Systeme im Überblick.';
+    }
+  });
+
   readonly agents = computed<AgentMeta[]>(() => {
     const cat = this.category();
     if (cat === 'Marketing') return AGENTS.filter(a => MARKETING_CATS.has(a.category));

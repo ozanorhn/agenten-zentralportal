@@ -34,7 +34,7 @@
 
             <div class="relative">
               <p class="text-[10px] font-black uppercase tracking-[0.22em] text-[#0A66FF]">GEO-Audit</p>
-              <h1 class="mt-3 break-all font-body text-base font-semibold lowercase normal-case tracking-normal text-on-surface md:text-xl">
+              <h1 class="mt-3 break-all font-body text-base font-semibold lowercase tracking-normal text-on-surface md:text-xl">
                 {{ displayReportTitle() }}
               </h1>
               <p class="mt-3 max-w-3xl text-sm leading-relaxed text-on-surface-variant md:text-base">
@@ -165,7 +165,7 @@
       <section class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 class="break-all font-body text-sm font-medium lowercase normal-case tracking-normal text-on-surface md:text-base">{{ compactUrl(analysis.input?.url || '') || 'Report' }}</h1>
+            <h1 class="break-all font-body text-sm font-medium lowercase tracking-normal text-on-surface md:text-base">{{ compactUrl(analysis.input?.url || '') || 'Report' }}</h1>
             <p class="mt-1 text-sm text-on-surface-variant">
               {{ analysis.input?.brand || '–' }} · {{ analysis.input?.industry || '–' }} · {{ analysis.input?.location || '–' }} · analysiert {{ formatDate(analysis.analysedAt) }}
             </p>
@@ -917,7 +917,7 @@
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Live Status</p>
-            <h1 class="mt-2 break-all font-body text-sm font-medium lowercase normal-case tracking-normal text-on-surface md:text-base">{{ currentJobUrl() }}</h1>
+            <h1 class="mt-2 break-all font-body text-sm font-medium lowercase tracking-normal text-on-surface md:text-base">{{ currentJobUrl() }}</h1>
             <p class="mt-1 text-sm text-on-surface-variant">
               {{ currentJobStatusLabel() }} · {{ currentJobStep() }}
             </p>

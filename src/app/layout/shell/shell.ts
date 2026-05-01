@@ -83,8 +83,7 @@ export class Shell {
 
   navSections: NavSection[] = [
     {
-      label: 'Navigation',
-      collapsible: true,
+      label: '',
       items: [
         { label: 'Live KPIs', icon: 'query_stats', route: '/kpi-dashboard' },
         { label: 'Reporting', icon: 'summarize', route: '/reporting-bot' },
@@ -93,7 +92,7 @@ export class Shell {
       ],
     },
     {
-      label: 'Systeme',
+      label: 'KI-Systeme',
       items: [
         { label: 'Marketing', icon: 'campaign', route: '/agents', queryParams: { category: 'Marketing' } },
         { label: 'Sales', icon: 'trending_up', route: '/agents', queryParams: { category: 'Sales' } },

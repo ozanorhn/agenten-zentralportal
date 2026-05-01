@@ -2,7 +2,7 @@
 
   <!-- ── Greeting ─────────────────────────────────────────────────── -->
   <div class="mb-11">
-    <p class="text-[10.5px] font-bold tracking-[0.22em] uppercase text-on-surface-variant/40 mb-2.5">
+    <p class="text-[12px] font-medium tracking-wide text-on-surface-variant/50 mb-2.5">
       {{ today }}
     </p>
     <h1 class="text-[2.5rem] md:text-[3.25rem] font-bold font-headline text-on-surface leading-[1.1] mb-3">
@@ -63,7 +63,7 @@
       <div class="flex items-center gap-2.5">
         <span class="material-symbols-outlined text-primary text-[18px]"
               style="font-variation-settings: 'FILL' 1;">checklist</span>
-        <h2 class="text-[15px] font-headline font-bold text-on-surface">Meine Todos</h2>
+        <h2 class="text-[15px] font-headline font-bold text-on-surface">Meine Aufgaben</h2>
         @if (openCount() > 0) {
           <span class="inline-flex items-center justify-center min-w-[20px] h-5 rounded-full
                        bg-primary/10 text-primary text-[10.5px] font-bold px-1.5">
@@ -163,7 +163,7 @@
         Jetzt starten. Die stärksten Hebel.
       </h2>
       <p class="text-[13px] text-on-surface-variant/60 hidden md:block">
-        Weitere Systeme über die Navigation erreichbar.
+        Alle Systeme im Bereich Marketing.
       </p>
     </div>
   </div>
@@ -196,11 +196,8 @@
 
         <!-- Card Body -->
         <div class="px-6 py-5 flex flex-col flex-1">
-          <p class="text-[13px] text-on-surface-variant/80 leading-relaxed flex-1 mb-4">
+          <p class="text-[13px] text-on-surface-variant/80 leading-relaxed flex-1 mb-5">
             {{ agent.description }}
-          </p>
-          <p class="text-[9.5px] font-bold uppercase tracking-[0.18em] text-on-surface-variant/35 mb-4">
-            {{ agent.name }}
           </p>
           <button
             (click)="startWorkflow(agent.id)"
@@ -219,8 +216,5 @@
     }
   </div>
 
-  <!-- ── Bottom hint ───────────────────────────────────────────────── -->
-  <p class="text-center text-[12.5px] text-on-surface-variant/40">
-Feedback oder Fehler? Schreiben Sie uns: kontakt@arcnode.de</p>
 
 </div>
