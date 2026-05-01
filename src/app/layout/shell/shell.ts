@@ -1,7 +1,28 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Location } from '@angular/common';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { NotificationService } from '../../services/notification.service';
 import { NotificationDropdown } from '../../components/notification-dropdown/notification-dropdown';
+import { AGENTS, AgentMeta } from '../../data/agents.data';
+
+const TOP_LEVEL_PATHS = new Set([
+  '/dashboard',
+  '/agents',
+  '/kpi-dashboard',
+  '/reporting-bot',
+  '/history',
+  '/management',
+  '/analytics',
+]);
+
+const MARKETING_CATEGORIES = new Set<AgentMeta['category']>(['Content', 'SEO', 'Ads']);
+
+function categoryForAgent(agentId: string): string | null {
+  const agent = AGENTS.find((a) => a.id === agentId);
+  if (!agent) return null;
+  return MARKETING_CATEGORIES.has(agent.category) ? 'Marketing' : agent.category;
+}
 
 interface NavItem {
   label: string;
@@ -25,10 +46,40 @@ interface NavSection {
 export class Shell {
   readonly notifService = inject(NotificationService);
   readonly router = inject(Router);
+  private readonly location = inject(Location);
 
   showNotifications = signal(false);
   sidebarCollapsed = signal(localStorage.getItem('sidebarCollapsed') === 'true');
   collapsedSections = signal<Set<string>>(new Set());
+  private readonly currentPath = signal(this.extractPath(this.router.url));
+
+  readonly showBackButton = computed(() => !TOP_LEVEL_PATHS.has(this.currentPath()));
+
+  constructor() {
+    this.router.events
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .subscribe((e) => this.currentPath.set(this.extractPath(e.urlAfterRedirects)));
+  }
+
+  private extractPath(url: string): string {
+    const queryIdx = url.indexOf('?');
+    return queryIdx >= 0 ? url.slice(0, queryIdx) : url;
+  }
+
+  goBack(): void {
+    const path = this.currentPath();
+    const agentMatch = path.match(/^\/agents\/([^/]+)/);
+    if (agentMatch) {
+      const category = categoryForAgent(agentMatch[1]);
+      if (category) {
+        this.router.navigate(['/agents'], { queryParams: { category } });
+        return;
+      }
+      this.router.navigate(['/agents']);
+      return;
+    }
+    this.location.back();
+  }
 
   tooltipText = signal('');
   tooltipTop = signal(0);

@@ -24,7 +24,7 @@
       @if (webhookError()) {
         <h2 class="text-2xl font-headline font-black text-red-400 mb-2 tracking-tight">Verbindungsfehler</h2>
         <p class="text-sm text-on-surface-variant mb-6 text-center max-w-xs">
-          Der Webhook konnte nicht erreicht werden.<br>Bitte prüfe die Verbindung und versuche es erneut.
+          Das System konnte gerade nicht erreicht werden.<br>Bitte prüfen Sie Ihre Verbindung und versuchen Sie es erneut.
         </p>
         <button (click)="isSubmitting.set(false); webhookError.set(false)"
                 class="px-6 py-3 bg-surface-container-high hover:bg-surface-container-highest text-on-surface

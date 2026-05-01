@@ -192,17 +192,17 @@ export class SeoGeoAssistantComponent {
           return 'Keine Verbindung. Bitte Internetverbindung prüfen.';
         default:
           if (error.status === 500) {
-            return 'Die Analyse konnte nicht gestartet werden, weil der Start-Webhook mit HTTP 500 geantwortet hat.';
+            return 'Die Analyse konnte nicht gestartet werden. Bitte versuchen Sie es in wenigen Minuten erneut.';
           }
 
           if (error.status === 404) {
-            return 'Der Start-Endpunkt wurde nicht gefunden. Bitte den n8n-Webhook prüfen.';
+            return 'Das System ist gerade nicht verfügbar. Bitte versuchen Sie es später erneut.';
           }
 
-          return 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.';
+          return 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.';
       }
     }
 
-    return 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.';
+    return 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.';
   }
 }

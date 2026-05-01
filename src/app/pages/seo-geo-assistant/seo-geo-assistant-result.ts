@@ -32,7 +32,7 @@ const SECONDARY_QUICK_WINS_TIMEOUT_MS = 60_000;
 const SECONDARY_QUICK_WINS_PROGRESS_ADVANCE_MS = 900;
 const SECONDARY_QUICK_WINS_PROGRESS_STOPS = [12, 27, 43, 61, 78, 92] as const;
 const SECONDARY_QUICK_WINS_LOADING_STEPS = [
-  'Prioritäten werden aus dem zweiten Webhook abgerufen.',
+  'Prioritäten werden aus der vertieften Analyse zusammengetragen.',
   'Aufwand und Score-Impact werden gewichtet.',
   'Konkrete Maßnahmen und Titel werden aufbereitet.',
   'Beispiele und Umsetzungsschritte werden ergänzt.',
@@ -244,7 +244,7 @@ export class SeoGeoAssistantResultComponent implements AfterViewInit, OnDestroy 
     const headers = payload?.headers ?? {};
 
     return [
-      { label: 'Webhook URL', value: payload?.webhookUrl ?? '' },
+      { label: 'Endpunkt', value: payload?.webhookUrl ?? '' },
       { label: 'Execution Mode', value: payload?.executionMode ?? '' },
       { label: 'Origin', value: headers['origin'] ?? '' },
       { label: 'Referer', value: headers['referer'] ?? '' },
@@ -941,7 +941,7 @@ export class SeoGeoAssistantResultComponent implements AfterViewInit, OnDestroy 
       {
         key: 'faqpage-note',
         title: 'FAQPage Hinweis',
-        description: 'Webhook-Hinweis, wenn noch keine ausreichenden FAQ-Fragen erkannt wurden.',
+        description: 'Hinweis, wenn noch keine ausreichenden FAQ-Fragen erkannt wurden.',
         content: artifacts.faqPageSchemaNote ?? '',
       },
       {
@@ -2333,7 +2333,7 @@ export class SeoGeoAssistantResultComponent implements AfterViewInit, OnDestroy 
     if (!targetUrl || requestBody === null || requestBody === undefined) {
       this.finishSecondaryQuickWins(record, [], true, null, {
         requestSource: request.source,
-        error: !targetUrl ? 'Quick-Wins-Webhook URL fehlt.' : 'Kein gültiges Request-Payload gefunden.',
+        error: !targetUrl ? 'Konfiguration unvollständig.' : 'Anfrage konnte nicht erstellt werden.',
       });
       return;
     }

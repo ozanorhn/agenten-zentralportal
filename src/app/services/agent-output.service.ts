@@ -267,7 +267,7 @@ export class AgentOutputService {
         { source: 'Salesforce', target: 'HubSpot CRM', status: 'success', recordCount: 1203, lastSync: 'Vor 5 Min.' },
         { source: 'LinkedIn Ads', target: 'Google Sheets', status: 'pending', recordCount: 891, lastSync: 'Läuft...' },
         { source: 'Notion DB', target: 'Airtable', status: 'success', recordCount: 456, lastSync: 'Vor 12 Min.' },
-        { source: 'Stripe Events', target: 'Slack Webhook', status: 'error', recordCount: 35, lastSync: 'Fehler' },
+        { source: 'Stripe Events', target: 'Slack-Benachrichtigung', status: 'error', recordCount: 35, lastSync: 'Fehler' },
       ],
     };
   }

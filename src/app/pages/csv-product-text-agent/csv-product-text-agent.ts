@@ -136,7 +136,7 @@ export class CsvProductTextAgentComponent {
         'Der CSV Produkttext-Service',
       );
 
-      this.statusLabel.set('Webhook-Antwort wird verarbeitet…');
+      this.statusLabel.set('Antwort wird verarbeitet …');
       const payload = await this.parseJsonResponse(response);
       const rows = this.normalizeRows(payload);
       const columns = this.buildColumnOrder(rows);
@@ -270,7 +270,7 @@ export class CsvProductTextAgentComponent {
         return parsed;
       }
 
-      throw new Error('Die Webhook-Antwort war kein gueltiges JSON.');
+      throw new Error('Die Antwort war kein gültiges JSON.');
     }
   }
 

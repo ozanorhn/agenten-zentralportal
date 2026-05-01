@@ -51,7 +51,7 @@ const PROPOSAL_RESULT: ProposalResult = {
     {
       title: 'Phase 2: Implementierung',
       points: [
-        'Setup KI-Automatisierungsplattform (n8n)',
+        'Setup KI-Automatisierungsplattform',
         'Integration CRM, E-Mail und Content-Tools',
         'Entwicklung von 5 automatisierten Workflows',
         'Quality-Assurance und Testphase',

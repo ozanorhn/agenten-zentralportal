@@ -27,8 +27,8 @@
               <span class="text-[#7DB4FF]">SEO-Texte raus.</span>
             </h1>
             <p class="max-w-2xl text-sm leading-relaxed text-blue-50/75 md:text-base">
-              CSV hochladen. Das System sendet sie direkt an den Webhook und liefert eine
-              angereicherte CSV mit SEO-Produkttexten zurück. Fertig zum Import.
+              CSV hochladen — das System liefert direkt eine angereicherte CSV mit
+              SEO-Produkttexten zurück. Fertig zum Import.
             </p>
           </div>
         </div>
@@ -60,7 +60,7 @@
                     CSV hier ablegen oder auswählen
                   </p>
                   <p class="mt-1 text-sm text-on-surface-variant/60">
-                    Die Datei wird direkt per Upload an den n8n-Webhook gesendet.
+                    Die Datei wird direkt zur Verarbeitung übergeben.
                   </p>
                 </div>
               </div>
@@ -150,7 +150,7 @@
           <div class="mt-5 space-y-4">
             @for (tip of [
               'Der Upload bleibt generisch. Es gibt im Frontend keine feste Spaltenpflicht.',
-              'Der Download wird aus der JSON-Antwort des Webhooks wieder als CSV erzeugt.',
+              'Der Download wird automatisch wieder als CSV bereitgestellt.',
               'Auf der Ergebnis-Seite sehen Sie die wichtigsten Felder direkt als Tabelle.'
             ]; track tip) {
               <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 px-4 py-4">

@@ -18,7 +18,7 @@
             </div>
             <div>
               <p class="text-sm font-bold text-on-surface">{{ agentMeta.name }}</p>
-              <p class="text-[10px] uppercase tracking-[0.2em] text-outline">Report</p>
+              <p class="text-[11px] text-on-surface-variant/70">Erstellt am {{ formatDate(displayReportTimestamp()) }}</p>
             </div>
           </div>
         </div>
@@ -44,18 +44,12 @@
               <div class="mt-5 flex flex-wrap gap-2">
                 <span class="inline-flex items-center gap-2 rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300">
                   <span class="material-symbols-outlined text-sm">mark_email_read</span>
-                  Request erhalten
+                  Anfrage erhalten
                 </span>
                 <span class="inline-flex items-center gap-2 rounded-full border border-[#0070FF]/20 bg-[#0070FF]/10 px-3 py-1 text-xs font-semibold text-[#0A66FF]">
-                  <span class="material-symbols-outlined text-sm">webhook</span>
-                  Webhook beantwortet
+                  <span class="material-symbols-outlined text-sm">check_circle</span>
+                  Verarbeitung gestartet
                 </span>
-                @if (analysis.executionMode) {
-                  <span class="inline-flex items-center gap-2 rounded-full border border-outline-variant/20 bg-surface-container-high/40 px-3 py-1 text-xs font-semibold text-on-surface-variant">
-                    <span class="material-symbols-outlined text-sm">deployed_code</span>
-                    {{ analysis.executionMode }}
-                  </span>
-                }
               </div>
             </div>
           </div>
@@ -69,9 +63,9 @@
               </div>
               <div>
                 <p class="text-[10px] font-black uppercase tracking-[0.2em] text-outline">Status</p>
-                <h2 class="mt-2 text-base font-semibold text-on-surface">Request erfolgreich empfangen</h2>
+                <h2 class="mt-2 text-base font-semibold text-on-surface">Anfrage erfolgreich empfangen</h2>
                 <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">
-                  Aktuell wurde ein Request-Envelope empfangen. Analysemetriken sind in dieser Antwort noch nicht enthalten.
+                  Die Analyse läuft im Hintergrund. Die Auswertung wird gleich hier angezeigt.
                 </p>
               </div>
             </div>
@@ -80,28 +74,18 @@
               <div class="flex items-start gap-3 rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-3 dark:border-emerald-500/20 dark:bg-emerald-500/10">
                 <span class="material-symbols-outlined text-emerald-800 dark:text-emerald-300">check_circle</span>
                 <div>
-                  <p class="text-sm font-medium text-on-surface">Webhook-Transport ok</p>
-                  <p class="mt-1 text-sm text-on-surface-variant">Die Anfrage wurde von n8n angenommen und verarbeitet.</p>
+                  <p class="text-sm font-medium text-on-surface">Verbindung steht</p>
+                  <p class="mt-1 text-sm text-on-surface-variant">Ihre Anfrage wurde übernommen und wird verarbeitet.</p>
                 </div>
               </div>
 
               <div class="flex items-start gap-3 rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 px-4 py-3">
                 <span class="material-symbols-outlined text-on-surface-variant">analytics</span>
                 <div>
-                  <p class="text-sm font-medium text-on-surface">Noch kein Analysekern</p>
-                  <p class="mt-1 text-sm text-on-surface-variant">Score-, Dimensions- und Report-Felder fehlen in diesem Payload und werden deshalb bewusst nicht als leere Report-Karten angezeigt.</p>
+                  <p class="text-sm font-medium text-on-surface">Auswertung in Arbeit</p>
+                  <p class="mt-1 text-sm text-on-surface-variant">Sobald Score und Dimensionen vorliegen, werden sie hier eingeblendet.</p>
                 </div>
               </div>
-
-              @if (analysis.executionMode) {
-                <div class="flex items-start gap-3 rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 px-4 py-3">
-                  <span class="material-symbols-outlined text-on-surface-variant">deployed_code</span>
-                  <div>
-                    <p class="text-sm font-medium text-on-surface">Execution Mode</p>
-                    <p class="mt-1 text-sm text-on-surface-variant">{{ analysis.executionMode }}</p>
-                  </div>
-                </div>
-              }
             </div>
           </section>
 
@@ -111,10 +95,10 @@
                 <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">inventory_2</span>
               </div>
               <div>
-                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-outline">Input Snapshot</p>
-                <h2 class="mt-2 text-base font-semibold text-on-surface">Übergebene Eingabedaten</h2>
+                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-outline">Eingabedaten</p>
+                <h2 class="mt-2 text-base font-semibold text-on-surface">Ihre Eingabe</h2>
                 <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">
-                  Diese Werte wurden an den Webhook übermittelt und sind die Grundlage für den nächsten Verarbeitungsschritt.
+                  Grundlage für die Analyse und den Befund.
                 </p>
               </div>
             </div>
@@ -127,40 +111,13 @@
                 </div>
               } @empty {
                 <div class="rounded-2xl border border-dashed border-outline-variant/20 bg-surface-container-high/20 px-4 py-5 sm:col-span-2">
-                  <p class="text-sm text-on-surface-variant">Keine verwertbaren Eingabedaten im Envelope gefunden.</p>
+                  <p class="text-sm text-on-surface-variant">Keine Eingabedaten gefunden.</p>
                 </div>
               }
             </div>
           </section>
         </div>
 
-        <section class="mt-4 rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
-          <div class="flex items-start gap-3">
-            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0A66FF]">
-              <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">lan</span>
-            </div>
-            <div>
-              <p class="text-[10px] font-black uppercase tracking-[0.2em] text-outline">Transport Diagnostics</p>
-              <h2 class="mt-2 text-base font-semibold text-on-surface">Webhook- und Request-Signale</h2>
-              <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">
-                Kuratierte Request-Metadaten für die technische Einordnung des empfangenen Outputs.
-              </p>
-            </div>
-          </div>
-
-          <div class="mt-5 grid gap-3 sm:grid-cols-2">
-            @for (item of envelopeDiagnosticItems(); track item.label) {
-              <div class="rounded-2xl border border-outline-variant/15 bg-surface-container-high/30 px-4 py-4">
-                <p class="text-[11px] uppercase tracking-[0.08em] text-on-surface-variant">{{ item.label }}</p>
-                <p class="mt-2 break-words text-sm text-on-surface">{{ item.value }}</p>
-              </div>
-            } @empty {
-              <div class="rounded-2xl border border-dashed border-outline-variant/20 bg-surface-container-high/20 px-4 py-5 sm:col-span-2">
-                <p class="text-sm text-on-surface-variant">Keine technischen Envelope-Details im Payload gefunden.</p>
-              </div>
-            }
-          </div>
-        </section>
       } @else {
       <section class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
         <div class="flex flex-wrap items-start justify-between gap-4">
@@ -286,7 +243,7 @@
                     <p class="text-sm text-on-surface">{{ fact.text }}</p>
                   </div>
                 } @empty {
-                  <p class="text-[12px] leading-4 text-on-surface-variant">Keine Fakten vom Webhook erhalten.</p>
+                  <p class="text-[12px] leading-4 text-on-surface-variant">Keine Fakten verfügbar.</p>
                 }
               </div>
             </article>
@@ -560,7 +517,7 @@
                   <div class="rounded-2xl border border-[#0070FF]/15 bg-[#0070FF]/5 px-4 py-4">
                     <div class="flex items-start justify-between gap-3">
                       <div>
-                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#0070FF]">Zweiter Webhook</p>
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#0070FF]">Vertiefte Analyse</p>
                         <p class="mt-2 text-sm font-medium text-on-surface">Sofortmaßnahmen werden geladen</p>
                         <p class="mt-1 text-sm text-on-surface-variant">
                           {{ secondaryQuickWinsLoadingLabel() }}
@@ -947,7 +904,7 @@
             <div>
               <p class="text-sm font-medium text-on-surface">{{ currentJobStep() }}</p>
               <p class="mt-1 text-sm text-on-surface-variant">
-                Die Seite fragt den Status automatisch ab und lädt den fertigen Report, sobald n8n ihn gespeichert hat.
+                Die Seite aktualisiert sich automatisch und zeigt den Bericht, sobald die Auswertung fertig ist.
               </p>
             </div>
           </div>

@@ -88,19 +88,19 @@
               <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">hub</span>
             </div>
             <div>
-              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Technik</p>
-              <p class="mt-2 font-headline text-lg font-black text-on-surface">Technischer Endpunkt</p>
-              <p class="mt-3 break-all text-sm leading-relaxed text-on-surface-variant">
-                {{ environment.contentSeoAnalyzerWebhookUrl }}
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Ablauf</p>
+              <p class="mt-2 font-headline text-lg font-black text-on-surface">So funktioniert die Analyse</p>
+              <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+                In drei Schritten zum vollständigen Wettbewerbs- und Potenzial-Befund.
               </p>
             </div>
           </div>
 
           <div class="mt-6 space-y-4">
             @for (step of [
-              'Domain validieren und in ein sauberes Eingabeformat überführen',
-              'Analysejob an den Content- und SEO-Workflow übergeben',
-              'Report speichern und direkt in der Ergebnisansicht öffnen'
+              'Domain prüfen und Anfrage starten',
+              'Content- und SEO-Analyse im Hintergrund',
+              'Befund speichern und in der Ergebnisansicht öffnen'
             ]; track step) {
               <div class="flex gap-3">
                 <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#0070FF]/10 text-[11px] font-black text-[#0070FF]">

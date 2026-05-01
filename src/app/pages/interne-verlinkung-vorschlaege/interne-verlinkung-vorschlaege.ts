@@ -194,21 +194,21 @@ export class InterneVerlinkungVorschlaegeComponent {
     if (error instanceof RequestError) {
       switch (error.code) {
         case 'timeout':
-          return 'Die Vorschlagsanalyse dauert laenger als erwartet. Bitte versuche es erneut.';
+          return 'Die Analyse dauert länger als erwartet. Bitte versuchen Sie es erneut.';
         case 'network':
-          return 'Keine Verbindung. Bitte pruefe Ihre Internetverbindung.';
+          return 'Keine Verbindung. Bitte prüfen Sie Ihre Internetverbindung.';
         case 'empty':
-          return 'Der Webhook hat keine auswertbare Antwort zurueckgegeben.';
+          return 'Es konnte kein verwertbares Ergebnis erzeugt werden. Bitte versuchen Sie es erneut.';
         default:
           if (error.status === 404) {
-            return 'Der Webhook fuer interne Verlinkung wurde nicht gefunden.';
+            return 'Das System ist gerade nicht verfügbar. Bitte versuchen Sie es später erneut.';
           }
 
           if (error.status === 500) {
-            return 'Der Webhook fuer interne Verlinkung hat mit HTTP 500 geantwortet.';
+            return 'Das System ist gerade nicht erreichbar. Bitte versuchen Sie es in wenigen Minuten erneut.';
           }
 
-          return 'Die Vorschlaege fuer interne Verlinkung konnten nicht gestartet werden. Bitte versuche es erneut.';
+          return 'Die Vorschläge konnten nicht erzeugt werden. Bitte versuchen Sie es erneut.';
       }
     }
 

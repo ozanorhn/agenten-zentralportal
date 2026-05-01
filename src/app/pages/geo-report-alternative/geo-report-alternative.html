@@ -8,8 +8,7 @@
         Lokal-SEO-Bericht <span class="text-[#0070FF]">(Alternativ)</span>
       </h1>
       <p class="max-w-3xl text-lg font-light leading-relaxed text-on-surface-variant md:text-xl">
-        Geben Sie genau eine URL ein, senden Sie sie an den alternativen n8n-Testwebhook und lies den
-        zurueckgegebenen Markdown-Report auf einer eigenen Ergebnisseite.
+        Geben Sie eine URL ein und erhalten Sie den lokalen SEO-Bericht direkt im Anschluss als Markdown-Report.
       </p>
     </div>
 
@@ -83,19 +82,19 @@
               <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">description</span>
             </div>
             <div>
-              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Webhook</p>
-              <p class="mt-2 font-headline text-lg font-black text-on-surface">Alternativer Test-Endpunkt</p>
-              <p class="mt-3 break-all text-sm leading-relaxed text-on-surface-variant">
-                {{ environment.geoReportAlternativeWebhookUrl }}
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Ablauf</p>
+              <p class="mt-2 font-headline text-lg font-black text-on-surface">So funktioniert die Analyse</p>
+              <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+                In drei Schritten zum fertigen Markdown-Bericht für die eingegebene Domain.
               </p>
             </div>
           </div>
 
           <div class="mt-6 space-y-4">
             @for (step of [
-              'URL normalisieren und per POST senden',
-              'Markdown oder JSON-Markdown vom Webhook empfangen',
-              'Direkt auf die eigene Result-Seite springen'
+              'URL prüfen und Anfrage senden',
+              'Bericht im Hintergrund generieren',
+              'Ergebnis direkt auf der Result-Seite öffnen'
             ]; track step) {
               <div class="flex gap-3">
                 <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#0070FF]/10 text-[11px] font-black text-[#0070FF]">
@@ -111,9 +110,9 @@
           <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Output</p>
           <div class="mt-4 space-y-3">
             @for (item of [
-              'Markdown Rendering',
-              'Eigene Result-Seite',
-              'Getrennter Flow neben dem bestehenden GEO-Audit'
+              'Markdown-Bericht',
+              'Eigene Ergebnisseite',
+              'Eigenständig neben dem GEO-Audit'
             ]; track item) {
               <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-3 text-sm text-on-surface-variant">
                 {{ item }}

@@ -21,7 +21,7 @@
             </div>
             <div>
               <p class="text-sm font-bold text-on-surface">Analyse starten</p>
-              <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Webhook Formular</p>
+              <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline">Eingabe</p>
             </div>
           </div>
         </div>
@@ -135,13 +135,13 @@
         <section class="glass-panel kinetic-border rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
           <div class="flex items-start gap-4">
             <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
-              <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">webhook</span>
+              <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">insights</span>
             </div>
             <div>
-              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Webhook</p>
-              <p class="mt-2 text-lg font-black text-on-surface font-headline">Start-Endpunkt</p>
-              <p class="mt-3 break-all text-sm leading-relaxed text-on-surface-variant">
-                {{ environment.geoAnalysisStartWebhookUrl }}
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Ablauf</p>
+              <p class="mt-2 text-lg font-black text-on-surface font-headline">So funktioniert die Analyse</p>
+              <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+                In drei Schritten zum vollständigen Sichtbarkeits-Report.
               </p>
             </div>
           </div>
@@ -149,8 +149,8 @@
           <div class="mt-6 space-y-4">
             @for (step of [
               'Formular absenden',
-              'Sofort zur eigenen Status-Seite springen',
-              'Status pollen und Ergebnis automatisch laden'
+              'Sofort zur Status-Seite wechseln',
+              'Ergebnis wird automatisch geladen'
             ]; track step) {
               <div class="flex gap-3">
                 <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#0070FF]/10 text-[11px] font-black text-[#0070FF]">

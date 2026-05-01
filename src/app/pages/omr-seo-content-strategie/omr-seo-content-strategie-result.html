@@ -18,7 +18,7 @@
           </div>
           <div>
             <p class="text-sm font-bold text-on-surface">{{ agentMeta.name }}</p>
-            <p class="text-[10px] uppercase tracking-[0.2em] text-outline">Webhook Result</p>
+            <p class="text-[10px] uppercase tracking-[0.2em] text-outline">Ergebnis</p>
           </div>
         </div>
       </div>
@@ -72,8 +72,8 @@
                 {{ result.keyword || report.input.topic }}
               </h2>
               <p class="mt-3 max-w-3xl text-sm leading-relaxed text-on-surface-variant">
-                Der folgende Plan stammt direkt aus dem Webhook und wird als Markdown gerendert, damit Artikelideen,
-                LinkedIn-Hooks und die Messe-Follow-up-Mail sofort lesbar sind.
+                Der folgende Plan ist als Markdown aufbereitet — Artikelideen,
+                LinkedIn-Hooks und die Messe-Follow-up-Mail sofort lesbar.
               </p>
             </div>
           </div>
@@ -87,7 +87,7 @@
             <div>
               <h2 class="text-base font-semibold text-on-surface">Content-Plan</h2>
               <p class="text-sm text-on-surface-variant">
-                Gerenderte Markdown-Antwort aus dem OMR-Webhook.
+                Vollständiger Plan als Markdown aufbereitet.
               </p>
             </div>
           </div>
@@ -107,7 +107,7 @@
                 <div>
                   <h2 class="text-base font-semibold text-on-surface">{{ section.label }}</h2>
                   <p class="mt-1 text-sm leading-relaxed text-on-surface-variant">
-                    Direkt aus der Webhook-Antwort aufbereitet.
+                    Aufbereitet aus der aktuellen Auswertung.
                   </p>
                 </div>
               </div>
@@ -144,7 +144,7 @@
           </div>
           <h1 class="mt-5 font-headline text-2xl font-black text-on-surface">Kein gespeicherter Report gefunden</h1>
           <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
-            Starten Sie den Agenten erneut und senden Sie Topic, Audience und Offer ab, damit wir die Webhook-Antwort anzeigen koennen.
+            Starten Sie den Agenten erneut und senden Sie Topic, Audience und Offer ab, damit das Ergebnis angezeigt werden kann.
           </p>
           <button
             type="button"

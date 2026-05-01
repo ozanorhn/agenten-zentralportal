@@ -25,10 +25,23 @@
 
     <!-- Actions strip -->
     <div class="shell-header-actions flex-1 flex items-center justify-between px-6 py-2.5">
-      <!-- Mobile-only logo -->
-      <a routerLink="/dashboard" class="shell-brand md:hidden brand-title flex items-baseline">
-        <span class="font-headline font-bold text-[1.5rem] lowercase">arcnode</span>&nbsp;<span class="font-headline font-bold text-[1.5rem] capitalize">OS</span>
-      </a>
+      <div class="flex items-center gap-3">
+        <!-- Mobile-only logo -->
+        <a routerLink="/dashboard" class="shell-brand md:hidden brand-title flex items-baseline">
+          <span class="font-headline font-bold text-[1.5rem] lowercase">arcnode</span>&nbsp;<span class="font-headline font-bold text-[1.5rem] capitalize">OS</span>
+        </a>
+
+        @if (showBackButton()) {
+          <button
+            (click)="goBack()"
+            class="shell-back-btn inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
+            aria-label="Zurück"
+          >
+            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+            <span class="hidden sm:inline">Zurück</span>
+          </button>
+        }
+      </div>
 
       <div class="flex items-center gap-1 ml-auto">
         <!-- Notification Bell -->

@@ -150,24 +150,24 @@ export class GeoReportAlternativeComponent {
     if (error instanceof RequestError) {
       switch (error.code) {
         case 'timeout':
-          return 'Der alternative GEO-Report dauert laenger als erwartet. Bitte versuche es erneut.';
+          return 'Die Analyse dauert länger als erwartet. Bitte versuchen Sie es erneut.';
         case 'network':
-          return 'Keine Verbindung. Bitte pruefe Ihre Internetverbindung.';
+          return 'Keine Verbindung. Bitte prüfen Sie Ihre Internetverbindung.';
         case 'empty':
-          return 'Der Webhook hat keine verwertbare Markdown-Antwort zurueckgegeben.';
+          return 'Es konnte kein verwertbarer Bericht erzeugt werden. Bitte versuchen Sie es erneut.';
         default:
           if (error.status === 500) {
-            return 'Der Webhook antwortet mit HTTP 500. Bitte pruefe den n8n-Testworkflow.';
+            return 'Das System ist gerade nicht erreichbar. Bitte versuchen Sie es in wenigen Minuten erneut.';
           }
 
           if (error.status === 404) {
-            return 'Der alternative Webhook-Endpunkt wurde nicht gefunden.';
+            return 'Das System ist gerade nicht verfügbar. Bitte versuchen Sie es später erneut.';
           }
 
-          return 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.';
+          return 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.';
       }
     }
 
-    return 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.';
+    return 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.';
   }
 }

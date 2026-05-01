@@ -119,7 +119,7 @@ const ROLE_RESULTS: DemoRoleResult[] = [
         resumeSnapshot: {
           experience: '6 Jahre Berufserfahrung',
           lastRole: 'Automation Engineer in einem Ops-Team',
-          focus: 'n8n-Workflows, API-Anbindungen, Prozessdesign',
+          focus: 'Automatisierungs-Workflows, API-Anbindungen, Prozessdesign',
         },
       },
       {
