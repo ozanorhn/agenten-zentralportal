@@ -200,7 +200,7 @@ export class AgentDetail {
   private readonly PROGRESS_LABELS_GEO = [
     'GEO Audit startet …',
     'Verbinde mit Sitemap-Crawler …',
-    'Prüfe robots.txt und llms.txt …',
+    'Prüfen Sie robots.txt und llms.txt …',
     'Analysiere Seitenstruktur und KI-Signale …',
     'Erstelle Ranking und Prioritätenliste …',
     'GEO Audit abgeschlossen',
@@ -208,7 +208,7 @@ export class AgentDetail {
 
   private readonly PROGRESS_LABELS_BLOG = [
     'Redaktion startet …',
-    'Prüfe Briefing und Outline …',
+    'Prüfen Sie Briefing und Outline …',
     'Analysiere Keywords und SERP …',
     'Erstelle Artikelentwurf …',
     'Führe Redaktions-Check durch …',
@@ -217,7 +217,7 @@ export class AgentDetail {
 
   private readonly PROGRESS_LABELS_GOOGLE_ADS = [
     'Audit startet …',
-    'Prüfe Kontostruktur und Brand-Abdeckung …',
+    'Prüfen Sie Kontostruktur und Brand-Abdeckung …',
     'Analysiere Tracking- und Conversion-Signale …',
     'Bewerte Anzeigen, Keywords und Erweiterungen …',
     'Priorisiere Maßnahmen nach Hebel …',
@@ -227,7 +227,7 @@ export class AgentDetail {
   private readonly PROGRESS_LABELS_ADS_HEALTH = [
     'Health Check startet …',
     'Synchronisiere Google- und Meta-Signale …',
-    'Prüfe CPL, CTR und Frequenz nach Kampagne …',
+    'Prüfen Sie CPL, CTR und Frequenz nach Kampagne …',
     'Analysiere Job-Performance und Auffälligkeiten …',
     'Erstelle kanalübergreifende Handlungsempfehlungen …',
     'Anzeigen-Leistungscheck bereit',
@@ -1512,7 +1512,7 @@ export class AgentDetail {
       agentId: this.agentId,
       agentName: this.agentMeta?.name ?? this.agentId,
       agentIcon: this.agentMeta?.icon ?? 'smart_toy',
-      message: `${this.agentMeta?.name ?? 'Agent'} hat deinen Workflow abgeschlossen. Ergebnis bereit!`,
+      message: `${this.agentMeta?.name ?? 'Agent'} hat Ihren Workflow abgeschlossen. Ergebnis bereit!`,
       time: 'Gerade eben',
       read: false,
       link: `/agents/${this.agentId}/result`,

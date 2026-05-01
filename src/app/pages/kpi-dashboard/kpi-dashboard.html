@@ -8,7 +8,7 @@
       </div>
       <div>
         <h1 class="text-2xl font-bold text-on-surface font-headline">Live KPI Monitor</h1>
-        <p class="text-sm text-on-surface-variant/60 mt-0.5">Detaillierte Prozess- und Workflow-Kennzahlen aus deiner Datenquelle</p>
+        <p class="text-sm text-on-surface-variant/60 mt-0.5">Detaillierte Prozess- und Workflow-Kennzahlen aus Ihrer Datenquelle</p>
       </div>
     </div>
     <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#10B981]/10 border border-[#10B981]/20 w-fit">
@@ -68,7 +68,7 @@
     <!-- KPI Cards -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
 
-      <div class="bg-surface-container rounded-2xl border border-outline-variant/20 p-5 space-y-2">
+      <div class="bg-white rounded-2xl border border-[#e3e8ee] p-5 space-y-2 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
         <p class="text-xs uppercase tracking-widest text-on-surface-variant/40 font-bold">Ausführungen</p>
         <p class="text-3xl font-black text-on-surface font-headline">{{ kpiExecutions() }}</p>
         <p class="text-xs text-on-surface-variant/50">{{ kpiExecSub() }}</p>
@@ -82,7 +82,7 @@
         >{{ kpiExecChange().label }}</span>
       </div>
 
-      <div class="bg-surface-container rounded-2xl border border-outline-variant/20 p-5 space-y-2">
+      <div class="bg-white rounded-2xl border border-[#e3e8ee] p-5 space-y-2 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
         <p class="text-xs uppercase tracking-widest text-on-surface-variant/40 font-bold">Zeit gespart</p>
         <p class="text-3xl font-black text-[#F59E0B] font-headline">{{ kpiTimeSaved() }}</p>
         <p class="text-xs text-on-surface-variant/50">{{ kpiTimeSub() }}</p>
@@ -96,7 +96,7 @@
         >{{ kpiTimeChange().label }}</span>
       </div>
 
-      <div class="bg-surface-container rounded-2xl border border-outline-variant/20 p-5 space-y-2">
+      <div class="bg-white rounded-2xl border border-[#e3e8ee] p-5 space-y-2 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
         <p class="text-xs uppercase tracking-widest text-on-surface-variant/40 font-bold">Wert erzeugt</p>
         <p class="text-3xl font-black text-[#10B981] font-headline">{{ kpiValue() }}</p>
         <p class="text-xs text-on-surface-variant/50">{{ kpiValueSub() }}</p>
@@ -110,7 +110,7 @@
         >{{ kpiValueChange().label }}</span>
       </div>
 
-      <div class="bg-surface-container rounded-2xl border border-outline-variant/20 p-5 space-y-2">
+      <div class="bg-white rounded-2xl border border-[#e3e8ee] p-5 space-y-2 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
         <p class="text-xs uppercase tracking-widest text-on-surface-variant/40 font-bold">Ø pro Ausführung</p>
         <p class="text-3xl font-black text-[#0070FF] font-headline">{{ kpiAvg() }}</p>
         <p class="text-xs text-on-surface-variant/50">{{ kpiAvgSub() }}</p>
@@ -128,14 +128,14 @@
 
     <!-- Charts Row 1 -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div class="bg-surface-container rounded-2xl border border-outline-variant/20 p-6">
+      <div class="bg-white rounded-2xl border border-[#e3e8ee] p-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
         <p class="text-sm font-semibold text-on-surface mb-0.5">Ausführungen pro Tag</p>
         <p class="text-xs text-on-surface-variant/40 mb-5">Anzahl täglicher Workflow-Ausführungen</p>
         <div class="h-52">
           <canvas #chartExecDaily></canvas>
         </div>
       </div>
-      <div class="bg-surface-container rounded-2xl border border-outline-variant/20 p-6">
+      <div class="bg-white rounded-2xl border border-[#e3e8ee] p-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
         <p class="text-sm font-semibold text-on-surface mb-0.5">Zeitersparnis pro Tag</p>
         <p class="text-xs text-on-surface-variant/40 mb-5">Eingesparte Minuten nach Tag</p>
         <div class="h-52">
@@ -146,14 +146,14 @@
 
     <!-- Charts Row 2 -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div class="bg-surface-container rounded-2xl border border-outline-variant/20 p-6">
-        <p class="text-sm font-semibold text-on-surface mb-0.5">Wertschöpfung nach Prozess</p>
-        <p class="text-xs text-on-surface-variant/40 mb-5">Top-Prozesse nach generiertem Netto-Wert (€)</p>
+      <div class="bg-white rounded-2xl border border-[#e3e8ee] p-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
+        <p class="text-sm font-semibold text-on-surface mb-0.5">Eingesparte Personalkosten nach Prozess</p>
+        <p class="text-xs text-on-surface-variant/40 mb-5">Top-Prozesse nach gesparten Personalkosten (€)</p>
         <div class="h-52">
           <canvas #chartValueByProcess></canvas>
         </div>
       </div>
-      <div class="bg-surface-container rounded-2xl border border-outline-variant/20 p-6">
+      <div class="bg-white rounded-2xl border border-[#e3e8ee] p-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
         <p class="text-sm font-semibold text-on-surface mb-0.5">Trigger-Typen</p>
         <p class="text-xs text-on-surface-variant/40 mb-5">Verteilung automatisch vs. manuell</p>
         <div class="h-52">
@@ -163,7 +163,7 @@
     </div>
 
     <!-- Process Table -->
-    <div class="bg-surface-container rounded-2xl border border-outline-variant/20 overflow-hidden">
+    <div class="bg-white rounded-2xl border border-[#e3e8ee] overflow-hidden shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
       <div class="px-6 py-5 border-b border-outline-variant/10">
         <p class="text-sm font-semibold text-on-surface">Prozess-Übersicht</p>
       </div>
@@ -181,7 +181,7 @@
                 <th class="text-left px-6 py-3 text-xs font-bold uppercase tracking-widest text-on-surface-variant/40">Prozess</th>
                 <th class="text-right px-6 py-3 text-xs font-bold uppercase tracking-widest text-on-surface-variant/40">Ausführungen</th>
                 <th class="text-right px-6 py-3 text-xs font-bold uppercase tracking-widest text-on-surface-variant/40">Zeit gespart</th>
-                <th class="text-right px-6 py-3 text-xs font-bold uppercase tracking-widest text-on-surface-variant/40">Netto-Wert</th>
+                <th class="text-right px-6 py-3 text-xs font-bold uppercase tracking-widest text-on-surface-variant/40">Kosten gespart</th>
                 <th class="px-6 py-3 text-xs font-bold uppercase tracking-widest text-on-surface-variant/40 w-32">Anteil</th>
               </tr>
             </thead>

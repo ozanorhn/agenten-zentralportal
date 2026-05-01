@@ -25,69 +25,69 @@ export class Management {
 
   agents: AgentRow[] = [
     {
-      id: 'nexus-01',
-      name: 'Nexus-01 Core',
-      agentId: 'AE-99234-X',
-      icon: 'neurology',
-      iconColor: 'text-primary-fixed-dim',
-      model: 'GPT-4 Omni',
-      core: 'Cognitive Layer 7',
-      status: 'operational',
-      lastActivity: 'Vor 2 Min.',
-    },
-    {
-      id: 'data-miner',
-      name: 'Data-Miner Alpha',
-      agentId: 'AE-11822-B',
-      icon: 'database',
-      iconColor: 'text-tertiary',
-      model: 'Claude 3.5 Sonnet',
-      core: 'Extraction Engine',
-      status: 'standby',
-      lastActivity: 'Gestern, 14:20',
-    },
-    {
-      id: 'security-audit',
-      name: 'Security-Audit Pro',
-      agentId: 'AE-55410-Z',
-      icon: 'security',
-      iconColor: 'text-error',
-      model: 'Llama 3 70B',
-      core: 'Threat Analysis',
-      status: 'error',
-      lastActivity: 'Vor 12 Std.',
-    },
-    {
-      id: 'customer-bot',
-      name: 'Customer-Bot Beta',
-      agentId: 'AE-22109-S',
-      icon: 'chat',
+      id: 'seo-tagesbericht',
+      name: 'SEO-Tagesbericht',
+      agentId: 'SYS-SEO-01',
+      icon: 'query_stats',
       iconColor: 'text-primary',
-      model: 'GPT-3.5 Turbo',
-      core: 'NLU Response System',
+      model: 'Claude Opus 4.7',
+      core: 'Tägliche SEO-Prioritäten',
       status: 'operational',
-      lastActivity: 'Gerade eben',
+      lastActivity: 'Heute, 06:00 Uhr',
+    },
+    {
+      id: 'geo-audit',
+      name: 'GEO-Audit',
+      agentId: 'SYS-GEO-02',
+      icon: 'travel_explore',
+      iconColor: 'text-primary',
+      model: 'Claude Sonnet 4.6',
+      core: 'KI-Sichtbarkeits-Analyse',
+      status: 'operational',
+      lastActivity: 'Vor 2 Stunden',
+    },
+    {
+      id: 'ad-copy',
+      name: 'Ad-Copy-Generator',
+      agentId: 'SYS-ADS-03',
+      icon: 'campaign',
+      iconColor: 'text-primary',
+      model: 'Claude Sonnet 4.6',
+      core: 'Anzeigentext für Google & Meta',
+      status: 'standby',
+      lastActivity: 'Gestern, 16:45 Uhr',
+    },
+    {
+      id: 'reporting-assistent',
+      name: 'Reporting-Assistent',
+      agentId: 'SYS-REP-04',
+      icon: 'summarize',
+      iconColor: 'text-primary',
+      model: 'Claude Opus 4.7',
+      core: 'Wochen- und Monatsberichte',
+      status: 'operational',
+      lastActivity: 'Vor 35 Minuten',
     },
   ];
 
   editAgent(agent: AgentRow): void {
-    this.toast.show(`Agent "${agent.name}" wird bearbeitet…`, 'info');
+    this.toast.show(`System „${agent.name}" wird bearbeitet …`, 'info');
   }
 
   duplicateAgent(agent: AgentRow): void {
-    this.toast.show(`Agent "${agent.name}" wurde dupliziert.`, 'success');
+    this.toast.show(`System „${agent.name}" wurde dupliziert.`, 'success');
   }
 
   deleteAgent(agent: AgentRow): void {
-    this.toast.show(`Agent "${agent.name}" wurde gelöscht.`, 'error');
+    this.toast.show(`System „${agent.name}" wurde gelöscht.`, 'error');
   }
 
   getStatusClasses(status: string): string {
     switch (status) {
       case 'operational':
-        return 'bg-primary/10 text-primary border border-primary/20';
+        return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
       case 'standby':
-        return 'bg-secondary-container/30 text-secondary';
+        return 'bg-amber-50 text-amber-700 border border-amber-200';
       case 'error':
         return 'bg-error-container/20 text-error border border-error/20';
       default:
@@ -98,11 +98,11 @@ export class Management {
   getStatusLabel(status: string): string {
     switch (status) {
       case 'operational':
-        return 'Operational';
+        return 'Aktiv';
       case 'standby':
-        return 'Standby';
+        return 'Pausiert';
       case 'error':
-        return 'Error Log';
+        return 'Fehler';
       default:
         return status;
     }

@@ -12,13 +12,13 @@ const CONFIG: Record<string, { title: string; message: string; color: string; ic
   },
   contact: {
     title: 'Nachricht erhalten',
-    message: 'Wir haben deine Nachricht erhalten und melden uns in Kürze.',
+    message: 'Wir haben Ihre Nachricht erhalten und melden uns in Kürze.',
     color: '#3B82F6',
     icon: 'mark_email_read',
   },
   idea: {
     title: 'Vorschlag eingereicht',
-    message: 'Danke für deinen Vorschlag. Wir prüfen das Potenzial und kommen auf dich zu.',
+    message: 'Danke für Ihren Vorschlag. Wir prüfen das Potenzial und kommen auf Sie zu.',
     color: '#3B82F6',
     icon: 'lightbulb',
   },

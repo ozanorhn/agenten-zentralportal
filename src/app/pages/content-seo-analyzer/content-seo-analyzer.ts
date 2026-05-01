@@ -296,7 +296,7 @@ export class ContentSeoAnalyzerComponent {
         case 'timeout':
           return 'Die Analyse dauert laenger als erwartet. Bitte versuche es erneut.';
         case 'network':
-          return 'Keine Verbindung. Bitte pruefe deine Internetverbindung.';
+          return 'Keine Verbindung. Bitte pruefe Ihre Internetverbindung.';
         case 'empty':
           return 'Der Webhook hat keine auswertbare SEO-Antwort zurueckgegeben.';
         default:

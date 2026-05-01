@@ -5,16 +5,16 @@
         {{ agentMeta.category }}
       </span>
       <h1 class="mb-5 font-headline text-4xl font-black leading-none tracking-tighter text-on-surface md:text-6xl">
-        Content <span class="text-[#0070FF]">&amp; SEO Analyzer</span>
+        SEO-<span class="text-[#0070FF]">Audit</span>
       </h1>
       <p class="max-w-3xl text-lg font-light leading-relaxed text-on-surface-variant md:text-xl">
-        Gib nur eine Domain ein. Das System startet daraus eine schnelle Content- und SEO-Analyse
+        Geben Sie nur eine Domain ein. Das System startet daraus eine schnelle Content- und SEO-Analyse
         und legt den Report auf einer eigenen Ergebnisseite ab.
       </p>
     </div>
 
     <div class="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(320px,1.05fr)]">
-      <section class="glass-panel kinetic-border rounded-[2rem] border border-outline-variant/20 bg-surface-container">
+      <section class="glass-panel kinetic-border rounded-[2rem] border border-[#e3e8ee] bg-white">
         <div class="border-b border-outline-variant/10 px-6 py-5 md:px-8">
           <div class="flex items-center gap-3">
             <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
@@ -82,7 +82,7 @@
       </section>
 
       <aside class="space-y-6">
-        <section class="glass-panel kinetic-border rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
+        <section class="glass-panel kinetic-border rounded-[2rem] border border-[#e3e8ee] bg-white px-6 py-6">
           <div class="flex items-start gap-4">
             <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
               <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">hub</span>
@@ -98,9 +98,9 @@
 
           <div class="mt-6 space-y-4">
             @for (step of [
-              'Domain validieren und in ein sauberes Eingabeformat ueberfuehren',
-              'Analysejob an den Content- und SEO-Workflow uebergeben',
-              'Report im Portal speichern und direkt in der Ergebnisansicht oeffnen'
+              'Domain validieren und in ein sauberes Eingabeformat überführen',
+              'Analysejob an den Content- und SEO-Workflow übergeben',
+              'Report speichern und direkt in der Ergebnisansicht öffnen'
             ]; track step) {
               <div class="flex gap-3">
                 <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#0070FF]/10 text-[11px] font-black text-[#0070FF]">
@@ -112,7 +112,7 @@
           </div>
         </section>
 
-        <section class="glass-panel kinetic-border rounded-[2rem] border border-outline-variant/20 bg-surface-container px-6 py-6">
+        <section class="glass-panel kinetic-border rounded-[2rem] border border-[#e3e8ee] bg-white px-6 py-6">
           <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Einsatz</p>
           <div class="mt-4 space-y-3">
             @for (item of [
@@ -120,7 +120,7 @@
               'Ein sauberer Single-Input statt komplexem Briefing',
               'Getrennter Workflow mit eigener Report-Ansicht fuer Teams'
             ]; track item) {
-              <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-3 text-sm text-on-surface-variant">
+              <div class="rounded-2xl border border-[#e3e8ee] bg-white px-4 py-3 text-sm text-on-surface-variant">
                 {{ item }}
               </div>
             }
@@ -131,7 +131,7 @@
             class="mt-6 inline-flex items-center gap-2 text-sm text-on-surface-variant transition-colors hover:text-on-surface"
           >
             <span class="material-symbols-outlined text-base">arrow_back</span>
-            Zurueck zum Marketplace
+            Zurück zur Übersicht
           </a>
         </section>
       </aside>

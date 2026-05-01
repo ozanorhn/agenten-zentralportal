@@ -31,13 +31,13 @@ interface ChatMessage {
       <!-- Hero -->
       <div class="mb-12 max-w-4xl">
         <span class="text-secondary font-headline font-bold tracking-[0.2em] uppercase text-xs mb-4 block">
-          Admin / CEO
+          Geschäftsleitung
         </span>
         <h1 class="text-5xl md:text-7xl font-black font-headline tracking-tighter text-on-surface mb-6 leading-none">
-          Reporting <span class="text-[#0070FF]">Bot</span>
+          Reporting-Assistent
         </h1>
         <p class="text-on-surface-variant text-xl max-w-2xl font-light leading-relaxed">
-          Automatische Berichte aus deiner Datenbasis oder stell einfach eine Frage zum Stand deiner Projekte.
+          Automatische Berichte und direkte Antworten zu Ihren Projekten.
         </p>
       </div>
 
@@ -99,28 +99,28 @@ interface ChatMessage {
 
               <div class="space-y-4 text-sm text-on-surface-variant leading-relaxed">
                 <h2 class="font-headline text-xl font-black text-on-surface">
-                  {{ activeReportLabel() }} — KW 13 / April 2025
+                  {{ activeReportLabel() }} — {{ currentPeriodLabel }}
                 </h2>
                 <p>
                   <strong class="text-on-surface">Zusammenfassung:</strong>
-                  Im Berichtszeitraum wurden <strong class="text-[#0070FF]">1.847 Tasks</strong> automatisch abgeschlossen.
-                  Das Team konnte durch KI-Automatisierung <strong class="text-[#0070FF]">312 Arbeitsstunden</strong> einsparen,
-                  was einem Gegenwert von <strong class="text-[#00C48C]">€ 4.820</strong> entspricht.
+                  Im Berichtszeitraum wurden <strong class="text-[#0070FF]">1.847 Aufgaben</strong> automatisch abgeschlossen.
+                  Ihr Team hat dadurch <strong class="text-[#0070FF]">312 Arbeitsstunden</strong> eingespart
+                  (Berechnung: durchschnittlich 10 Minuten pro Aufgabe × 1.847 Aufgaben).
                 </p>
                 <p>
-                  <strong class="text-on-surface">Sales:</strong>
-                  Der Outreach-Agent hat 480 personalisierte Outreach-Sequenzen vorbereitet.
-                  Conversion-Rate dieser Woche: <strong class="text-[#0070FF]">8,4 %</strong>.
-                  3 neue Deals in der Pipeline (Gesamtwert: ~€ 24.000).
+                  <strong class="text-on-surface">Vertrieb:</strong>
+                  Der Outreach-Assistent hat 480 personalisierte E-Mail-Sequenzen vorbereitet.
+                  Antwortquote dieser Woche: <strong class="text-[#0070FF]">8,4 %</strong> (Branchenschnitt: 4 %).
+                  3 neue qualifizierte Leads in der Pipeline.
                 </p>
                 <p>
                   <strong class="text-on-surface">Content:</strong>
-                  LinkedIn-Post-Agent hat 12 Beiträge zur Freigabe vorbereitet.
-                  Durchschnittliche Engagement-Rate: <strong class="text-[#0070FF]">6,2 %</strong>.
+                  Der LinkedIn-Assistent hat 12 Beiträge zur Freigabe vorbereitet.
+                  Durchschnittliche Interaktionsrate: <strong class="text-[#0070FF]">6,2 %</strong>.
                 </p>
                 <p>
                   <strong class="text-on-surface">Handlungsbedarf:</strong>
-                  Projekt <em>„Website Relaunch"</em> liegt 5 Tage hinter dem Zeitplan —
+                  Projekt <em>„Website-Relaunch"</em> liegt 5 Tage hinter dem Zeitplan —
                   <span class="text-error font-bold">Eskalation empfohlen</span>.
                 </p>
               </div>
@@ -139,7 +139,7 @@ interface ChatMessage {
               <thead>
                 <tr class="border-b border-outline-variant/10">
                   <th class="text-left px-8 py-3 text-[10px] uppercase tracking-widest text-on-surface-variant/50 font-bold">Projekt</th>
-                  <th class="text-left px-4 py-3 text-[10px] uppercase tracking-widest text-on-surface-variant/50 font-bold hidden sm:table-cell">Owner</th>
+                  <th class="text-left px-4 py-3 text-[10px] uppercase tracking-widest text-on-surface-variant/50 font-bold hidden sm:table-cell">Bereich</th>
                   <th class="text-left px-4 py-3 text-[10px] uppercase tracking-widest text-on-surface-variant/50 font-bold">Fortschritt</th>
                   <th class="text-left px-4 py-3 text-[10px] uppercase tracking-widest text-on-surface-variant/50 font-bold">Status</th>
                 </tr>
@@ -173,7 +173,7 @@ interface ChatMessage {
                               : row.status === 'at-risk'
                                 ? 'bg-error/10 text-error'
                                 : 'bg-[#0070FF]/10 text-[#0070FF]'">
-                        {{ row.status === 'done' ? 'Fertig' : row.status === 'at-risk' ? 'Risiko' : 'On Track' }}
+                        {{ row.status === 'done' ? 'Fertig' : row.status === 'at-risk' ? 'Risiko' : 'Im Plan' }}
                       </span>
                     </td>
                   </tr>
@@ -194,7 +194,7 @@ interface ChatMessage {
                         style="font-variation-settings: 'FILL' 1;">smart_toy</span>
                 </div>
                 <div>
-                  <p class="font-headline font-bold text-on-surface text-sm">Reporting Assistant</p>
+                  <p class="font-headline font-bold text-on-surface text-sm">Reporting-Assistent</p>
                   <div class="flex items-center gap-1.5">
                     <span class="w-1.5 h-1.5 bg-[#00C48C] rounded-full animate-pulse"></span>
                     <p class="text-[10px] text-[#00C48C] font-bold uppercase tracking-wider">Online</p>
@@ -246,7 +246,7 @@ interface ChatMessage {
                 <input
                   [(ngModel)]="userInput"
                   (keydown.enter)="sendMessage()"
-                  placeholder="Frag mich etwas... z. B. Womit beschäftigt sich mein Team gerade?"
+                  placeholder="Stellen Sie eine Frage … z. B. Womit beschäftigt sich mein Team gerade?"
                   class="flex-1 bg-transparent text-sm text-on-surface placeholder:text-on-surface-variant/40
                          outline-none px-3 py-2" />
                 <button
@@ -275,16 +275,35 @@ export class ReportingBot {
   chatMessages = signal<ChatMessage[]>([
     {
       role: 'bot',
-      text: 'Hallo! Ich bin dein Reporting-Assistent. Ich kann dir Berichte generieren oder Fragen zu deinen Projekten beantworten. Was möchtest du wissen?',
+      text: 'Hallo, ich bin Ihr Reporting-Assistent. Ich erstelle Berichte und beantworte Fragen zu Ihren Projekten. Was möchten Sie wissen?',
     },
   ]);
 
+  private readonly now = new Date();
+  private readonly weekNumber = this.computeIsoWeek(this.now);
+  private readonly monthName = this.now.toLocaleDateString('de-DE', { month: 'long' });
+  private readonly year = this.now.getFullYear();
+  private readonly quarter = Math.floor(this.now.getMonth() / 3) + 1;
+
   reportTypes: ReportType[] = [
-    { id: 'weekly', label: 'Woche', icon: 'calendar_view_week', period: 'KW 13' },
-    { id: 'monthly', label: 'Monat', icon: 'calendar_month', period: 'März 2025' },
-    { id: 'quarterly', label: 'Quartal', icon: 'date_range', period: 'Q1 2025' },
-    { id: 'yearly', label: 'Jahr', icon: 'calendar_today', period: '2025' },
+    { id: 'weekly', label: 'Woche', icon: 'calendar_view_week', period: `KW ${this.weekNumber}` },
+    { id: 'monthly', label: 'Monat', icon: 'calendar_month', period: `${this.monthName} ${this.year}` },
+    { id: 'quarterly', label: 'Quartal', icon: 'date_range', period: `Q${this.quarter} ${this.year}` },
+    { id: 'yearly', label: 'Jahr', icon: 'calendar_today', period: `${this.year}` },
   ];
+
+  get currentPeriodLabel(): string {
+    const found = this.reportTypes.find((r) => r.id === this.selectedReport());
+    return found?.period ?? '';
+  }
+
+  private computeIsoWeek(date: Date): number {
+    const target = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = target.getUTCDay() || 7;
+    target.setUTCDate(target.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(target.getUTCFullYear(), 0, 1));
+    return Math.ceil(((target.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  }
 
   promptSuggestions = [
     'Stand Projekt XYZ?',
@@ -294,11 +313,11 @@ export class ReportingBot {
   ];
 
   dataPoints: DataPoint[] = [
-    { project: 'Website Relaunch', owner: 'Anna K.', status: 'at-risk', progress: 45, lastUpdate: 'Vor 2 Std.' },
-    { project: 'Q2 Sales-Kampagne', owner: 'Max B.', status: 'on-track', progress: 72, lastUpdate: 'Vor 30 Min.' },
-    { project: 'CRM Migration', owner: 'Lisa M.', status: 'done', progress: 100, lastUpdate: 'Gestern' },
-    { project: 'LinkedIn-Strategie', owner: 'Tom S.', status: 'on-track', progress: 60, lastUpdate: 'Heute' },
-    { project: 'SEO Audit 2025', owner: 'Jana R.', status: 'on-track', progress: 33, lastUpdate: 'Vor 1 Tag' },
+    { project: 'Website-Relaunch', owner: 'Marketing', status: 'at-risk', progress: 45, lastUpdate: 'Vor 2 Stunden' },
+    { project: 'Q2-Sales-Kampagne', owner: 'Vertrieb', status: 'on-track', progress: 72, lastUpdate: 'Vor 30 Minuten' },
+    { project: 'CRM-Migration', owner: 'IT', status: 'done', progress: 100, lastUpdate: 'Gestern' },
+    { project: 'LinkedIn-Strategie', owner: 'Marketing', status: 'on-track', progress: 60, lastUpdate: 'Heute' },
+    { project: 'SEO-Audit 2026', owner: 'Marketing', status: 'on-track', progress: 33, lastUpdate: 'Vor 1 Tag' },
   ];
 
   get activeReportLabel(): () => string {
@@ -337,17 +356,17 @@ export class ReportingBot {
   private getBotReply(input: string): string {
     const lower = input.toLowerCase();
     if (lower.includes('team') || lower.includes('beschäftigt')) {
-      return 'Dein Team arbeitet gerade an 5 aktiven Projekten. Anna K. fokussiert sich auf den Website Relaunch (Achtung: Risiko!), Max B. treibt die Q2 Sales-Kampagne voran, und Lisa M. hat die CRM-Migration erfolgreich abgeschlossen.';
+      return 'Ihr Team arbeitet gerade an 5 aktiven Projekten. Marketing fokussiert sich auf den Website-Relaunch (Achtung: Risiko!), Vertrieb treibt die Q2-Sales-Kampagne voran, und die IT hat die CRM-Migration erfolgreich abgeschlossen.';
     }
     if (lower.includes('risiko') || lower.includes('problem')) {
-      return 'Es gibt aktuell ein Projekt mit erhöhtem Risiko: „Website Relaunch" liegt 5 Tage hinter dem Plan (45% Fortschritt). Empfehlung: Eskalation oder Ressourcen aufstocken.';
+      return 'Es gibt aktuell ein Projekt mit erhöhtem Risiko: „Website-Relaunch" liegt 5 Tage hinter dem Plan (45 % Fortschritt). Empfehlung: Eskalation oder Ressourcen aufstocken.';
     }
     if (lower.includes('kpi') || lower.includes('kennzahl') || lower.includes('diese woche')) {
-      return 'KPIs diese Woche: 312 eingesparte Stunden, €4.820 Kostenersparnis, 480 Outreach-Mails versendet (8,4% Conversion), 12 LinkedIn-Posts (6,2% Engagement). Sehr starke Woche!';
+      return 'KPIs diese Woche: 312 eingesparte Stunden, 4.820 € Kostenersparnis, 480 Outreach-Mails versendet (8,4 % Conversion), 12 LinkedIn-Posts (6,2 % Engagement). Sehr starke Woche.';
     }
     if (lower.includes('xyz') || lower.includes('projekt')) {
-      return 'Ich habe 5 aktive Projekte in der Datenbank. Meinst du „Website Relaunch", „Q2 Sales-Kampagne", „CRM Migration", „LinkedIn-Strategie" oder „SEO Audit 2025"? Bitte präzisiere, zu welchem ich dir mehr Details geben soll.';
+      return 'Ich habe 5 aktive Projekte in der Datenbank. Meinen Sie „Website-Relaunch", „Q2-Sales-Kampagne", „CRM-Migration", „LinkedIn-Strategie" oder „SEO-Audit 2025"? Bitte präzisieren Sie, zu welchem ich Ihnen mehr Details geben soll.';
     }
-    return 'Auf Basis der aktuellen Datenbasis konnte ich keine spezifische Antwort finden. Möchtest du einen vollständigen Bericht generieren oder die Frage präzisieren?';
+    return 'Auf Basis der aktuellen Datenbasis konnte ich keine spezifische Antwort finden. Möchten Sie einen vollständigen Bericht erstellen oder die Frage präzisieren?';
   }
 }

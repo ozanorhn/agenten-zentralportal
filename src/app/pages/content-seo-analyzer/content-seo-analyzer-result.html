@@ -7,7 +7,7 @@
           class="inline-flex items-center gap-2 text-sm text-on-surface-variant transition-colors hover:text-on-surface"
         >
           <span class="material-symbols-outlined text-sm">arrow_back</span>
-          Zurueck
+          Zurück
         </button>
 
         <div class="h-4 w-px bg-outline-variant/30"></div>
@@ -18,7 +18,7 @@
           </div>
           <div>
             <p class="text-sm font-bold text-on-surface">{{ agentMeta.name }}</p>
-            <p class="text-[10px] uppercase tracking-[0.2em] text-outline">Structured Result</p>
+            <p class="text-[10px] uppercase tracking-[0.2em] text-outline">Ergebnis</p>
           </div>
         </div>
       </div>
@@ -38,7 +38,7 @@
 
   <div class="mx-auto max-w-[1120px] px-4 py-6 md:px-6">
     @if (record(); as report) {
-      <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+      <section class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Inhalts- & SEO-Prüfung</p>
@@ -50,7 +50,7 @@
             </p>
           </div>
 
-          <div class="min-w-[220px] rounded-[1.75rem] border border-outline-variant/20 bg-surface-container-high/40 px-5 py-5">
+          <div class="min-w-[220px] rounded-[1.75rem] border border-[#e3e8ee] bg-white px-5 py-5">
             <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">SEO Score</p>
             <div class="mt-3 flex items-end gap-2">
               <span class="font-headline text-5xl font-black" [class]="scoreToneClass()">
@@ -65,7 +65,7 @@
 
       <div class="mt-4 grid gap-4 lg:grid-cols-3">
         @for (card of seoInsightCards(); track card.title) {
-          <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+          <section class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
             <div class="flex items-start gap-3">
               <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
                 <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">{{ card.icon }}</span>
@@ -78,7 +78,7 @@
 
             <div class="mt-5 space-y-3">
               @for (item of card.items; track item) {
-                <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-3 text-sm leading-relaxed text-on-surface-variant">
+                <div class="rounded-2xl border border-[#e3e8ee] bg-white px-4 py-3 text-sm leading-relaxed text-on-surface-variant">
                   {{ item }}
                 </div>
               }
@@ -88,7 +88,7 @@
       </div>
 
       <div class="mt-4 grid gap-4 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-        <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+        <section class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
           <div class="flex items-start gap-3">
             <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
               <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">groups</span>
@@ -103,7 +103,7 @@
 
           @if (competitive()?.topCompetitors?.length) {
             <div class="mt-5">
-              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Top Competitors</p>
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Top-Wettbewerber</p>
               <div class="mt-3 flex flex-wrap gap-2">
                 @for (competitor of competitive()!.topCompetitors!; track competitor) {
                   <span class="rounded-full border border-outline-variant/20 bg-surface-container-high/40 px-3 py-2 text-sm text-on-surface">
@@ -115,8 +115,8 @@
           }
 
           @if (competitive()?.marketPosition) {
-            <div class="mt-5 rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-4">
-              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Market Position</p>
+            <div class="mt-5 rounded-2xl border border-[#e3e8ee] bg-white px-4 py-4">
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Marktposition</p>
               <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
                 {{ competitive()!.marketPosition }}
               </p>
@@ -124,7 +124,7 @@
           }
         </section>
 
-        <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+        <section class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
           <div class="flex items-start gap-3">
             <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
               <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">emoji_objects</span>
@@ -139,10 +139,10 @@
 
           @if (competitive()?.advantages?.length) {
             <div class="mt-5">
-              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Advantages</p>
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-outline">Vorteile</p>
               <div class="mt-3 space-y-3">
                 @for (advantage of competitive()!.advantages!; track advantage) {
-                  <div class="rounded-2xl border border-outline-variant/20 bg-surface-container-high/40 px-4 py-3 text-sm leading-relaxed text-on-surface-variant">
+                  <div class="rounded-2xl border border-[#e3e8ee] bg-white px-4 py-3 text-sm leading-relaxed text-on-surface-variant">
                     {{ advantage }}
                   </div>
                 }
@@ -152,7 +152,7 @@
 
           @if (competitive()?.recommendedPositioning) {
             <div class="mt-5 rounded-2xl border border-[#0070FF]/20 bg-[#0070FF]/8 px-4 py-4">
-              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-[#0070FF]">Recommended Positioning</p>
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-[#0070FF]">Positionierungsempfehlung</p>
               <p class="mt-3 text-sm leading-relaxed text-on-surface">
                 {{ competitive()!.recommendedPositioning }}
               </p>
@@ -161,14 +161,14 @@
         </section>
       </div>
     } @else {
-      <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-8 text-center md:px-6">
+      <section class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-8 text-center md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
         <div class="mx-auto max-w-xl">
           <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0070FF]">
             <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">insights</span>
           </div>
           <h1 class="mt-5 font-headline text-2xl font-black text-on-surface">Kein gespeicherter Analyse-Report gefunden</h1>
           <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
-            Starte den Agenten erneut und sende eine Domain ab, damit wir die SEO- und Wettbewerbsanalyse anzeigen koennen.
+            Starten Sie den Agenten erneut und senden Sie eine Domain ab, damit wir die SEO- und Wettbewerbsanalyse anzeigen können.
           </p>
           <button
             type="button"

@@ -74,7 +74,7 @@ const AD_RESULT: AdResult = {
   metaAd: {
     format: 'Single Image Ad (Feed)',
     primaryText:
-      'Deine Agentur verliert täglich Stunden durch manuelle Planung. KI macht das in Sekunden. Automatisch priorisiert, immer aktuell, immer im Budget.',
+      'Ihre Agentur verliert täglich Stunden durch manuelle Planung. KI macht das in Sekunden. Automatisch priorisiert, immer aktuell, immer im Budget.',
     headline: 'KI-Planung für Agenturen',
     description: '14 Tage kostenlos testen. Keine Kreditkarte.',
     cta: 'Jetzt kostenlos starten',

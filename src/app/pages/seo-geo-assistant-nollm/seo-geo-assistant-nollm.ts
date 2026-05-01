@@ -27,7 +27,7 @@ const OVERLAY_SUCCESS_HOLD_MS = 320;
 const OVERLAY_PROGRESS_STOPS = [18, 36, 58, 78, 92] as const;
 const ANALYSIS_STEPS = [
   'Analysiere Website-Struktur und Crawler-Zugriff...',
-  'Prüfe Marken-Autorität und E-E-A-T Signale...',
+  'Prüfen Sie Marken-Autorität und E-E-A-T Signale...',
   'Extrahiere strukturierte Daten und FAQ-Sektionen...',
   'Berechne GEO-Score für KI-Plattformen...',
   'Generiere finalen Optimierungs-Bericht...',

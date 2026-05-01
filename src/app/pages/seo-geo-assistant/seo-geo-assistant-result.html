@@ -33,7 +33,7 @@
             <div class="pointer-events-none absolute inset-x-0 top-[-3.5rem] h-32 rounded-full bg-[#0070FF]/12 blur-3xl"></div>
 
             <div class="relative">
-              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-[#0A66FF]">NoLLM Envelope</p>
+              <p class="text-[10px] font-black uppercase tracking-[0.22em] text-[#0A66FF]">GEO-Audit</p>
               <h1 class="mt-3 break-all font-body text-base font-semibold lowercase normal-case tracking-normal text-on-surface md:text-xl">
                 {{ displayReportTitle() }}
               </h1>
@@ -48,7 +48,7 @@
                 </span>
                 <span class="inline-flex items-center gap-2 rounded-full border border-[#0070FF]/20 bg-[#0070FF]/10 px-3 py-1 text-xs font-semibold text-[#0A66FF]">
                   <span class="material-symbols-outlined text-sm">webhook</span>
-                  NoLLM Webhook beantwortet
+                  Webhook beantwortet
                 </span>
                 @if (analysis.executionMode) {
                   <span class="inline-flex items-center gap-2 rounded-full border border-outline-variant/20 bg-surface-container-high/40 px-3 py-1 text-xs font-semibold text-on-surface-variant">
@@ -62,7 +62,7 @@
         </section>
 
         <div class="mt-4 grid gap-4 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-          <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+          <section class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
             <div class="flex items-start gap-3">
               <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0A66FF]">
                 <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">task_alt</span>
@@ -81,7 +81,7 @@
                 <span class="material-symbols-outlined text-emerald-800 dark:text-emerald-300">check_circle</span>
                 <div>
                   <p class="text-sm font-medium text-on-surface">Webhook-Transport ok</p>
-                  <p class="mt-1 text-sm text-on-surface-variant">Die Anfrage wurde von n8n angenommen und als NoLLM-Envelope zurückgegeben.</p>
+                  <p class="mt-1 text-sm text-on-surface-variant">Die Anfrage wurde von n8n angenommen und verarbeitet.</p>
                 </div>
               </div>
 
@@ -105,7 +105,7 @@
             </div>
           </section>
 
-          <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+          <section class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
             <div class="flex items-start gap-3">
               <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0A66FF]">
                 <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">inventory_2</span>
@@ -114,7 +114,7 @@
                 <p class="text-[10px] font-black uppercase tracking-[0.2em] text-outline">Input Snapshot</p>
                 <h2 class="mt-2 text-base font-semibold text-on-surface">Übergebene Eingabedaten</h2>
                 <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">
-                  Diese Werte wurden an den NoLLM-Webhook übermittelt und sind die Grundlage für den nächsten Verarbeitungsschritt.
+                  Diese Werte wurden an den Webhook übermittelt und sind die Grundlage für den nächsten Verarbeitungsschritt.
                 </p>
               </div>
             </div>
@@ -134,7 +134,7 @@
           </section>
         </div>
 
-        <section class="mt-4 rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+        <section class="mt-4 rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
           <div class="flex items-start gap-3">
             <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0070FF]/10 text-[#0A66FF]">
               <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">lan</span>
@@ -143,7 +143,7 @@
               <p class="text-[10px] font-black uppercase tracking-[0.2em] text-outline">Transport Diagnostics</p>
               <h2 class="mt-2 text-base font-semibold text-on-surface">Webhook- und Request-Signale</h2>
               <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">
-                Kuratierte Request-Metadaten für die technische Einordnung des empfangenen NoLLM-Outputs.
+                Kuratierte Request-Metadaten für die technische Einordnung des empfangenen Outputs.
               </p>
             </div>
           </div>
@@ -162,7 +162,7 @@
           </div>
         </section>
       } @else {
-      <section class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+      <section class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 class="break-all font-body text-sm font-medium lowercase normal-case tracking-normal text-on-surface md:text-base">{{ compactUrl(analysis.input?.url || '') || 'Report' }}</h1>
@@ -174,7 +174,7 @@
 
         <div class=" sm:grid-cols-2 xl:grid-cols-4">
           @for (box of scoreBoxes(); track box.label) {
-            <div class="rounded-2xl bg-surface-container-high/40 px-4 py-4 text-center" [hidden]="box.label === 'Branchen-Median'">
+            <div class="rounded-2xl bg-white border border-[#e3e8ee] px-4 py-4 text-center shadow-[0_1px_4px_rgba(10,37,64,0.04)]" [hidden]="box.label === 'Branchen-Median'">
               <p class="mb-2 text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ box.label }}</p>
               <p class="text-3xl font-medium" [class]="scoreNumberClass(box)">
                 {{ box.label === 'GEO Score' && box.value !== null ? geoScoreDisplayValue() : formatScoreBoxValue(box) }}<span class="text-sm text-outline">{{ scoreBoxSuffix(box) }}</span>
@@ -192,7 +192,7 @@
         @if (balancedScoreBoxes().length) {
           <div class="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             @for (box of balancedScoreBoxes(); track box.label) {
-              <div class="rounded-2xl bg-surface-container-high/40 px-4 py-4 text-center">
+              <div class="rounded-2xl bg-white border border-[#e3e8ee] px-4 py-4 text-center shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
                 <p class="mb-2 text-[11px] uppercase tracking-[0.05em] text-on-surface-variant">{{ box.label }}</p>
                 <p class="text-3xl font-medium" [class]="scoreNumberClass(box)">
                   {{ formatScoreBoxValue(box) }}<span class="text-sm text-outline">{{ scoreBoxSuffix(box) }}</span>
@@ -217,7 +217,7 @@
 
       </section>
 
-      <section class="mt-4 rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+      <section class="mt-4 rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h2 class="text-base font-medium text-on-surface">GEO Dimensionen</h2>
@@ -327,7 +327,7 @@
       @if (true) {
         <section class="mt-4 space-y-3">
           @if (currentReport()) {
-            <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+            <div class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
               <h2 class="text-base font-medium text-on-surface">{{ currentTabLabel() }}</h2>
               <div class="mt-4 space-y-2">
                 @for (item of currentStatuses(); track item.text) {
@@ -343,7 +343,7 @@
               </div>
             </div>
 
-            <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+            <div class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
               <h3 class="text-sm font-medium text-on-surface">Findings</h3>
               <div class="mt-4 space-y-2">
                 @for (finding of currentFindings(); track finding) {
@@ -359,7 +359,7 @@
           }
 
           @if (activeTab() === 'technik' && hasBotAccessibilityData()) {
-            <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+            <div class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
               <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <h3 class="text-sm font-medium text-on-surface">Bot Accessibility</h3>
@@ -508,7 +508,7 @@
           }
 
             @if (activeTab() === 'onpage' && contentDetails().length) {
-              <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+              <div class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
                 <h3 class="text-sm font-medium text-on-surface">Content & E-E-A-T Details</h3>
                 <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   @for (item of contentDetails(); track item.label) {
@@ -524,7 +524,7 @@
             
 
             @if (activeTab() === 'offpage' && authorityDetails().length) {
-              <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+              <div class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
                 <h3 class="text-sm font-medium text-on-surface">Autoritätsdaten</h3>
                 <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   @for (item of authorityDetails(); track item.label) {
@@ -538,8 +538,8 @@
             }
 
             @if (shouldShowQuickWinsCard()) {
-            <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
-              <h3 class="text-sm font-medium text-on-surface">Quick Wins</h3>
+            <div class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
+              <h3 class="text-sm font-medium text-on-surface">Sofortmaßnahmen</h3>
               <div class="mt-4 space-y-3">
                 @if (secondaryQuickWinsMeta(); as meta) {
                   <div class="flex flex-wrap items-center gap-2 text-xs text-on-surface-variant">
@@ -550,7 +550,7 @@
                     }
                     @if (meta.count !== undefined) {
                       <span class="rounded-full border border-outline-variant/20 bg-surface-container-high/30 px-3 py-1">
-                        {{ meta.count }} Quick Wins
+                        {{ meta.count }} Sofortmaßnahmen
                       </span>
                     }
                   </div>
@@ -561,7 +561,7 @@
                     <div class="flex items-start justify-between gap-3">
                       <div>
                         <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#0070FF]">Zweiter Webhook</p>
-                        <p class="mt-2 text-sm font-medium text-on-surface">Quick Wins werden geladen</p>
+                        <p class="mt-2 text-sm font-medium text-on-surface">Sofortmaßnahmen werden geladen</p>
                         <p class="mt-1 text-sm text-on-surface-variant">
                           {{ secondaryQuickWinsLoadingLabel() }}
                         </p>
@@ -608,7 +608,7 @@
                     </div>
                   }
                 } @else if (!isSecondaryQuickWinsLoading()) {
-                  <p class="text-sm text-on-surface-variant">Keine Quick Wins im Report vorhanden.</p>
+                  <p class="text-sm text-on-surface-variant">Keine Sofortmaßnahmen im Report vorhanden.</p>
                 }
 
               </div>
@@ -657,7 +657,7 @@
       @if (false) {
         <section class="mt-4 space-y-3">
           @if (executiveSummary().length) {
-            <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+            <div class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
               <h2 class="text-base font-medium text-on-surface">Executive Summary</h2>
               <div class="mt-4 space-y-2">
                 @for (item of executiveSummary(); track item) {
@@ -671,7 +671,7 @@
           }
 
           @if (geoDimensionEntries().length) {
-            <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+            <div class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
               <h2 class="text-base font-medium text-on-surface">AI</h2>
               <div class="mt-4 space-y-5">
                 @for (entry of geoDimensionEntries(); track entry.key) {
@@ -694,7 +694,7 @@
           }
 
           @if (geoAiMode().length) {
-            <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+            <div class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
               <h3 class="text-sm font-medium text-on-surface">AI Mode</h3>
               <div class="mt-4 space-y-2">
                 @for (item of geoAiMode(); track item) {
@@ -707,7 +707,7 @@
             </div>
           }
 
-          <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+          <div class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
             <h3 class="text-sm font-medium text-on-surface">AI Live Tests</h3>
 
             @if (hasAiLiveTestData()) {
@@ -776,7 +776,7 @@
             }
           </div>
 
-          <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+          <div class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
             <h3 class="text-sm font-medium text-on-surface">AI Platforms</h3>
             <div class="mt-4 divide-y divide-outline-variant/15">
               @for (platform of aiPlatforms(); track platform.name) {
@@ -805,7 +805,7 @@
             </div>
           </div>
 
-          <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+          <div class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
             <h3 class="text-sm font-medium text-on-surface">Strategische Maßnahmen</h3>
             <div class="mt-4 space-y-3">
               @for (action of strategicActions(); track action.titel || $index) {
@@ -835,7 +835,7 @@
           </div>
 
           @if (schemaAnalysis() || artifactCards().length) {
-            <div class="rounded-[2rem] border border-outline-variant/20 bg-surface-container px-5 py-5 md:px-6">
+            <div class="rounded-[2rem] border border-[#e3e8ee] bg-white px-5 py-5 md:px-6 shadow-[0_1px_4px_rgba(10,37,64,0.04)]">
               <h3 class="text-sm font-medium text-on-surface">Schema & Artefakte</h3>
 
               @if (schemaAnalysis(); as schema) {
@@ -989,7 +989,7 @@
     } @else {
       <div class="py-24 text-center text-on-surface-variant">
         <span class="material-symbols-outlined mb-4 block text-5xl opacity-30">hourglass_empty</span>
-        <p>Kein SEO/GEO-Report gefunden. Starte die Analyse erneut.</p>
+        <p>Kein SEO/GEO-Report gefunden. Starten Sie die Analyse erneut.</p>
         <button
           (click)="goBack()"
           class="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#0070FF] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0060db]"

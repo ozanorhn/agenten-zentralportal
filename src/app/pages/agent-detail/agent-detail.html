@@ -80,7 +80,7 @@
       } @else {
         <h1 class="text-3xl font-headline font-black tracking-tighter text-on-surface">KI-Agent</h1>
         <p class="text-on-surface-variant text-sm mt-2 opacity-70">
-          Definiere deine Parameter und starte die Generierung.
+          Definiere Ihre Parameter und starten Sie die Generierung.
         </p>
       }
     </header>
@@ -113,7 +113,7 @@
           <div class="relative">
             <input
               type="url"
-              placeholder="https://www.ihre-firma.de/"
+              placeholder="https://Ihre-firma.de"
               [value]="websiteUrl()"
               (input)="websiteUrl.set($any($event.target).value)"
               class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 pl-12 text-sm text-on-surface
@@ -425,7 +425,7 @@
                 @if (isAdsHealthChecker) {
                   Dieses Tool simuliert einen kanalübergreifenden Ads-Health-Check für Stellenanzeigen und liefert nach 5 Sekunden den fertigen Report.
                 } @else {
-                  Dieses Tool simuliert einen vollständigen Google-Ads-Audit im Portalstil und liefert nach 5 Sekunden den fertigen Report.
+                  Dieses Tool simuliert einen vollständigen Google-Ads-Audit und liefert nach 5 Sekunden den fertigen Report.
                 }
               </p>
             </div>
@@ -478,7 +478,7 @@
           <div class="relative">
             <input
               type="url"
-              placeholder="https://ihre-firma.de"
+              placeholder="https://Ihre-firma.de"
               [value]="websiteUrl()"
               (input)="websiteUrl.set($any($event.target).value)"
               class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 pl-12 text-sm text-on-surface
@@ -608,7 +608,7 @@
           <div class="space-y-6 text-on-surface-variant leading-relaxed text-lg font-light">
             <p>
               @if (agentMeta.id === 'geo-site-audit') {
-                Gib links deine Domain und den Crawl-Umfang an. Der Agent prueft Sitemap, robots.txt,
+                Geben Sie links Ihre Domain und den Crawl-Umfang an. Der Agent prueft Sitemap, robots.txt,
                 llms.txt und die wichtigsten Struktur-, Trust- und KI-Signale ueber alle gefundenen Seiten.
               } @else if (agentMeta.id === 'ads-health-checker') {
                 Der Agent simuliert einen Health Check für Recruiting-Kampagnen und bewertet Google Ads und Meta Ads auf Wochenbasis mit Fokus auf CPL, CTR, Frequenz und Bewerbungen.
@@ -616,14 +616,14 @@
                 Der Agent simuliert einen Google-Ads-Audit für eom.de und bewertet Kontostruktur, Conversion-Tracking,
                 Brand-Schutz und Anzeigenqualität in einem kompakten Management-Report.
               } @else if (agentMeta.id === 'blog-redakteur') {
-                Gib links dein Redaktions-Briefing ein. Der Agent kombiniert Thema, Primary Keyword,
+                Geben Sie links Ihr Redaktions-Briefing ein. Der Agent kombiniert Thema, Primary Keyword,
                 Zielgruppe, Wortanzahl und Outline zu einem strukturierten Blog-Ergebnis mit Artikel,
                 Chefredakteurs-Check, Keyword-Daten und SERP-Uebersicht.
               } @else if (agentMeta.id === 'content-strategy-bot') {
-                Gib dein Hauptthema, deine Zielgruppe und den Content-Typ ein. Der Agent analysiert
-                Suchvolumen, Keyword-Difficulty und findet die stärksten Wettbewerber-URLs für deinen Plan.
+                Geben Sie Ihr Hauptthema, Ihre Zielgruppe und den Content-Typ ein. Der Agent analysiert
+                Suchvolumen, Keyword-Difficulty und findet die stärksten Wettbewerber-URLs für Ihren Plan.
               } @else {
-                Links definierst du Zielgruppe, Kontext und Quellen. Rechts entsteht das Ergebnis. Das System übersetzt deinen Input in einen belastbaren Entwurf, eine Recherche oder eine priorisierte Empfehlung.
+                Links definieren Sie Zielgruppe, Kontext und Quellen. Rechts entsteht das Ergebnis. Das System übersetzt Ihren Input in einen belastbaren Entwurf, eine Recherche oder eine priorisierte Empfehlung.
               }
             </p>
             <p class="border-l-2 border-[#0070FF] pl-6 italic">
@@ -641,18 +641,18 @@
             </p>
             <p>
               @if (agentMeta.id === 'geo-site-audit') {
-                Konfiguriere links Domain und Seitenlimit und starte den Crawl. Das Ergebnis zeigt dir
+                Konfigurieren Sie links Domain und Seitenlimit und starten Sie den Crawl. Das Ergebnis zeigt Ihnen
                 die staerksten Seiten, die groessten Muster und die kritischsten Ausreisser auf einen Blick.
               } @else if (agentMeta.id === 'ads-health-checker') {
-                Klicke auf <span class="text-on-surface font-semibold">"Jetzt starten"</span> und warte kurz.
-                Danach erscheint ein kanalübergreifender Stellenanzeigen-Report mit KPI-Sicht, Kampagnen-Tabelle und KI-Maßnahmen im Stil des Portals.
+                Klicken Sie auf <span class="text-on-surface font-semibold">"Jetzt starten"</span> und warten Sie kurz.
+                Danach erscheint ein kanalübergreifender Stellenanzeigen-Report mit KPI-Sicht, Kampagnen-Tabelle und KI-Maßnahmen.
               } @else if (agentMeta.id === 'google-ads-audit') {
-                Klicke auf <span class="text-on-surface font-semibold">"Jetzt starten"</span> und warte kurz.
-                Danach erscheint ein strukturierter Audit mit Score, Befunden und priorisiertem Maßnahmenplan im Stil des Portals.
+                Klicken Sie auf <span class="text-on-surface font-semibold">"Jetzt starten"</span> und warten Sie kurz.
+                Danach erscheint ein strukturierter Audit mit Score, Befunden und priorisiertem Maßnahmenplan.
               } @else if (agentMeta.id === 'blog-redakteur') {
-                Nutze die Platzhalter als Vorlage für dein Briefing und klicke auf
+                Nutzen Sie die Platzhalter als Vorlage für Ihr Briefing und klicken Sie auf
                 <span class="text-on-surface font-semibold">"Jetzt generieren"</span>
-                . Danach bekommst du ein vollständiges Redaktionspaket statt nur eines Textblocks.
+                . Danach erhalten Sie ein vollständiges Redaktionspaket statt nur eines Textblocks.
               } @else {
                 Parameter eingeben, Workflow starten. Das Ergebnis ist direkt weiterverwendbar. Kein Feintuning nötig.
               }
@@ -671,7 +671,7 @@
           </div>
           <div class="rounded-[1.5rem] border border-primary/12 bg-primary/8 px-5 py-5">
             <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-primary mb-2">Qualitätsanspruch</p>
-            <p class="text-sm text-on-surface leading-relaxed">Kein Gimmick. Ein belastbarer Arbeitsstand für dein Team. Immer.</p>
+            <p class="text-sm text-on-surface leading-relaxed">Kein Gimmick. Ein belastbarer Arbeitsstand für Ihr Team. Immer.</p>
           </div>
         </div>
 

@@ -53,33 +53,33 @@ export class Dashboard {
 
   readonly kpis: Kpi[] = [
     {
-      label: 'Ausführungen',
+      label: 'Aufgaben erledigt',
       value: '928',
-      sub: 'Prozesse ausgeführt',
-      trend: '↓ -4%',
+      sub: 'in den letzten 30 Tagen',
+      trend: '−4 % vs. Vormonat',
       trendDown: true,
       icon: 'bolt',
     },
     {
       label: 'Zeit gespart',
-      value: '171h 40m',
-      sub: '≈171.7h Netto',
-      trend: '↓ -4%',
+      value: '171,7 h',
+      sub: '11,1 Min. × 928 Aufgaben',
+      trend: '−4 % vs. Vormonat',
       trendDown: true,
       icon: 'schedule',
     },
     {
-      label: 'Wert erzeugt',
+      label: 'Personalkosten gespart',
       value: '9.992 €',
-      sub: 'Netto Wertschöpfung',
-      trend: '↓ -4%',
+      sub: '171,7 h × 58,20 €/h*',
+      trend: '−4 % vs. Vormonat',
       trendDown: true,
       icon: 'payments',
     },
     {
-      label: 'Ø Ausführung',
-      value: '11,1 min',
-      sub: 'Zeit gespart je Lauf',
+      label: 'Ø Bearbeitungszeit',
+      value: '11,1 Min.',
+      sub: 'pro Aufgabe',
       trend: 'Stabil',
       trendDown: false,
       icon: 'avg_pace',
@@ -98,10 +98,10 @@ export class Dashboard {
     {
       id: 'seo-geo-analyse-assistent-nollm',
       icon: 'forum',
-      benefit: 'GEO-Report für jede Domain. Strukturiert und verwertbar.',
-      name: 'GEO-Report',
+      benefit: 'GEO-Audit für jede Domain. Strukturiert und verwertbar.',
+      name: 'GEO-Audit',
       description:
-        'URL, Marke und Branche eingeben. Vollständigen Sichtbarkeits-Report mit GEO-Anteil und konkreten Quick Wins direkt im Portal erhalten.',
+        'URL, Marke und Branche eingeben. Vollständigen Sichtbarkeits-Report mit GEO-Anteil und konkreten Sofortmaßnahmen direkt erhalten.',
     },
     {
       id: 'ad-copy-generator',
@@ -109,7 +109,7 @@ export class Dashboard {
       benefit: 'Ad-Copy für Google & Meta. Sofort testbereit.',
       name: 'Ad-Copy',
       description:
-        'Drei Anzeigen-Varianten mit Tonalitätslabel und Quality Score. Copy-paste in dein Konto, keine Nachbearbeitung nötig.',
+        'Drei Anzeigen-Varianten mit Tonalitätslabel und Qualitäts-Score. Kopieren und in Ihr Konto einfügen, keine Nachbearbeitung nötig.',
     },
   ];
 

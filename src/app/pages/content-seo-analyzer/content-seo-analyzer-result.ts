@@ -72,20 +72,20 @@ export class ContentSeoAnalyzerResultComponent {
     const seo = this.seo();
     return [
       {
-        title: 'Content Gaps',
+        title: 'Inhaltliche Lücken',
         description: 'Themen und Inhalte, die im aktuellen Auftritt noch fehlen.',
         items: seo?.contentGaps ?? [],
         icon: 'plagiarism',
       },
       {
-        title: 'Keyword Opportunities',
-        description: 'Suchbegriffe mit Potenzial fuer Sichtbarkeit und Nachfrage.',
+        title: 'Keyword-Potenziale',
+        description: 'Suchbegriffe mit Potenzial für Sichtbarkeit und Nachfrage.',
         items: seo?.keywordOpportunities ?? [],
         icon: 'manage_search',
       },
       {
-        title: 'Quick Wins',
-        description: 'Schnelle Optimierungen mit direktem Hebel fuer SEO und Content.',
+        title: 'Sofortmaßnahmen',
+        description: 'Schnelle Optimierungen mit direktem Hebel für SEO und Inhalte.',
         items: seo?.quickWins ?? [],
         icon: 'bolt',
       },

@@ -12,13 +12,13 @@ import { RunHistoryService } from '../../services/run-history.service';
       <!-- Hero -->
       <div class="mb-12 max-w-4xl">
         <span class="text-secondary font-headline font-bold tracking-[0.2em] uppercase text-xs mb-4 block">
-          History
+          Archiv
         </span>
         <h1 class="text-5xl md:text-7xl font-black font-headline tracking-tighter text-on-surface mb-6 leading-none">
-          Workflow <span class="text-[#0070FF]">History</span>
+          Verlauf
         </h1>
         <p class="text-on-surface-variant text-xl max-w-2xl font-light leading-relaxed">
-          Alle Läufe, Ergebnisse und Verlaufseinträge deiner Agenten an einem Ort.
+          Alle Berichte und Auswertungen, chronologisch.
         </p>
       </div>
 
@@ -57,7 +57,7 @@ import { RunHistoryService } from '../../services/run-history.service';
         <div class="mt-16 flex flex-col items-center justify-center text-center opacity-40">
           <span class="material-symbols-outlined text-6xl text-on-surface-variant mb-4">history_edu</span>
           <p class="text-on-surface-variant text-lg font-medium">Noch keine Workflows ausgeführt</p>
-          <p class="text-on-surface-variant text-sm mt-2">Starte deinen ersten Agenten im Marketplace.</p>
+          <p class="text-on-surface-variant text-sm mt-2">Starten Sie Ihr erstes System in der Übersicht.</p>
         </div>
       }
 

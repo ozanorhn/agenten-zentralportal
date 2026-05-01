@@ -13,7 +13,7 @@ import { Component } from '@angular/core';
           Operations <span class="text-primary">Monitor</span>
         </h1>
         <p class="text-on-surface-variant max-w-xl text-base leading-relaxed">
-          Überblick über Agenten-Auslastung, Credits und operative Kapazität deiner KI-Workflows.
+          Überblick über Agenten-Auslastung, Credits und operative Kapazität Ihrer KI-Workflows.
         </p>
       </header>
 
@@ -95,7 +95,7 @@ import { Component } from '@angular/core';
               </div>
               <div>
                 <h3 class="font-headline text-[15px] font-bold text-on-surface">Kapazität fast erschöpft</h3>
-                <p class="text-[13px] text-on-surface-variant">Deine freien Credits decken nur noch 5% deines Workflows.</p>
+                <p class="text-[13px] text-on-surface-variant">Ihre freien Credits decken nur noch 5% deines Workflows.</p>
               </div>
             </div>
             <button class="px-6 py-2.5 bg-primary hover:bg-[#2563eb] text-white font-bold text-[13px]

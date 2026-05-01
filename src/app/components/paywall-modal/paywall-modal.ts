@@ -51,10 +51,10 @@ import { CreditService } from '../../services/credit.service';
               Credits aufgebraucht
             </h2>
             <p class="text-on-surface-variant text-sm text-center leading-relaxed mb-8">
-              Deine Test-Credits sind aufgebraucht. Da wir uns auf der&nbsp;
-              <span class="text-secondary font-bold">OMR</span>&nbsp;getroffen haben: Buche dir jetzt
+              Ihre Test-Credits sind aufgebraucht. Da wir uns auf der&nbsp;
+              <span class="text-secondary font-bold">OMR</span>&nbsp;getroffen haben: Buche Ihnen jetzt
               einen kurzen&nbsp;<span class="font-semibold text-on-surface">10-Minuten-Discovery-Call</span>&nbsp;
-              und wir schalten dir den Account für&nbsp;
+              und wir schalten Ihnen den Account für&nbsp;
               <span class="text-secondary font-bold">30&thinsp;Tage</span>&nbsp;frei.
             </p>
 

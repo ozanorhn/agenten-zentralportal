@@ -36,7 +36,7 @@ const SECONDARY_QUICK_WINS_LOADING_STEPS = [
   'Aufwand und Score-Impact werden gewichtet.',
   'Konkrete Maßnahmen und Titel werden aufbereitet.',
   'Beispiele und Umsetzungsschritte werden ergänzt.',
-  'Quick Wins werden für die Anzeige finalisiert.',
+  'Sofortmaßnahmen werden für die Anzeige finalisiert.',
 ] as const;
 const LEGACY_DIMENSION_ORDER = ['brand', 'citation', 'eeat', 'technical', 'schema', 'content'] as const;
 type LegacyDimensionKey = typeof LEGACY_DIMENSION_ORDER[number];
@@ -264,7 +264,7 @@ export class SeoGeoAssistantResultComponent implements AfterViewInit, OnDestroy 
   readonly secondaryQuickWinsProgress = signal(0);
   readonly secondaryQuickWinsLoadingStepIndex = signal(0);
   readonly secondaryQuickWinsLoadingLabel = computed<string>(() =>
-    SECONDARY_QUICK_WINS_LOADING_STEPS[this.secondaryQuickWinsLoadingStepIndex()] ?? 'Quick Wins werden geladen.',
+    SECONDARY_QUICK_WINS_LOADING_STEPS[this.secondaryQuickWinsLoadingStepIndex()] ?? 'Sofortmaßnahmen werden geladen.',
   );
   readonly isPolling = signal(false);
   readonly statusErrorMessage = signal('');
@@ -2631,7 +2631,7 @@ export class SeoGeoAssistantResultComponent implements AfterViewInit, OnDestroy 
       return error.message;
     }
 
-    return 'Unbekannter Fehler beim Laden der Quick Wins.';
+    return 'Unbekannter Fehler beim Laden der Sofortmaßnahmen.';
   }
 
   private parseJson(raw: string): unknown {
@@ -2672,7 +2672,7 @@ export class SeoGeoAssistantResultComponent implements AfterViewInit, OnDestroy 
       return status.error.message;
     }
 
-    return 'Die Analyse ist fehlgeschlagen. Bitte starte sie erneut.';
+    return 'Die Analyse ist fehlgeschlagen. Bitte starten Sie sie erneut.';
   }
 
   private toStatusLabel(status?: GeoAnalysisJobState): string {

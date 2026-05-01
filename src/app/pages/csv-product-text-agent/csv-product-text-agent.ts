@@ -73,7 +73,7 @@ export class CsvProductTextAgentComponent {
   readonly dragOver = signal(false);
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal('');
-  readonly statusLabel = signal('Lade eine CSV-Datei hoch und starte dann den Agenten.');
+  readonly statusLabel = signal('Lade eine CSV-Datei hoch und starten Sie dann den Agenten.');
 
   readonly hasSelectedFile = computed(() => !!this.selectedFile());
   readonly selectedFileName = computed(() => this.selectedFile()?.name ?? 'Noch keine CSV ausgewaehlt');
@@ -108,7 +108,7 @@ export class CsvProductTextAgentComponent {
   clearSelectedFile(): void {
     this.selectedFile.set(null);
     this.errorMessage.set('');
-    this.statusLabel.set('CSV entfernt. Du kannst jetzt eine neue Datei auswaehlen.');
+    this.statusLabel.set('CSV entfernt. Sie kannst jetzt eine neue Datei auswaehlen.');
   }
 
   async submit(): Promise<void> {
@@ -222,7 +222,7 @@ export class CsvProductTextAgentComponent {
     }
 
     this.selectedFile.set(file);
-    this.statusLabel.set('CSV bereit. Du kannst den Agenten jetzt starten.');
+    this.statusLabel.set('CSV bereit. Sie kannst den Agenten jetzt starten.');
   }
 
   private async callWebhook(

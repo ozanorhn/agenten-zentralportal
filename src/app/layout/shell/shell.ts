@@ -49,7 +49,7 @@ export class Shell {
   readonly navItemClass = computed(() =>
     this.sidebarCollapsed()
       ? 'shell-nav-item flex items-center justify-center py-2 w-9 mx-auto rounded-lg text-sm transition-all duration-150'
-      : 'shell-nav-item flex items-center gap-2 px-3 py-1.5 rounded-lg font-body font-medium text-[12px] transition-all duration-150'
+      : 'shell-nav-item flex items-center gap-2 px-3 py-1.5 rounded-lg font-body font-medium text-sm transition-all duration-150'
   );
 
   readonly mainClass = computed(() =>

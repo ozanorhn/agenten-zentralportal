@@ -721,7 +721,7 @@ export class AgentResult {
     if (audit.botStatus.cloudflareBlocksAll) {
       addRecommendation({
         title: 'Cloudflare fuer Audit-Traffic oeffnen',
-        body: 'Die Domain ist fuer Browser und Bots abgeschirmt. Erlaube bekannte Bots oder richte gezielte Allowlists ein, bevor du Content-Themen priorisierst.',
+        body: 'Die Domain ist fuer Browser und Bots abgeschirmt. Erlauben Sie bekannte Bots oder richten Sie gezielte Allowlists ein, bevor Sie Content-Themen priorisieren.',
         icon: 'shield_lock',
         tone: 'critical',
       });
@@ -747,7 +747,7 @@ export class AgentResult {
       } else if (label.includes('robots')) {
         addRecommendation({
           title: 'robots.txt fuer KI-Bots sauber regeln',
-          body: 'Pruefe GPTBot, Google-Extended und verwandte Bots explizit. So vermeidest du widerspruechliche Signale zwischen Crawl-Freigabe und Content-Strategie.',
+          body: 'Prüfen Sie GPTBot, Google-Extended und verwandte Bots explizit. So vermeiden Sie widerspruechliche Signale zwischen Crawl-Freigabe und Content-Strategie.',
           icon: 'rule',
           tone: 'warning',
         });
@@ -796,7 +796,7 @@ export class AgentResult {
     if (!recommendations.length && audit.worstPages.length > 0) {
       addRecommendation({
         title: 'Schwaechste Seiten zuerst ueberarbeiten',
-        body: `Starte mit ${audit.worstPages[0].path} und uebernehme die Fixes anschliessend fuer weitere Seiten mit denselben Defiziten.`,
+        body: `Starten Sie mit ${audit.worstPages[0].path} und übernehmen Sie die Fixes anschließend für weitere Seiten mit denselben Defiziten.`,
         icon: 'task_alt',
         tone: 'info',
       });

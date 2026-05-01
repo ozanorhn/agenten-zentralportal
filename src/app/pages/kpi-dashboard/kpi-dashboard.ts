@@ -92,13 +92,13 @@ export class KpiDashboardComponent implements AfterViewInit, OnDestroy {
   currentPeriod = signal<Period>('month');
 
   kpiExecutions = signal('0');
-  kpiExecSub = signal('Prozesse ausgeführt');
-  kpiTimeSaved = signal('0h');
-  kpiTimeSub = signal('Netto Zeitersparnis');
+  kpiExecSub = signal('Aufgaben automatisiert');
+  kpiTimeSaved = signal('0 h');
+  kpiTimeSub = signal('Bearbeitungszeit gespart');
   kpiValue = signal('0 €');
-  kpiValueSub = signal('Netto Wertschöpfung');
-  kpiAvg = signal('0 min');
-  kpiAvgSub = signal('Zeit gespart je Lauf');
+  kpiValueSub = signal('Personalkosten gespart');
+  kpiAvg = signal('0 Min.');
+  kpiAvgSub = signal('pro Aufgabe');
 
   kpiExecChange = signal<{ label: string; cls: string }>({ label: '—', cls: 'neutral' });
   kpiTimeChange = signal<{ label: string; cls: string }>({ label: '—', cls: 'neutral' });
@@ -195,9 +195,9 @@ export class KpiDashboardComponent implements AfterViewInit, OnDestroy {
 
     this.kpiExecutions.set(String(executions));
     this.kpiTimeSaved.set(this.formatMinutes(totalNetTime));
-    this.kpiTimeSub.set(`≈${(totalNetTime / 60).toFixed(1)}h Netto`);
+    this.kpiTimeSub.set(`${(totalNetTime / 60).toFixed(1)} h × ${executions} Aufgaben`);
     this.kpiValue.set(totalNetValue.toFixed(2).replace('.', ',') + ' €');
-    this.kpiAvg.set(avg.toFixed(1).replace('.', ',') + ' min');
+    this.kpiAvg.set(avg.toFixed(1).replace('.', ',') + ' Min.');
 
     this.kpiExecChange.set(this.changeLabel(executions, prevExec));
     this.kpiTimeChange.set(this.changeLabel(totalNetTime, prevTime));

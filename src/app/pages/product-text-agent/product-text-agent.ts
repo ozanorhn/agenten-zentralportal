@@ -91,7 +91,7 @@ export class ProductTextAgentComponent {
   readonly description = signal('');
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal('');
-  readonly statusLabel = signal('Gib eine Produkt-URL ein oder lade ein Bild hoch und starte dann den Agenten.');
+  readonly statusLabel = signal('Geben Sie eine Produkt-URL ein oder lade ein Bild hoch und starten Sie dann den Agenten.');
   readonly isUrlMode = computed(() => this.inputMode() === 'productUrl');
   readonly isImageMode = computed(() => this.inputMode() === 'imageUrl');
   readonly hasSelectedImage = computed(() => !!this.selectedImage());
@@ -114,8 +114,8 @@ export class ProductTextAgentComponent {
     this.errorMessage.set('');
     this.statusLabel.set(
       mode === 'productUrl'
-        ? 'URL-Modus aktiv. Du kannst jetzt eine Produktseite einfügen.'
-        : 'Bild-Modus aktiv. Du kannst jetzt ein Produktbild hochladen.',
+        ? 'URL-Modus aktiv. Sie kannst jetzt eine Produktseite einfügen.'
+        : 'Bild-Modus aktiv. Sie kannst jetzt ein Produktbild hochladen.',
     );
   }
 
@@ -155,7 +155,7 @@ export class ProductTextAgentComponent {
     this.selectedImage.set(null);
     this.revokePreviewUrl();
     this.errorMessage.set('');
-    this.statusLabel.set('Bild entfernt. Du kannst ein neues Produktbild auswählen.');
+    this.statusLabel.set('Bild entfernt. Sie kannst ein neues Produktbild auswählen.');
   }
 
   clearForm(): void {
@@ -165,7 +165,7 @@ export class ProductTextAgentComponent {
     this.dragOver.set(false);
     this.description.set('');
     this.errorMessage.set('');
-    this.statusLabel.set('Gib eine Produkt-URL ein oder lade ein Bild hoch und starte dann den Agenten.');
+    this.statusLabel.set('Geben Sie eine Produkt-URL ein oder lade ein Bild hoch und starten Sie dann den Agenten.');
   }
 
   async submit(): Promise<void> {
@@ -288,7 +288,7 @@ export class ProductTextAgentComponent {
 
     this.selectedImage.set(file);
     this.updatePreviewUrl(file);
-    this.statusLabel.set('Bild bereit. Du kannst den Agenten jetzt starten.');
+    this.statusLabel.set('Bild bereit. Sie kannst den Agenten jetzt starten.');
   }
 
   private updatePreviewUrl(file: File): void {
@@ -1440,7 +1440,7 @@ export class ProductTextAgentComponent {
       return backendMessage;
     }
 
-    return 'Deine Eingabe konnte gerade nicht verarbeitet werden. Bitte pruefe URL, Bild und Hinweise und versuche es erneut.';
+    return 'Ihre Eingabe konnte gerade nicht verarbeitet werden. Bitte pruefe URL, Bild und Hinweise und versuche es erneut.';
   }
 
   private persistSessionRun(record: RunRecord): void {

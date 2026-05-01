@@ -80,10 +80,10 @@ import { RouterLink } from '@angular/router';
               </div>
               <div class="space-y-3">
                 <h2 class="font-headline text-3xl font-bold text-white tracking-tight leading-tight">
-                  Wähle deinen Agenten.
+                  Wählen Sie Ihren Agenten.
                 </h2>
                 <p class="text-on-surface-variant/80 font-body text-base">
-                  Starte mit einem spezialisierten Kernmodul für Sales, SEO oder Datenanalyse.
+                  Starten Sie mit einem spezialisierten Kernmodul für Sales, SEO oder Datenanalyse.
                 </p>
               </div>
               <div class="grid grid-cols-2 gap-3 pt-2">
@@ -161,7 +161,7 @@ export class Login {
     {
       icon: 'smart_toy',
       title: 'Agenten auswählen',
-      description: 'Wähle aus Sales, Content, SEO oder Data Agents.',
+      description: 'Wählen Sie aus Sales, Content, SEO oder Data Agents.',
     },
     {
       icon: 'tune',

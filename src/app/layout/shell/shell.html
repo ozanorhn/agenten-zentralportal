@@ -163,9 +163,9 @@
          [class]="navItemClass()"
          (mouseenter)="showTooltip($event, 'Hilfe')"
          (mouseleave)="hideTooltip()">
-        <span class="material-symbols-outlined flex-shrink-0 text-lg">help_outline</span>
+        <span class="material-symbols-outlined flex-shrink-0 text-base">help_outline</span>
         @if (!sidebarCollapsed()) {
-          <span class="text-sm">Hilfe</span>
+          <span class="text-xs">Hilfe</span>
         }
       </a>
 
@@ -173,27 +173,27 @@
          [class]="navItemClass()"
          (mouseenter)="showTooltip($event, 'Fehler melden')"
          (mouseleave)="hideTooltip()">
-        <span class="material-symbols-outlined flex-shrink-0 text-lg">warning</span>
+        <span class="material-symbols-outlined flex-shrink-0 text-base">warning</span>
         @if (!sidebarCollapsed()) {
-          <span class="text-sm">Fehler melden</span>
+          <span class="text-xs">Fehler melden</span>
         }
       </a>
       <a routerLink="/kontakt"
          [class]="navItemClass()"
          (mouseenter)="showTooltip($event, 'Kontakt')"
          (mouseleave)="hideTooltip()">
-        <span class="material-symbols-outlined flex-shrink-0 text-lg">mail</span>
+        <span class="material-symbols-outlined flex-shrink-0 text-base">mail</span>
         @if (!sidebarCollapsed()) {
-          <span class="text-sm">Kontakt</span>
+          <span class="text-xs">Kontakt</span>
         }
       </a>
       <a routerLink="/idee-einreichen"
          [class]="navItemClass()"
          (mouseenter)="showTooltip($event, 'Idee einreichen')"
          (mouseleave)="hideTooltip()">
-        <span class="material-symbols-outlined flex-shrink-0 text-lg">lightbulb</span>
+        <span class="material-symbols-outlined flex-shrink-0 text-base">lightbulb</span>
         @if (!sidebarCollapsed()) {
-          <span class="text-sm">Idee einreichen</span>
+          <span class="text-xs">Idee einreichen</span>
         }
       </a>
     </div>

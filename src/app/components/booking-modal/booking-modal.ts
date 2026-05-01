@@ -46,17 +46,17 @@ const CALENDLY_URL = ''; // e.g. 'https://calendly.com/your-handle/15min?embed_t
               </div>
               <div>
                 <p class="text-[10px] font-bold tracking-[0.2em] uppercase text-secondary mb-1">
-                  Deploy Agent
+                  System einrichten
                 </p>
                 <h2 class="text-xl font-headline font-black tracking-tight text-on-surface leading-snug">
-                  Stell dir vor, dieser Agent läuft 24/7 vollautomatisch in deinem CRM.
+                  Stellen Sie sich vor, dieses System läuft rund um die Uhr automatisch in Ihrem CRM.
                 </h2>
               </div>
             </div>
 
             <p class="text-on-surface-variant text-sm leading-relaxed mb-6">
-              Lass uns das in&nbsp;<span class="text-secondary font-bold">15&thinsp;Minuten</span>&nbsp;aufsetzen.
-              Wähle direkt deinen Wunschtermin:
+              Wir setzen das in&nbsp;<span class="text-secondary font-bold">15&thinsp;Minuten</span>&nbsp;auf.
+              Wählen Sie direkt Ihren Wunschtermin:
             </p>
 
             <!-- Calendly iframe / placeholder -->
@@ -84,7 +84,7 @@ const CALENDLY_URL = ''; // e.g. 'https://calendly.com/your-handle/15min?embed_t
                     Calendly / Cal.com Widget
                   </p>
                   <p class="text-outline text-xs text-center">
-                    Platzhalter: Setze <code class="text-secondary/70">CALENDLY_URL</code>
+                    Platzhalter: Setzen Sie <code class="text-secondary/70">CALENDLY_URL</code>
                     in <code class="text-secondary/70">booking-modal.ts</code>
                   </p>
                 </div>
