@@ -70,12 +70,12 @@ export const routes: Routes = [
           import('./pages/content-seo-analyzer/content-seo-analyzer-result').then((m) => m.ContentSeoAnalyzerResultComponent),
       },
       {
-        path: 'agents/omr-seo-content-strategie',
+        path: 'agents/seo-content-strategie',
         loadComponent: () =>
           import('./pages/omr-seo-content-strategie/omr-seo-content-strategie').then((m) => m.OmrSeoContentStrategieComponent),
       },
       {
-        path: 'agents/omr-seo-content-strategie/result',
+        path: 'agents/seo-content-strategie/result',
         loadComponent: () =>
           import('./pages/omr-seo-content-strategie/omr-seo-content-strategie-result').then((m) => m.OmrSeoContentStrategieResultComponent),
       },
@@ -110,41 +110,6 @@ export const routes: Routes = [
         path: 'agents/seo-intelligence-dashboard',
         loadComponent: () =>
           import('./pages/seo-intelligence-dashboard/seo-intelligence-dashboard').then((m) => m.SeoIntelligenceDashboard),
-      },
-      {
-        path: 'agents/ai-screening-agent',
-        loadComponent: () =>
-          import('./pages/ai-screening-agent/ai-screening-agent').then((m) => m.AiScreeningAgentComponent),
-      },
-      {
-        path: 'agents/interview-scorecard-agent',
-        loadComponent: () =>
-          import('./pages/interview-scorecard-agent/interview-scorecard-agent').then((m) => m.InterviewScorecardAgentComponent),
-      },
-      {
-        path: 'agents/hiring-funnel-agent',
-        loadComponent: () =>
-          import('./pages/hiring-funnel-agent/hiring-funnel-agent').then((m) => m.HiringFunnelAgentComponent),
-      },
-      {
-        path: 'agents/pipeline-analyst',
-        loadComponent: () =>
-          import('./pages/pipeline-analyst/pipeline-analyst').then((m) => m.PipelineAnalystComponent),
-      },
-      {
-        path: 'agents/meeting-protokoll-agent',
-        loadComponent: () =>
-          import('./pages/meeting-protokoll-agent/meeting-protokoll-agent').then((m) => m.MeetingProtokollAgentComponent),
-      },
-      {
-        path: 'agents/ad-copy-generator',
-        loadComponent: () =>
-          import('./pages/ad-copy-generator/ad-copy-generator').then((m) => m.AdCopyGeneratorComponent),
-      },
-      {
-        path: 'agents/angebots-assistent',
-        loadComponent: () =>
-          import('./pages/angebots-assistent/angebots-assistent').then((m) => m.AngebotAssistentComponent),
       },
       {
         path: 'agents/:id',

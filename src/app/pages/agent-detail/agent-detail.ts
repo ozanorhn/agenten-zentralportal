@@ -65,8 +65,6 @@ export class AgentDetail {
   readonly isLeadResearcher = this.agentId === 'lead-researcher';
   readonly isFirmenFinder = this.agentId === 'firmen-finder';
   readonly isGeoSiteAudit = this.agentId === 'geo-site-audit';
-  readonly isGoogleAdsAudit = this.agentId === 'google-ads-audit';
-  readonly isAdsHealthChecker = this.agentId === 'ads-health-checker';
   readonly isSocialMediaWizard = this.agentId === 'social-media-wizard';
   readonly isContentStrategyBot = this.agentId === 'content-strategy-bot';
   readonly isBlogRedakteur = this.agentId === 'blog-redakteur';
@@ -215,24 +213,6 @@ export class AgentDetail {
     'Blog-Paket bereit',
   ];
 
-  private readonly PROGRESS_LABELS_GOOGLE_ADS = [
-    'Audit startet …',
-    'Prüfen Sie Kontostruktur und Brand-Abdeckung …',
-    'Analysiere Tracking- und Conversion-Signale …',
-    'Bewerte Anzeigen, Keywords und Erweiterungen …',
-    'Priorisiere Maßnahmen nach Hebel …',
-    'Google Ads Prüfung bereit',
-  ];
-
-  private readonly PROGRESS_LABELS_ADS_HEALTH = [
-    'Health Check startet …',
-    'Synchronisiere Google- und Meta-Signale …',
-    'Prüfen Sie CPL, CTR und Frequenz nach Kampagne …',
-    'Analysiere Job-Performance und Auffälligkeiten …',
-    'Erstelle kanalübergreifende Handlungsempfehlungen …',
-    'Anzeigen-Leistungscheck bereit',
-  ];
-
   submitWorkflow(): void {
     if (this.isSubmitting()) return;
     this.isSubmitting.set(true);
@@ -245,10 +225,6 @@ export class AgentDetail {
       this.runFirmenFinderWorkflow();
     } else if (this.isGeoSiteAudit) {
       this.runGeoSiteAuditWorkflow();
-    } else if (this.isGoogleAdsAudit) {
-      this.runGoogleAdsAuditWorkflow();
-    } else if (this.isAdsHealthChecker) {
-      this.runAdsHealthCheckerWorkflow();
     } else if (this.isSocialMediaWizard) {
       this.runSocialMediaWizardWorkflow();
     } else if (this.isContentStrategyBot) {
@@ -932,64 +908,6 @@ export class AgentDetail {
     };
 
     this.saveAndNavigate(output, `Social Media: ${this.socialTopic()}`, input);
-  }
-
-  private runGoogleAdsAuditWorkflow(): void {
-    const labels = this.PROGRESS_LABELS_GOOGLE_ADS;
-    this.progressLabel.set(labels[0]);
-
-    const startTime = Date.now();
-    const minDuration = 5000;
-
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const pct = Math.min(Math.round((elapsed / minDuration) * 92), 92);
-      this.progress.set(pct);
-      if (pct >= 70) this.progressLabel.set(labels[4]);
-      else if (pct >= 50) this.progressLabel.set(labels[3]);
-      else if (pct >= 28) this.progressLabel.set(labels[2]);
-      else if (pct >= 8) this.progressLabel.set(labels[1]);
-    }, 100);
-
-    setTimeout(() => {
-      clearInterval(interval);
-      this.progress.set(100);
-      this.progressLabel.set(labels[5]);
-
-      const output = this.agentOutput.generateOutput('google-ads-audit', {});
-      setTimeout(() => {
-        this.saveAndNavigate(output, 'Google Ads Prüfung: eom.de', {});
-      }, 400);
-    }, minDuration);
-  }
-
-  private runAdsHealthCheckerWorkflow(): void {
-    const labels = this.PROGRESS_LABELS_ADS_HEALTH;
-    this.progressLabel.set(labels[0]);
-
-    const startTime = Date.now();
-    const minDuration = 5000;
-
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const pct = Math.min(Math.round((elapsed / minDuration) * 92), 92);
-      this.progress.set(pct);
-      if (pct >= 70) this.progressLabel.set(labels[4]);
-      else if (pct >= 50) this.progressLabel.set(labels[3]);
-      else if (pct >= 28) this.progressLabel.set(labels[2]);
-      else if (pct >= 8) this.progressLabel.set(labels[1]);
-    }, 100);
-
-    setTimeout(() => {
-      clearInterval(interval);
-      this.progress.set(100);
-      this.progressLabel.set(labels[5]);
-
-      const output = this.agentOutput.generateOutput('ads-health-checker', {});
-      setTimeout(() => {
-        this.saveAndNavigate(output, 'Anzeigen-Leistungscheck: Stellenanzeigen', {});
-      }, 400);
-    }, minDuration);
   }
 
   private runContentStrategyWorkflow(): void {

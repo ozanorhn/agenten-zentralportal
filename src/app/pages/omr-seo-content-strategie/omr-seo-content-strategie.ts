@@ -24,7 +24,7 @@ class RequestError extends Error {
 const WEBHOOK_TIMEOUT_MS = 90_000;
 
 @Component({
-  selector: 'app-omr-seo-content-strategie',
+  selector: 'app-seo-content-strategie',
   standalone: true,
   imports: [FormsModule, RouterLink],
   templateUrl: './omr-seo-content-strategie.html',
@@ -33,7 +33,7 @@ export class OmrSeoContentStrategieComponent {
   private readonly router = inject(Router);
 
   readonly environment = environment;
-  readonly agentMeta = AGENTS_MAP['omr-seo-content-strategie'];
+  readonly agentMeta = AGENTS_MAP['seo-content-strategie'];
 
   topic = '';
   audience = '';
@@ -60,7 +60,7 @@ export class OmrSeoContentStrategieComponent {
 
     try {
       const response = await this.fetchWithTimeout(
-        environment.omrContentOpportunityWebhookUrl,
+        environment.contentOpportunityWebhookUrl,
         {
           method: 'POST',
           headers: {
@@ -75,9 +75,9 @@ export class OmrSeoContentStrategieComponent {
       const rawResponse = await response.text().catch(() => '');
 
       if (!response.ok) {
-        console.error('OMR SEO Content Strategie webhook error', {
+        console.error('SEO Content Strategie webhook error', {
           status: response.status,
-          url: environment.omrContentOpportunityWebhookUrl,
+          url: environment.contentOpportunityWebhookUrl,
           method: 'POST',
           requestBody: payload,
           responseBody: rawResponse,
@@ -91,7 +91,7 @@ export class OmrSeoContentStrategieComponent {
       }
 
       const record: StoredOmrSeoContentStrategieReport = {
-        id: `omr-seo-content-strategie-${Date.now()}`,
+        id: `seo-content-strategie-${Date.now()}`,
         createdAt: Date.now(),
         input: payload,
         parsedResponse,
@@ -100,12 +100,12 @@ export class OmrSeoContentStrategieComponent {
 
       saveOmrSeoContentStrategieReport(record);
 
-      await this.router.navigate(['/agents', 'omr-seo-content-strategie', 'result'], {
+      await this.router.navigate(['/agents', 'seo-content-strategie', 'result'], {
         queryParams: { reportId: record.id },
       });
     } catch (error) {
       this.errorMessage.set(this.toFriendlyErrorMessage(error));
-      console.error('OMR SEO Content Strategie request failed', error);
+      console.error('SEO Content Strategie request failed', error);
     } finally {
       this.isSubmitting.set(false);
     }

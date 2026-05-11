@@ -6,7 +6,7 @@
       {{ today }}
     </p>
     <h1 class="text-[2.5rem] md:text-[3.25rem] font-bold font-headline text-on-surface leading-[1.1] mb-3">
-      Guten Tag, <span class="text-primary">OMR.</span>
+      Guten Tag, <span class="text-primary">EOM.</span>
     </h1>
     <p class="text-[15px] text-on-surface-variant leading-relaxed max-w-md">
       Was Ihre KI-Systeme heute geleistet haben.
@@ -15,7 +15,7 @@
 
   <!-- ── Live KPIs ─────────────────────────────────────────────────── -->
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-    @for (kpi of kpis; track kpi.label) {
+    @for (kpi of kpis(); track kpi.label) {
       <div class="bg-white border border-[#e3e8ee] rounded-2xl p-5
                   shadow-[0_1px_4px_rgba(10,37,64,0.04)]
                   hover:border-primary/20 hover:shadow-[0_4px_16px_rgba(10,37,64,0.07)]
@@ -51,7 +51,7 @@
   </div>
 
   <p class="text-[11px] text-on-surface-variant/45 mb-10 -mt-6">
-    * Annahme: 58,20 € durchschnittliche Personalkosten pro Stunde (inkl. Lohnnebenkosten, Quelle: Statistisches Bundesamt 2025).
+    Personalkosten gespart = Nettowert nach Abzug der KI-Betriebskosten (Quelle: n8n KPI-Auswertung).
   </p>
 
   <!-- ── Todos ─────────────────────────────────────────────────────── -->

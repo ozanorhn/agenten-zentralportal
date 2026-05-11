@@ -47,7 +47,7 @@ function demoRuns(): RunRecord[] {
     },
     {
       id: 'demo-content-1',
-      agentId: 'omr-seo-content-strategie',
+      agentId: 'seo-content-strategie',
       agentName: 'Content-Strategie',
       agentIcon: 'article',
       agentCategory: 'Content',
