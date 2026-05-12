@@ -2,6 +2,7 @@ import { Component, OnDestroy, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import { AgentRunContextService } from '../../services/agent-run-context.service';
 import {
   extractGeoWebhookResult,
   sanitizeNoLlmGeoWebhookResult,
@@ -41,6 +42,7 @@ const ANALYSIS_STEPS = [
 })
 export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
   private readonly router = inject(Router);
+  private readonly runCtx = inject(AgentRunContextService);
   private overlayStepTimerId: number | null = null;
 
   readonly environment = environment;
@@ -158,6 +160,7 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
         industry: this.industry.trim(),
         location: this.location.trim() || 'Deutschland',
         websiteType: this.websiteType.trim(),
+        ...this.runCtx.buildContext('seo-geo-analyse-assistent-nollm'),
       };
 
       const response = await this.fetchWithTimeout(
@@ -205,6 +208,7 @@ export class SeoGeoAssistantNoLlmComponent implements OnDestroy {
       };
 
       saveSeoGeoReport(record);
+      // Hinweis: agent_runs-Insert macht n8n am Workflow-Ende — wir senden nur den Lauf-Kontext mit.
       await this.showOverlayCompletedState();
 
       navigationSucceeded = await this.router.navigate(['/agents', 'seo-geo-analyse-assistent-nollm', 'result'], {

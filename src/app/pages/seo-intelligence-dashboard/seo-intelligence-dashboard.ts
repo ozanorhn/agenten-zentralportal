@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgClass } from '@angular/common';
+import { RunHistoryService } from '../../services/run-history.service';
 
 const WEBHOOK_URL = 'https://n8n.eom.de/webhook/74cb760b-813e-4007-8c2b-4a4e3bbfc0d6';
 
@@ -64,6 +65,7 @@ function buildTimestampPayload(): object[] {
   templateUrl: './seo-intelligence-dashboard.html',
 })
 export class SeoIntelligenceDashboard {
+  private readonly runHistory = inject(RunHistoryService);
   state = signal<'idle' | 'loading' | 'success' | 'error'>('idle');
   errorMsg = signal('');
   responseItems = signal<SeoItem[]>([]);
@@ -106,6 +108,18 @@ export class SeoIntelligenceDashboard {
       if (items.length === 0) throw new Error(`Struktur nicht erkannt: ${JSON.stringify(data).slice(0, 150)}`);
       this.responseItems.set(items);
       this.state.set('success');
+      this.runHistory.addRun({
+        id: `run-${Date.now()}`,
+        agentId: 'seo-intelligence-dashboard',
+        agentName: 'SEO-Tagesbericht',
+        agentIcon: 'query_stats',
+        agentCategory: 'SEO',
+        timestamp: Date.now(),
+        inputData: {},
+        outputSummary: `${items.length} SEO-Maßnahmen — ${items.filter(i => i.fokus === 'CTR').length}× CTR, ${items.filter(i => i.fokus === 'Ranking').length}× Ranking`,
+        fullOutput: { type: 'markdown', content: JSON.stringify(items) },
+        tokenCount: 0,
+      });
     } catch (err) {
       this.errorMsg.set((err as Error).message);
       this.state.set('error');

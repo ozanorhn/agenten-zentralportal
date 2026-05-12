@@ -1,17 +1,51 @@
 import { Routes } from '@angular/router';
 import { Shell } from './layout/shell/shell';
+import { adminGuard } from './guards/admin.guard';
+import { authGuard } from './guards/auth.guard';
+import { paidGuard } from './guards/paid.guard';
 
 export const routes: Routes = [
-  // Standalone login page (no shell)
+  // Öffentliche Seiten (kein Login nötig)
   {
     path: 'login',
     loadComponent: () =>
       import('./pages/login/login').then((m) => m.Login),
   },
-  // Shell-wrapped pages
+  {
+    path: 'registrieren',
+    loadComponent: () =>
+      import('./pages/register/register').then((m) => m.Register),
+  },
+  {
+    path: 'zugang-anfragen',
+    loadComponent: () =>
+      import('./pages/zugang-anfragen/zugang-anfragen').then((m) => m.ZugangAnfragen),
+  },
+  // Zugang-beschränkt-Seite: erscheint nur, wenn das Abo seit >30 Tagen abgelaufen ist.
+  {
+    path: 'zugang',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/upgrade/upgrade').then((m) => m.Upgrade),
+  },
+  // Einstellungen: nur Login nötig
+  {
+    path: 'einstellungen',
+    component: Shell,
+    canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/einstellungen/einstellungen').then((m) => m.Einstellungen),
+      },
+    ],
+  },
+  // Shell-Seiten: Login + aktives Abo (Karenzfrist 30 Tage)
   {
     path: '',
     component: Shell,
+    canActivate: [authGuard, paidGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
@@ -134,6 +168,7 @@ export const routes: Routes = [
       },
       {
         path: 'management',
+        canActivate: [adminGuard],
         loadComponent: () =>
           import('./pages/management/management').then((m) => m.Management),
       },
@@ -144,6 +179,7 @@ export const routes: Routes = [
       },
       {
         path: 'reporting-bot',
+        canActivate: [adminGuard],
         loadComponent: () =>
           import('./pages/reporting-bot/reporting-bot').then((m) => m.ReportingBot),
       },
@@ -156,6 +192,11 @@ export const routes: Routes = [
         path: 'kontakt',
         loadComponent: () =>
           import('./pages/contact/contact').then((m) => m.ContactComponent),
+      },
+      {
+        path: 'hilfe',
+        loadComponent: () =>
+          import('./pages/hilfe/hilfe').then((m) => m.HilfeComponent),
       },
       {
         path: 'idee-einreichen',

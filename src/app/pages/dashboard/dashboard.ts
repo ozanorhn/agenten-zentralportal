@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 interface FeaturedAgent {
   id: string;
@@ -80,12 +81,13 @@ interface RawRow {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
 export class Dashboard implements OnInit {
   private readonly router = inject(Router);
+  readonly auth = inject(AuthService);
 
   readonly today = new Date().toLocaleDateString('de-DE', {
     weekday: 'long',

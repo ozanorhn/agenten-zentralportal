@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import { RunHistoryService } from '../../services/run-history.service';
 import { AGENTS_MAP } from '../../data/agents.data';
 import {
   AiLiveTestResult,
@@ -165,6 +166,7 @@ class StatusRequestError extends Error {
 export class SeoGeoAssistantResultComponent implements AfterViewInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly runHistory = inject(RunHistoryService);
   private pollTimeoutId: number | null = null;
   private quickWinsProgressTimerId: number | null = null;
   private _animRafId: number | null = null;
@@ -191,6 +193,7 @@ export class SeoGeoAssistantResultComponent implements AfterViewInit, OnDestroy 
   readonly agentMeta = AGENTS_MAP[this.agentId];
   readonly reportId = this.route.snapshot.queryParamMap.get('reportId');
   readonly jobId = this.route.snapshot.queryParamMap.get('jobId');
+  readonly runId = this.route.snapshot.queryParamMap.get('runId');
   readonly activeTab = signal<SeoGeoTabKey>('onpage');
   readonly openDimensionNoteKey = signal<string | null>(null);
   readonly tabs: TabDefinition[] = [
@@ -988,6 +991,12 @@ export class SeoGeoAssistantResultComponent implements AfterViewInit, OnDestroy 
     }
     this.maybeLoadSecondaryQuickWins();
 
+    // Lädt das vollständige Ergebnis aus agent_runs.output_payload,
+    // falls die Seite über den Verlauf mit ?runId=<uuid> aufgerufen wurde.
+    if (!this._record() && this.runId) {
+      void this.loadFromDb(this.runId);
+    }
+
     if (!this._record() && this.jobId) {
       void this.pollJobStatus();
     }
@@ -1002,6 +1011,21 @@ export class SeoGeoAssistantResultComponent implements AfterViewInit, OnDestroy 
 
   ngAfterViewInit(): void {
     this.attachStickyTabs();
+  }
+
+  private async loadFromDb(runId: string): Promise<void> {
+    const payload = await this.runHistory.fetchOutputPayload(runId);
+    const result = extractGeoWebhookResult(payload);
+    if (!result) return;
+
+    const record: StoredSeoGeoReport = {
+      id: runId,
+      createdAt: Date.now(),
+      payload: result,
+    };
+    saveSeoGeoReport(record);
+    this._record.set(record);
+    this.maybeLoadSecondaryQuickWins();
   }
 
   private animateGeoScore(target: number): void {
@@ -2210,6 +2234,18 @@ export class SeoGeoAssistantResultComponent implements AfterViewInit, OnDestroy 
 
         saveSeoGeoReport(record);
         this._record.set(record);
+        this.runHistory.addRun({
+          id: `run-${Date.now()}`,
+          agentId: 'seo-geo-analyse-assistent-nollm',
+          agentName: 'GEO-Audit',
+          agentIcon: 'forum',
+          agentCategory: 'SEO',
+          timestamp: Date.now(),
+          inputData: { domain: payload.input?.url ?? '' },
+          outputSummary: `GEO-Audit: ${payload.input?.url ?? 'Domain'}`,
+          fullOutput: { type: 'markdown', content: '' },
+          tokenCount: 0,
+        });
         this.isPolling.set(false);
         this.maybeLoadSecondaryQuickWins();
 

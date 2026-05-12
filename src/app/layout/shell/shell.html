@@ -65,11 +65,81 @@
           />
         </div>
 
-        <button class="shell-action-btn transition-all duration-150 p-2 rounded-lg" aria-label="Einstellungen öffnen">
+        <a routerLink="/einstellungen"
+           class="shell-action-btn transition-all duration-150 p-2 rounded-lg inline-flex items-center"
+           aria-label="Einstellungen öffnen">
           <span class="shell-icon material-symbols-outlined text-xl">settings</span>
-        </button>
-        <div class="shell-avatar w-7 h-7 rounded-full flex items-center justify-center ml-2">
-          <span class="shell-avatar-icon material-symbols-outlined text-base">person</span>
+        </a>
+
+        @if (auth.isAdmin()) {
+          <span
+            class="hidden sm:inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full
+                   bg-[#0070FF]/15 text-[#0070FF] text-[10px] font-bold uppercase tracking-widest"
+            title="Sie sind als Administrator angemeldet"
+          >
+            <span class="material-symbols-outlined text-[12px]">shield</span>
+            Admin
+          </span>
+        }
+
+        <!-- User Avatar + Dropdown -->
+        <div class="relative ml-2">
+          <button
+            (click)="toggleUserMenu()"
+            class="shell-avatar w-7 h-7 rounded-full flex items-center justify-center relative"
+            [class.ring-2]="auth.isAdmin()"
+            [class.ring-[#0070FF]]="auth.isAdmin()"
+            [class.ring-offset-2]="auth.isAdmin()"
+            [class.ring-offset-transparent]="auth.isAdmin()"
+            [title]="auth.userEmail() ?? 'Konto'"
+            aria-label="Benutzerkonto"
+          >
+            <span class="shell-avatar-icon material-symbols-outlined text-base">person</span>
+            @if (auth.isAdmin()) {
+              <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#0070FF]
+                           border-2 border-background flex items-center justify-center">
+                <span class="material-symbols-outlined text-[8px] text-white" style="font-variation-settings: 'FILL' 1;">shield</span>
+              </span>
+            }
+          </button>
+
+          @if (showUserMenu()) {
+            <!-- Backdrop -->
+            <div class="fixed inset-0 z-[90]" (click)="showUserMenu.set(false)"></div>
+
+            <!-- Dropdown -->
+            <div class="absolute right-0 top-10 z-[100] w-56 rounded-xl border border-white/10 shadow-xl overflow-hidden"
+                 style="background: rgba(26, 28, 32, 0.97); backdrop-filter: blur(20px);">
+              <!-- Nutzerinfo -->
+              <div class="px-4 py-3 border-b border-white/5">
+                <div class="flex items-center gap-2">
+                  <p class="text-sm font-medium text-on-surface truncate flex-1">{{ auth.displayName() }}</p>
+                  @if (auth.isAdmin()) {
+                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest
+                                 bg-[#0070FF]/20 text-[#0070FF] flex-shrink-0">
+                      Admin
+                    </span>
+                  }
+                </div>
+                <p class="text-xs text-on-surface-variant truncate mt-0.5">{{ auth.userEmail() }}</p>
+                @if (auth.isAdmin()) {
+                  <p class="text-[10px] text-[#0070FF]/70 mt-1 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[11px]">shield</span>
+                    Administratorzugang aktiv
+                  </p>
+                }
+              </div>
+              <!-- Abmelden -->
+              <button
+                (click)="signOut()"
+                class="w-full flex items-center gap-3 px-4 py-3 text-sm text-on-surface-variant
+                       hover:bg-surface-container-high hover:text-on-surface transition-all duration-150"
+              >
+                <span class="material-symbols-outlined text-base">logout</span>
+                Abmelden
+              </button>
+            </div>
+          }
         </div>
       </div>
     </div>
@@ -99,7 +169,7 @@
     <div class="flex-1 overflow-hidden py-2.5"
          [class.px-3]="!sidebarCollapsed()"
          [class.px-2]="sidebarCollapsed()">
-      @for (section of navSections; track section.label) {
+      @for (section of navSections(); track section.label) {
         <div class="mb-3">
           @if (!sidebarCollapsed() && section.label) {
             @if (section.collapsible) {
@@ -132,7 +202,24 @@
           @if (sidebarCollapsed() || !section.collapsible || !isSectionCollapsed(section.label)) {
             <nav class="space-y-0.5">
               @for (item of section.items; track item.route + item.label) {
-                @if (item.queryParams) {
+                @if (item.comingSoon) {
+                  <div
+                    [class]="navItemClass() + ' opacity-60 cursor-not-allowed select-none'"
+                    (mouseenter)="showTooltip($event, item.label + ' — bald verfügbar')"
+                    (mouseleave)="hideTooltip()"
+                    [attr.aria-disabled]="true"
+                    [title]="item.label + ' — bald verfügbar'"
+                  >
+                    <span class="material-symbols-outlined flex-shrink-0">{{ item.icon }}</span>
+                    @if (!sidebarCollapsed()) {
+                      <span class="flex-1">{{ item.label }}</span>
+                      <span class="ml-auto px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest
+                                   bg-on-surface-variant/15 text-on-surface-variant whitespace-nowrap">
+                        Bald
+                      </span>
+                    }
+                  </div>
+                } @else if (item.queryParams) {
                   <a
                     [routerLink]="item.route"
                     [queryParams]="item.queryParams"
@@ -172,7 +259,7 @@
     <div class="shell-bottom-links border-t py-2.5 space-y-0.5"
          [class.px-3]="!sidebarCollapsed()"
          [class.px-2]="sidebarCollapsed()">
-      <a href="#"
+      <a routerLink="/hilfe"
          [class]="navItemClass()"
          (mouseenter)="showTooltip($event, 'Hilfe')"
          (mouseleave)="hideTooltip()">

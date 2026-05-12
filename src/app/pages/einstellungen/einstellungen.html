@@ -1,0 +1,185 @@
+<section class="px-6 md:px-10 py-8 max-w-4xl mx-auto">
+  <!-- Hero -->
+  <div class="mb-8">
+    <span class="text-[11px] uppercase tracking-[0.2em] text-on-surface-variant font-semibold">
+      Konto
+    </span>
+    <h1 class="font-headline text-3xl md:text-4xl font-bold text-on-surface mt-1">Einstellungen</h1>
+    <p class="text-sm text-on-surface-variant mt-2">
+      Verwalten Sie Ihr Profil und Ihre Benachrichtigungen.
+    </p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="flex gap-1 border-b border-outline-variant/30 mb-6">
+    <button
+      (click)="setTab('profil')"
+      class="px-4 py-2.5 text-sm font-medium transition-colors border-b-2"
+      [class.border-primary]="activeTab() === 'profil'"
+      [class.text-on-surface]="activeTab() === 'profil'"
+      [class.border-transparent]="activeTab() !== 'profil'"
+      [class.text-on-surface-variant]="activeTab() !== 'profil'"
+    >
+      Profil
+    </button>
+    <button
+      (click)="setTab('benachrichtigungen')"
+      class="px-4 py-2.5 text-sm font-medium transition-colors border-b-2"
+      [class.border-primary]="activeTab() === 'benachrichtigungen'"
+      [class.text-on-surface]="activeTab() === 'benachrichtigungen'"
+      [class.border-transparent]="activeTab() !== 'benachrichtigungen'"
+      [class.text-on-surface-variant]="activeTab() !== 'benachrichtigungen'"
+    >
+      Benachrichtigungen
+    </button>
+  </div>
+
+  <!-- Profil -->
+  @if (activeTab() === 'profil') {
+    <div class="space-y-6">
+      <div class="bg-surface-container-low/60 border border-outline-variant/20 rounded-2xl p-6">
+        <h2 class="text-base font-semibold text-on-surface mb-4">Persönliche Daten</h2>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-medium text-on-surface-variant mb-1.5">
+              Anzeigename
+            </label>
+            <div class="flex gap-2">
+              <input
+                type="text"
+                [ngModel]="fullName()"
+                (ngModelChange)="fullName.set($event)"
+                placeholder="Ihr Name"
+                class="flex-1 px-3 py-2 text-sm bg-surface-container border border-outline-variant/30 rounded-lg
+                       text-on-surface placeholder:text-outline focus:outline-none focus:border-primary"
+              />
+              <button
+                (click)="saveName()"
+                [disabled]="savingName()"
+                class="px-4 py-2 text-sm font-medium bg-primary text-on-primary rounded-lg
+                       hover:bg-primary/90 transition-colors disabled:opacity-50"
+              >
+                {{ savingName() ? 'Speichert…' : 'Speichern' }}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-on-surface-variant mb-1.5">
+              E-Mail
+            </label>
+            <input
+              type="email"
+              [value]="auth.userEmail() ?? ''"
+              readonly
+              class="w-full px-3 py-2 text-sm bg-surface-container/50 border border-outline-variant/20 rounded-lg
+                     text-on-surface-variant cursor-not-allowed"
+            />
+            <p class="text-[11px] text-outline mt-1">
+              Die E-Mail-Adresse kann derzeit nicht geändert werden.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-surface-container-low/60 border border-outline-variant/20 rounded-2xl p-6">
+        <h2 class="text-base font-semibold text-on-surface mb-4">Passwort ändern</h2>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-medium text-on-surface-variant mb-1.5">
+              Neues Passwort
+            </label>
+            <input
+              type="password"
+              [ngModel]="password()"
+              (ngModelChange)="password.set($event)"
+              autocomplete="new-password"
+              placeholder="Mindestens 8 Zeichen"
+              class="w-full px-3 py-2 text-sm bg-surface-container border border-outline-variant/30 rounded-lg
+                     text-on-surface placeholder:text-outline focus:outline-none focus:border-primary"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-on-surface-variant mb-1.5">
+              Passwort wiederholen
+            </label>
+            <input
+              type="password"
+              [ngModel]="passwordConfirm()"
+              (ngModelChange)="passwordConfirm.set($event)"
+              autocomplete="new-password"
+              class="w-full px-3 py-2 text-sm bg-surface-container border border-outline-variant/30 rounded-lg
+                     text-on-surface placeholder:text-outline focus:outline-none focus:border-primary"
+            />
+          </div>
+          <button
+            (click)="changePassword()"
+            [disabled]="savingPassword() || !password()"
+            class="px-4 py-2 text-sm font-medium bg-primary text-on-primary rounded-lg
+                   hover:bg-primary/90 transition-colors disabled:opacity-50"
+          >
+            {{ savingPassword() ? 'Speichert…' : 'Passwort aktualisieren' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-surface-container-low/60 border border-outline-variant/20 rounded-2xl p-6">
+        <h2 class="text-base font-semibold text-on-surface mb-2">Abmelden</h2>
+        <p class="text-sm text-on-surface-variant mb-4">
+          Beenden Sie Ihre aktuelle Sitzung auf diesem Gerät.
+        </p>
+        <button
+          (click)="signOut()"
+          class="px-4 py-2 text-sm font-medium border border-outline-variant/40 text-on-surface rounded-lg
+                 hover:bg-surface-container-high transition-colors"
+        >
+          Sitzung beenden
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Benachrichtigungen -->
+  @if (activeTab() === 'benachrichtigungen') {
+    <div class="bg-surface-container-low/60 border border-outline-variant/20 rounded-2xl p-6">
+      <h2 class="text-base font-semibold text-on-surface mb-2">Benachrichtigungs-Präferenzen</h2>
+      <p class="text-sm text-on-surface-variant mb-6">
+        Legen Sie fest, wie Sie über neue Aktivitäten informiert werden möchten.
+      </p>
+
+      <div class="space-y-4">
+        <label class="flex items-start gap-4 cursor-pointer">
+          <input
+            type="checkbox"
+            [checked]="notifyInApp()"
+            (change)="toggleInApp($any($event.target).checked)"
+            class="mt-1 w-4 h-4 accent-primary"
+          />
+          <div>
+            <p class="text-sm font-medium text-on-surface">In-App-Benachrichtigungen</p>
+            <p class="text-xs text-on-surface-variant mt-0.5">
+              Sie sehen das Glocken-Symbol oben rechts und erhalten dort neue Hinweise.
+            </p>
+          </div>
+        </label>
+
+        <label class="flex items-start gap-4 cursor-pointer">
+          <input
+            type="checkbox"
+            [checked]="notifyEmail()"
+            (change)="toggleEmail($any($event.target).checked)"
+            class="mt-1 w-4 h-4 accent-primary"
+          />
+          <div>
+            <p class="text-sm font-medium text-on-surface">E-Mail-Benachrichtigungen</p>
+            <p class="text-xs text-on-surface-variant mt-0.5">
+              Wir senden Ihnen wichtige Hinweise zusätzlich per E-Mail.
+            </p>
+          </div>
+        </label>
+      </div>
+    </div>
+  }
+</section>

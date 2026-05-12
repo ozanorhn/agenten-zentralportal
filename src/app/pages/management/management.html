@@ -1,138 +1,583 @@
 <div class="px-8 py-10 pb-24 md:pb-10">
 
   <!-- Hero -->
-  <div class="mb-12 max-w-4xl">
+  <div class="mb-10 max-w-4xl">
     <span class="text-secondary font-headline font-bold tracking-[0.2em] uppercase text-xs mb-4 block">
       Verwaltung
     </span>
     <h1 class="text-5xl md:text-7xl font-black font-headline tracking-tighter text-on-surface mb-6 leading-none">
-      Ihre KI-Systeme im Überblick.
+      Systemverwaltung.
     </h1>
     <p class="text-on-surface-variant text-xl max-w-2xl font-light leading-relaxed">
-      Status, Modelle und Konfiguration.
+      KI-Systeme, Nutzer und Zugangscodes an einem Ort.
     </p>
   </div>
 
-  <!-- Stats Overview -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-    <div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10">
-      <span class="text-[10px] text-on-surface-variant/60 uppercase tracking-widest font-bold">Aktive Systeme</span>
-      <div class="flex items-baseline gap-2 mt-4">
-        <span class="text-3xl font-headline text-[#0070FF]">3</span>
-        <span class="text-on-surface-variant text-xs">von 4</span>
-      </div>
-    </div>
-    <div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10">
-      <span class="text-[10px] text-on-surface-variant/60 uppercase tracking-widest font-bold">Letzte Ausführung</span>
-      <div class="flex items-baseline gap-2 mt-4">
-        <span class="text-3xl font-headline text-on-surface">06:00</span>
-        <span class="text-on-surface-variant text-xs">Uhr</span>
-      </div>
-    </div>
-    <div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10">
-      <span class="text-[10px] text-on-surface-variant/60 uppercase tracking-widest font-bold">Pausiert</span>
-      <div class="flex items-baseline gap-2 mt-4">
-        <span class="text-3xl font-headline text-on-surface">1</span>
-        <span class="text-on-surface-variant text-xs">manuell</span>
-      </div>
-    </div>
-    <div class="bg-surface-container-low p-6 rounded-xl border border-emerald-200">
-      <span class="text-[10px] text-emerald-700 uppercase tracking-widest font-bold">Status</span>
-      <div class="flex items-center gap-2 mt-4">
-        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-        <span class="text-xl font-headline text-on-surface">Stabil</span>
-      </div>
-    </div>
+  <!-- Tabs -->
+  <div class="flex gap-1 mb-8 bg-surface-container-low p-1 rounded-xl w-fit border border-outline-variant/10">
+    <button
+      (click)="setTab('systeme')"
+      [class.bg-surface-container-highest]="activeTab() === 'systeme'"
+      [class.text-on-surface]="activeTab() === 'systeme'"
+      [class.text-on-surface-variant]="activeTab() !== 'systeme'"
+      class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all">
+      KI-Systeme
+    </button>
+    <button
+      (click)="setTab('nutzer')"
+      [class.bg-surface-container-highest]="activeTab() === 'nutzer'"
+      [class.text-on-surface]="activeTab() === 'nutzer'"
+      [class.text-on-surface-variant]="activeTab() !== 'nutzer'"
+      class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all">
+      Nutzer
+    </button>
+    <button
+      (click)="setTab('codes')"
+      [class.bg-surface-container-highest]="activeTab() === 'codes'"
+      [class.text-on-surface]="activeTab() === 'codes'"
+      [class.text-on-surface-variant]="activeTab() !== 'codes'"
+      class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all">
+      Zugangscodes
+    </button>
+    <button
+      (click)="setTab('benachrichtigungen')"
+      [class.bg-surface-container-highest]="activeTab() === 'benachrichtigungen'"
+      [class.text-on-surface]="activeTab() === 'benachrichtigungen'"
+      [class.text-on-surface-variant]="activeTab() !== 'benachrichtigungen'"
+      class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all">
+      Benachrichtigungen
+    </button>
   </div>
 
-  <!-- Search -->
-  <div class="relative mb-6 max-w-sm">
-    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/50 text-xl">search</span>
-    <input
-      type="text"
-      placeholder="System suchen …"
-      class="w-full bg-surface-container-highest border-0 rounded-xl pl-10 pr-4 py-3 text-sm text-on-surface
-             focus:ring-1 focus:ring-[#0070FF] placeholder:text-on-surface-variant/30 transition-all"
-    />
-  </div>
+  <!-- ═══ TAB: KI-Systeme ═══ -->
+  @if (activeTab() === 'systeme') {
 
-  <!-- Agent Table -->
-  <div class="bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/10">
-    <div class="overflow-x-auto">
-      <table class="w-full text-left">
-        <thead>
-          <tr class="bg-surface-container-highest/30">
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Name / Kennung</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest hidden md:table-cell">Modell & Kern</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Status</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest hidden lg:table-cell">Letzte Aktivität</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest text-right">Aktionen</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (agent of agents; track agent.id; let last = $last) {
-            <tr class="group hover:bg-surface-container-highest/20 transition-colors"
-                [class.border-b]="!last"
-                [class.border-surface-container-highest]="!last">
-              <td class="px-6 py-5">
-                <div class="flex items-center gap-4">
-                  <div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center flex-shrink-0">
-                    <span class="material-symbols-outlined" [class]="agent.iconColor">{{ agent.icon }}</span>
-                  </div>
-                  <div>
-                    <a [routerLink]="['/agents', agent.id]"
-                       class="text-on-surface font-semibold hover:text-[#0070FF] transition-colors text-sm">
-                      {{ agent.name }}
-                    </a>
-                    <div class="text-on-surface-variant/50 text-xs">ID: {{ agent.agentId }}</div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-5 hidden md:table-cell">
-                <div class="text-on-surface text-sm">{{ agent.model }}</div>
-                <div class="text-on-surface-variant/50 text-xs">{{ agent.core }}</div>
-              </td>
-              <td class="px-6 py-5">
-                <span class="px-3 py-1 rounded-full text-xs font-bold" [class]="getStatusClasses(agent.status)">
-                  {{ getStatusLabel(agent.status) }}
-                </span>
-              </td>
-              <td class="px-6 py-5 text-on-surface-variant/60 text-sm hidden lg:table-cell">{{ agent.lastActivity }}</td>
-              <td class="px-6 py-5 text-right">
-                <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button (click)="editAgent(agent)"
-                          class="p-2 hover:bg-surface-container-highest rounded-lg transition-colors text-on-surface-variant hover:text-[#0070FF]">
-                    <span class="material-symbols-outlined text-xl">edit</span>
-                  </button>
-                  <button (click)="duplicateAgent(agent)"
-                          class="p-2 hover:bg-surface-container-highest rounded-lg transition-colors text-on-surface-variant hover:text-[#0070FF]">
-                    <span class="material-symbols-outlined text-xl">content_copy</span>
-                  </button>
-                  <button (click)="deleteAgent(agent)"
-                          class="p-2 hover:bg-surface-container-highest rounded-lg transition-colors text-on-surface-variant hover:text-error">
-                    <span class="material-symbols-outlined text-xl">delete</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
+    <!-- Stats (live aus agent_runs) -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10">
+        <span class="text-[10px] text-on-surface-variant/60 uppercase tracking-widest font-bold">Aktive Systeme</span>
+        <div class="flex items-baseline gap-2 mt-4">
+          <span class="text-3xl font-headline text-[#0070FF]">{{ activeCount() }}</span>
+          <span class="text-on-surface-variant text-xs">von {{ agents().length }}</span>
+        </div>
+      </div>
+      <div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10">
+        <span class="text-[10px] text-on-surface-variant/60 uppercase tracking-widest font-bold">Aufrufe (30 Tage)</span>
+        <div class="flex items-baseline gap-2 mt-4">
+          <span class="text-3xl font-headline text-on-surface">{{ totalRuns30d() }}</span>
+          <span class="text-on-surface-variant text-xs">gesamt</span>
+        </div>
+      </div>
+      <div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10">
+        <span class="text-[10px] text-on-surface-variant/60 uppercase tracking-widest font-bold">Datenbasis</span>
+        <div class="flex items-baseline gap-2 mt-4">
+          <span class="text-3xl font-headline text-on-surface">{{ debugInfo()?.total ?? '—' }}</span>
+          <span class="text-on-surface-variant text-xs">Zeilen in agent_runs</span>
+        </div>
+      </div>
+      <div class="bg-surface-container-low p-6 rounded-xl border border-emerald-200">
+        <span class="text-[10px] text-emerald-700 uppercase tracking-widest font-bold">Status</span>
+        <div class="flex items-center gap-2 mt-4">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span class="text-xl font-headline text-on-surface">Stabil</span>
+        </div>
+      </div>
+    </div>
+
+@if (debugInfo() && debugInfo()!.total === 0) {
+      <div class="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-3">
+        <span class="material-symbols-outlined text-amber-600 mt-0.5">info</span>
+        <div class="text-sm text-amber-900">
+          <p class="font-semibold mb-1">Die Tabelle agent_runs ist leer.</p>
+          <p class="text-xs leading-relaxed">
+            Es wurde noch kein Agent-Lauf gespeichert. Mögliche Ursachen:
+            (1) Es wurde noch kein Agent ausgeführt, der addRun() aufruft.
+            (2) Der INSERT scheitert per RLS — schauen Sie in die Browser-Konsole nach Fehlern aus „[RunHistory]".
+            (3) Die SQL-Migration „20260511_agent_runs_admin.sql" wurde noch nicht ausgeführt.
+          </p>
+        </div>
+      </div>
+    }
+
+    <!-- Agent Table — Live aus agent_runs -->
+    <div class="bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/10">
+      @if (agentStatsLoading()) {
+        <div class="flex items-center justify-center py-20 gap-3 text-on-surface-variant/50">
+          <span class="material-symbols-outlined animate-spin text-2xl">progress_activity</span>
+          <span class="text-sm">Aktivität wird geladen …</span>
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="bg-surface-container-highest/30">
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Name / Kennung</th>
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest hidden md:table-cell">Modell</th>
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest hidden lg:table-cell">Letzte Aktivität</th>
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest text-right">Aufrufe (30 T.)</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (agent of agents(); track agent.id; let last = $last) {
+                <tr class="hover:bg-surface-container-highest/20 transition-colors"
+                    [class.border-b]="!last"
+                    [class.border-surface-container-highest]="!last">
+                  <td class="px-6 py-5">
+                    <div class="flex items-center gap-4">
+                      <div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-primary">{{ agent.icon }}</span>
+                      </div>
+                      <div>
+                        <a [routerLink]="['/agents', agent.id]"
+                           class="text-on-surface font-semibold hover:text-[#0070FF] transition-colors text-sm">
+                          {{ agent.name }}
+                        </a>
+                        <div class="text-on-surface-variant/50 text-xs">ID: {{ agent.agentId }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-5 hidden md:table-cell">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-on-surface text-sm font-mono">{{ agent.model }}</span>
+                      @if (modelSource(agent.id) === 'live') {
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"
+                              title="Aus letztem Lauf in agent_runs"></span>
+                      } @else {
+                        <span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant/30"
+                              title="Fallback aus Katalog — n8n hat noch kein model geschrieben"></span>
+                      }
+                    </div>
+                    <div class="text-on-surface-variant/50 text-xs">{{ agent.core }}</div>
+                  </td>
+                  <td class="px-6 py-5 text-on-surface-variant/70 text-sm hidden lg:table-cell">
+                    {{ agent.lastActivity }}
+                  </td>
+                  <td class="px-6 py-5 text-right">
+                    @if (runCountFor(agent.id) > 0) {
+                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold
+                                   bg-[#0070FF]/10 text-[#0070FF]">
+                        {{ runCountFor(agent.id) }}
+                      </span>
+                    } @else {
+                      <span class="text-on-surface-variant/40 text-xs">—</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="px-6 py-4 flex justify-between items-center border-t border-surface-container-highest/50">
+          <span class="text-on-surface-variant/50 text-xs">{{ agents().length }} Systeme · {{ totalRuns30d() }} Aufrufe in 30 Tagen</span>
+          <button (click)="loadAgentStats()" class="text-xs text-[#0070FF] hover:underline">Aktualisieren</button>
+        </div>
+      }
+    </div>
+
+  }
+
+  <!-- ═══ TAB: Nutzer ═══ -->
+  @if (activeTab() === 'nutzer') {
+
+    <div class="bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/10">
+
+      @if (usersLoading()) {
+        <div class="flex items-center justify-center py-20 gap-3 text-on-surface-variant/50">
+          <span class="material-symbols-outlined animate-spin text-2xl">progress_activity</span>
+          <span class="text-sm">Nutzer werden geladen …</span>
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="bg-surface-container-highest/30">
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Nutzer</th>
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest hidden md:table-cell">Zugangscode</th>
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest hidden lg:table-cell">Registriert</th>
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Abo</th>
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest text-center">Aktion</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of users(); track user.id; let last = $last) {
+                <tr class="hover:bg-surface-container-highest/20 transition-colors"
+                    [class.border-b]="!last"
+                    [class.border-surface-container-highest]="!last">
+                  <td class="px-6 py-5">
+                    <div class="text-on-surface font-semibold text-sm">{{ user.full_name || '—' }}</div>
+                    <div class="text-on-surface-variant/50 text-xs">{{ user.email }}</div>
+                    @if (user.is_admin) {
+                      <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#0070FF]/10 text-[#0070FF]">Admin</span>
+                    }
+                  </td>
+                  <td class="px-6 py-5 hidden md:table-cell">
+                    <span class="font-mono text-xs text-on-surface-variant">{{ user.invite_code || '—' }}</span>
+                  </td>
+                  <td class="px-6 py-5 text-on-surface-variant/60 text-sm hidden lg:table-cell">
+                    {{ formatDate(user.created_at) }}
+                  </td>
+                  <td class="px-6 py-5">
+                    <div class="flex flex-col gap-1.5">
+                      <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest w-fit"
+                            [class.bg-emerald-50]="subscriptionStatus(user) === 'active' || subscriptionStatus(user) === 'unlimited'"
+                            [class.text-emerald-700]="subscriptionStatus(user) === 'active' || subscriptionStatus(user) === 'unlimited'"
+                            [class.bg-amber-50]="subscriptionStatus(user) === 'grace'"
+                            [class.text-amber-700]="subscriptionStatus(user) === 'grace'"
+                            [class.bg-red-50]="subscriptionStatus(user) === 'expired'"
+                            [class.text-red-700]="subscriptionStatus(user) === 'expired'">
+                        <span class="w-1.5 h-1.5 rounded-full"
+                              [class.bg-emerald-500]="subscriptionStatus(user) === 'active' || subscriptionStatus(user) === 'unlimited'"
+                              [class.bg-amber-500]="subscriptionStatus(user) === 'grace'"
+                              [class.bg-red-500]="subscriptionStatus(user) === 'expired'"></span>
+                        {{ subscriptionLabel(user) }}
+                      </span>
+                      <input
+                        type="date"
+                        [value]="user.subscription_expires_at ? user.subscription_expires_at.slice(0, 10) : ''"
+                        (change)="setExpiryFromInput(user, $any($event.target).value)"
+                        class="text-xs bg-surface-container-highest border border-outline-variant/20 rounded-md px-2 py-1 text-on-surface-variant
+                               focus:outline-none focus:border-primary w-36"
+                        title="Ablaufdatum des Abos. Leer = unbegrenzt." />
+                    </div>
+                  </td>
+                  <td class="px-6 py-5 text-center">
+                    @if (subscriptionStatus(user) === 'expired') {
+                      <button
+                        (click)="unlockUser(user)"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+                               bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors"
+                        title="Entsperren — setzt das Ablaufdatum auf unbegrenzt">
+                        <span class="material-symbols-outlined text-base">lock_open</span>
+                        Entsperren
+                      </button>
+                    } @else {
+                      <button
+                        (click)="lockUser(user)"
+                        [disabled]="user.is_admin"
+                        [title]="user.is_admin ? 'Admins können nicht gesperrt werden' : 'Sperren — setzt das Ablaufdatum 31 Tage in die Vergangenheit'"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+                               bg-surface-container-highest text-on-surface-variant
+                               hover:bg-red-50 hover:text-red-700 transition-colors
+                               disabled:opacity-40 disabled:cursor-not-allowed">
+                        <span class="material-symbols-outlined text-base">lock</span>
+                        Sperren
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="px-6 py-4 flex justify-between items-center border-t border-surface-container-highest/50">
+          <span class="text-on-surface-variant/50 text-xs">{{ users().length }} Nutzer gesamt</span>
+          <button (click)="loadUsers()" class="text-xs text-[#0070FF] hover:underline">Aktualisieren</button>
+        </div>
+      }
+    </div>
+
+  }
+
+  <!-- ═══ TAB: Zugangscodes ═══ -->
+  @if (activeTab() === 'codes') {
+
+    <!-- Neuen Code erstellen -->
+    <div class="bg-surface-container-low rounded-xl border border-outline-variant/10 p-6 mb-6">
+      <h3 class="text-on-surface font-bold text-sm mb-4">Neuen Zugangscode erstellen</h3>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <input
+          type="text"
+          [(ngModel)]="newCode"
+          placeholder="z. B. ARCNODE-2027"
+          class="flex-1 bg-surface-container-highest border-0 rounded-xl px-4 py-3 text-sm text-on-surface
+                 focus:ring-1 focus:ring-[#0070FF] placeholder:text-on-surface-variant/30 uppercase font-mono transition-all"
+        />
+        <input
+          type="number"
+          [(ngModel)]="newCodeMaxUses"
+          min="1"
+          max="1000"
+          placeholder="Max. Nutzungen"
+          class="w-40 bg-surface-container-highest border-0 rounded-xl px-4 py-3 text-sm text-on-surface
+                 focus:ring-1 focus:ring-[#0070FF] placeholder:text-on-surface-variant/30 transition-all"
+        />
+        <button
+          (click)="createCode()"
+          [disabled]="!newCode.trim() || codeCreating()"
+          class="px-6 py-3 bg-[#0070FF] text-white rounded-xl text-sm font-semibold
+                 hover:bg-[#0060ee] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
+          @if (codeCreating()) {
+            <span class="material-symbols-outlined text-sm animate-spin">progress_activity</span>
           }
-        </tbody>
-      </table>
+          Erstellen
+        </button>
+      </div>
+      <label class="mt-4 flex items-start gap-3 cursor-pointer select-none">
+        <input
+          type="checkbox"
+          [(ngModel)]="newCodeGrantsAdmin"
+          class="mt-0.5 h-4 w-4 rounded border-outline-variant/40 text-[#0070FF] focus:ring-[#0070FF]"
+        />
+        <span class="text-sm">
+          <span class="text-on-surface font-medium">Admin-Rechte vergeben</span>
+          <span class="block text-on-surface-variant/70 text-xs mt-0.5">
+            Nutzer, die diesen Code einlösen, werden automatisch zu Administratoren. Nur an vertrauenswürdige Personen weitergeben.
+          </span>
+        </span>
+      </label>
     </div>
 
-    <!-- Pagination -->
-    <div class="px-6 py-4 bg-surface-container-low flex justify-between items-center border-t border-surface-container-highest/50">
-      <span class="text-on-surface-variant/50 text-xs">{{ agents.length }} Systeme</span>
+    <!-- Code-Tabelle -->
+    <div class="bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/10">
+      @if (codesLoading()) {
+        <div class="flex items-center justify-center py-20 gap-3 text-on-surface-variant/50">
+          <span class="material-symbols-outlined animate-spin text-2xl">progress_activity</span>
+          <span class="text-sm">Codes werden geladen …</span>
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="bg-surface-container-highest/30">
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Code</th>
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest text-center">Rechte</th>
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest text-center">Nutzungen</th>
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest hidden lg:table-cell">Erstellt</th>
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest text-center">Aktiv</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (code of codes(); track code.id; let last = $last) {
+                <tr class="hover:bg-surface-container-highest/20 transition-colors"
+                    [class.border-b]="!last"
+                    [class.border-surface-container-highest]="!last"
+                    [class.opacity-50]="!code.is_active">
+                  <td class="px-6 py-5">
+                    <span class="font-mono text-sm text-on-surface font-semibold">{{ code.code }}</span>
+                  </td>
+                  <td class="px-6 py-5 text-center">
+                    @if (code.grants_admin) {
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium
+                                   bg-amber-50 text-amber-700 border border-amber-200">
+                        <span class="material-symbols-outlined text-[14px]">admin_panel_settings</span>
+                        Admin
+                      </span>
+                    } @else {
+                      <span class="text-on-surface-variant/50 text-xs">Standard</span>
+                    }
+                  </td>
+                  <td class="px-6 py-5 text-center">
+                    <span class="text-sm text-on-surface">{{ code.uses_count }}</span>
+                    <span class="text-on-surface-variant/50 text-xs"> / {{ code.max_uses }}</span>
+                    <div class="mt-1 h-1 bg-surface-container-highest rounded-full overflow-hidden w-16 mx-auto">
+                      <div
+                        class="h-full bg-[#0070FF] rounded-full transition-all"
+                        [style.width.%]="(code.uses_count / code.max_uses) * 100">
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-5 text-on-surface-variant/60 text-sm hidden lg:table-cell">
+                    {{ formatDate(code.created_at) }}
+                  </td>
+                  <td class="px-6 py-5 text-center">
+                    <button
+                      (click)="toggleCode(code)"
+                      class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+                      [class.bg-[#0070FF]]="code.is_active"
+                      [class.bg-outline-variant]="!code.is_active">
+                      <span
+                        class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform"
+                        [class.translate-x-6]="code.is_active"
+                        [class.translate-x-1]="!code.is_active">
+                      </span>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="px-6 py-4 flex justify-between items-center border-t border-surface-container-highest/50">
+          <span class="text-on-surface-variant/50 text-xs">{{ codes().length }} Codes insgesamt</span>
+          <button (click)="loadCodes()" class="text-xs text-[#0070FF] hover:underline">Aktualisieren</button>
+        </div>
+      }
     </div>
-  </div>
 
-  <!-- Footer Info -->
+  }
+
+  <!-- ═══ TAB: Benachrichtigungen ═══ -->
+  @if (activeTab() === 'benachrichtigungen') {
+
+    <!-- Formular: Neue Benachrichtigung -->
+    <div class="bg-surface-container-low rounded-xl border border-outline-variant/10 p-6 mb-6">
+      <h3 class="text-on-surface font-bold text-sm mb-4">Neue Benachrichtigung senden</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="md:col-span-2">
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-widest mb-1.5">
+            Titel
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="notifTitle"
+            placeholder="z. B. Neuer Agent verfügbar"
+            class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-3 text-sm text-on-surface
+                   focus:ring-1 focus:ring-[#0070FF] placeholder:text-on-surface-variant/30 transition-all" />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-widest mb-1.5">
+            Text
+          </label>
+          <textarea
+            [(ngModel)]="notifBody"
+            rows="3"
+            placeholder="Was möchten Sie den Nutzern mitteilen?"
+            class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-3 text-sm text-on-surface
+                   focus:ring-1 focus:ring-[#0070FF] placeholder:text-on-surface-variant/30 transition-all resize-y"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-widest mb-1.5">
+            Empfänger
+          </label>
+          <select
+            [(ngModel)]="notifTargetUserId"
+            class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-3 text-sm text-on-surface
+                   focus:ring-1 focus:ring-[#0070FF] transition-all">
+            <option value="">Alle Nutzer</option>
+            @for (u of users(); track u.id) {
+              <option [value]="u.id">{{ u.full_name || u.email }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-widest mb-1.5">
+            Symbol (Material Icon)
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="notifIcon"
+            placeholder="campaign"
+            class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-3 text-sm text-on-surface
+                   focus:ring-1 focus:ring-[#0070FF] placeholder:text-on-surface-variant/30 transition-all font-mono" />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-widest mb-1.5">
+            Link (optional)
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="notifLink"
+            placeholder="/agents/seo-intelligence-dashboard"
+            class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-3 text-sm text-on-surface
+                   focus:ring-1 focus:ring-[#0070FF] placeholder:text-on-surface-variant/30 transition-all font-mono" />
+        </div>
+      </div>
+
+      <div class="mt-5 flex items-center justify-between">
+        <p class="text-[11px] text-on-surface-variant/60">
+          Empfänger werden sofort per Echtzeit-Verbindung benachrichtigt.
+        </p>
+        <button
+          (click)="sendNotification()"
+          [disabled]="!notifTitle.trim() || !notifBody.trim() || notifSending()"
+          class="px-6 py-3 bg-[#0070FF] text-white rounded-xl text-sm font-semibold
+                 hover:bg-[#0060ee] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
+          @if (notifSending()) {
+            <span class="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+          }
+          Senden
+        </button>
+      </div>
+    </div>
+
+    <!-- Liste vergangener Benachrichtigungen -->
+    <div class="bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/10">
+      @if (adminNotif.loading()) {
+        <div class="flex items-center justify-center py-20 gap-3 text-on-surface-variant/50">
+          <span class="material-symbols-outlined animate-spin text-2xl">progress_activity</span>
+          <span class="text-sm">Benachrichtigungen werden geladen …</span>
+        </div>
+      } @else if (adminNotif.items().length === 0) {
+        <div class="px-6 py-12 text-center">
+          <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-2 block">notifications_off</span>
+          <p class="text-sm text-on-surface-variant">Noch keine Benachrichtigungen gesendet.</p>
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="bg-surface-container-highest/30">
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Titel / Text</th>
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest hidden md:table-cell">Empfänger</th>
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest hidden lg:table-cell">Gesendet</th>
+                <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest text-center">Aktion</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (n of adminNotif.items(); track n.id; let last = $last) {
+                <tr class="hover:bg-surface-container-highest/20 transition-colors"
+                    [class.border-b]="!last"
+                    [class.border-surface-container-highest]="!last">
+                  <td class="px-6 py-5">
+                    <div class="flex items-start gap-3">
+                      <span class="material-symbols-outlined text-[#0070FF] mt-0.5">{{ n.icon || 'campaign' }}</span>
+                      <div>
+                        <div class="text-on-surface font-semibold text-sm">{{ n.title }}</div>
+                        <div class="text-on-surface-variant/70 text-xs mt-1 leading-relaxed">{{ n.body }}</div>
+                        @if (n.link) {
+                          <div class="text-[11px] font-mono text-on-surface-variant/50 mt-1">→ {{ n.link }}</div>
+                        }
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-5 hidden md:table-cell text-sm text-on-surface-variant">
+                    @if (n.target_user_id) {
+                      <span class="px-2 py-0.5 rounded text-[11px] bg-surface-container-highest text-on-surface">
+                        {{ userLabel(n.target_user_id) }}
+                      </span>
+                    } @else {
+                      <span class="px-2 py-0.5 rounded text-[11px] bg-[#0070FF]/10 text-[#0070FF] font-semibold">
+                        Alle Nutzer
+                      </span>
+                    }
+                  </td>
+                  <td class="px-6 py-5 text-on-surface-variant/60 text-sm hidden lg:table-cell">
+                    {{ formatDateTime(n.created_at) }}
+                  </td>
+                  <td class="px-6 py-5 text-center">
+                    <button
+                      (click)="deleteNotification(n.id)"
+                      class="text-on-surface-variant hover:text-error transition-colors"
+                      aria-label="Benachrichtigung löschen">
+                      <span class="material-symbols-outlined text-base">delete</span>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="px-6 py-4 flex justify-between items-center border-t border-surface-container-highest/50">
+          <span class="text-on-surface-variant/50 text-xs">{{ adminNotif.items().length }} Benachrichtigungen</span>
+          <button (click)="adminNotif.load()" class="text-xs text-[#0070FF] hover:underline">Aktualisieren</button>
+        </div>
+      }
+    </div>
+
+  }
+
+  <!-- Statuszeile -->
   <div class="mt-10 p-6 glass-panel kinetic-border rounded-xl flex items-center gap-6">
-    <span class="material-symbols-outlined text-[#0070FF] text-3xl">info</span>
+    <span class="material-symbols-outlined text-[#0070FF] text-3xl">shield</span>
     <div>
-      <h4 class="text-on-surface font-bold text-sm">Systemstatus</h4>
+      <h4 class="text-on-surface font-bold text-sm">Administratorbereich</h4>
       <p class="text-on-surface-variant/60 text-xs mt-1">
-        Alle Systeme arbeiten stabil. Sie werden bei jeder Auffälligkeit per E-Mail informiert.
+        Alle Änderungen werden sofort wirksam. Zugangscodes können jederzeit deaktiviert werden.
       </p>
     </div>
   </div>

@@ -8,6 +8,7 @@ import {
   saveInternalLinkSuggestionsReport,
   StoredInternalLinkSuggestionsReport,
 } from './interne-verlinkung-vorschlaege.models';
+import { RunHistoryService } from '../../services/run-history.service';
 
 type RequestErrorCode = 'timeout' | 'network' | 'api' | 'empty';
 
@@ -31,6 +32,7 @@ const WEBHOOK_TIMEOUT_MS = 90_000;
 })
 export class InterneVerlinkungVorschlaegeComponent {
   private readonly router = inject(Router);
+  private readonly runHistory = inject(RunHistoryService);
 
   readonly environment = environment;
   readonly agentMeta = AGENTS_MAP['interne-verlinkung-vorschlaege'];
@@ -99,6 +101,18 @@ export class InterneVerlinkungVorschlaegeComponent {
       };
 
       saveInternalLinkSuggestionsReport(record);
+      this.runHistory.addRun({
+        id: `run-${Date.now()}`,
+        agentId: 'interne-verlinkung-vorschlaege',
+        agentName: 'Verlinkungsplan',
+        agentIcon: 'alt_route',
+        agentCategory: 'SEO',
+        timestamp: Date.now(),
+        inputData: { websiteUrl: record.input.targetUrl },
+        outputSummary: `Verlinkungsplan für ${record.input.targetUrl}`,
+        fullOutput: { type: 'markdown', content: JSON.stringify(record.parsedResponse) },
+        tokenCount: 0,
+      });
 
       await this.router.navigate(['/agents', 'interne-verlinkung-vorschlaege', 'result'], {
         queryParams: { reportId: record.id },

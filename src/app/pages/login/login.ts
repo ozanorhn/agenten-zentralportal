@@ -1,177 +1,310 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+
+type LoginMode = 'password' | 'magic-link';
 
 @Component({
   selector: 'app-login',
-  imports: [RouterLink],
+  standalone: true,
+  imports: [FormsModule, RouterLink],
   template: `
-    <div class="min-h-screen bg-[#0F1115] font-body text-on-surface flex items-center justify-center overflow-hidden relative">
+    <div class="min-h-screen bg-[#080A0E] font-body text-on-surface flex overflow-hidden">
 
-      <!-- Ambient glow orbs -->
-      <div class="fixed inset-0 pointer-events-none">
-        <div class="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px]"></div>
-        <div class="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-secondary/10 rounded-full blur-[120px]"></div>
+      <!-- ─── Linke Spalte: Editorial Panel ─── -->
+      <div class="hidden lg:flex lg:w-[52%] xl:w-[55%] flex-col relative overflow-hidden">
+
+        <!-- Hintergrund-Gradient -->
+        <div class="absolute inset-0"
+             style="background: linear-gradient(135deg, #0D1117 0%, #0a0f1a 50%, #060810 100%);">
+        </div>
+
+        <!-- Dot-Grid Pattern -->
+        <div class="absolute inset-0 opacity-[0.03]"
+             style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 32px 32px;">
+        </div>
+
+        <!-- Glow-Orbs -->
+        <div class="absolute top-[-15%] left-[-10%] w-[60%] h-[60%] rounded-full opacity-20"
+             style="background: radial-gradient(circle, #0070FF 0%, transparent 70%); filter: blur(60px);"></div>
+        <div class="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full opacity-10"
+             style="background: radial-gradient(circle, #6366f1 0%, transparent 70%); filter: blur(80px);"></div>
+
+        <!-- Inhalt -->
+        <div class="relative z-10 flex flex-col h-full p-12 xl:p-16">
+
+          <!-- Logo -->
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary text-base">hub</span>
+            </div>
+            <span class="font-headline font-bold text-white text-lg tracking-tight">arcnode OS</span>
+          </div>
+
+          <!-- Headline-Block -->
+          <div class="mt-auto mb-auto pt-16 space-y-8 max-w-md">
+            <div class="space-y-4">
+              <span class="inline-flex items-center gap-2 text-[10px] font-label font-semibold uppercase tracking-[0.25em] text-primary">
+                <span class="w-4 h-[1px] bg-primary"></span>
+                KI-Portal für den Mittelstand
+              </span>
+              <h1 class="font-headline text-5xl xl:text-6xl font-black text-white leading-[0.95] tracking-tighter">
+                Ihre KI-Systeme.<br>
+                <span style="color: #0070FF;">Ihr Ergebnis.</span>
+              </h1>
+              <p class="text-[#8b9ab0] text-base leading-relaxed">
+                Von der Idee zum fertigen Output in Minuten — nicht Wochen. Automatisiert, zuverlässig, für Ihr Team.
+              </p>
+            </div>
+
+            <!-- Feature-Cards -->
+            <div class="grid grid-cols-1 gap-3">
+              @for (f of features; track f.label) {
+                <div class="flex items-center gap-4 p-4 rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-sm">
+                  <div class="w-9 h-9 rounded-lg flex-shrink-0 flex items-center justify-center"
+                       [style.background]="f.bg">
+                    <span class="material-symbols-outlined text-base" [style.color]="f.color">{{ f.icon }}</span>
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-white">{{ f.label }}</p>
+                    <p class="text-xs text-[#8b9ab0] mt-0.5">{{ f.desc }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Status -->
+          <div class="flex items-center gap-3 mt-auto">
+            <div class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+            </div>
+            <span class="text-[11px] text-[#8b9ab0] font-label uppercase tracking-widest">Alle Systeme stabil</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Decorative bottom gradient -->
-      <div class="fixed bottom-0 left-0 w-full h-72 bg-gradient-to-t from-[#0070FF]/10 to-transparent pointer-events-none opacity-40"></div>
+      <!-- ─── Rechte Spalte: Login-Formular ─── -->
+      <div class="flex-1 flex items-center justify-center p-6 lg:p-12 relative"
+           style="background: #0D1117;">
 
-      <!-- Content -->
-      <main class="relative z-10 w-full max-w-6xl px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-
-        <!-- Left: Editorial Branding -->
-        <div class="lg:col-span-5 space-y-8">
-          <div class="space-y-2">
-            <span class="font-label text-primary tracking-[0.2em] text-[10px] uppercase font-bold">
-              Intelligence Orchestration
-            </span>
-            <h1 class="font-headline text-5xl md:text-7xl font-black text-on-surface leading-[0.9] tracking-tighter">
-              AgentHub<span class="text-[#0070FF]">.</span>
-            </h1>
+        <!-- Mobile Logo -->
+        <div class="absolute top-6 left-6 flex items-center gap-2 lg:hidden">
+          <div class="w-7 h-7 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-sm">hub</span>
           </div>
-          <p class="text-on-surface-variant text-lg leading-relaxed max-w-sm">
-            Unlock the potential of autonomous intelligence. Design, deploy, and scale with frictionless precision.
-          </p>
-          <div class="flex gap-4 items-center">
-            <div class="w-12 h-[1px] bg-outline-variant/30"></div>
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-[#0070FF]/20 border border-[#0070FF]/30 flex items-center justify-center">
-                <span class="material-symbols-outlined text-primary text-sm">person</span>
-              </div>
-              <div class="w-8 h-8 rounded-full bg-secondary/20 border border-secondary/30 flex items-center justify-center -ml-2">
-                <span class="material-symbols-outlined text-secondary text-sm">person</span>
-              </div>
-              <div class="w-8 h-8 rounded-full bg-tertiary/20 border border-tertiary/30 flex items-center justify-center -ml-2">
-                <span class="material-symbols-outlined text-tertiary text-sm">person</span>
+          <span class="font-headline font-bold text-white text-base">arcnode OS</span>
+        </div>
+
+        <div class="w-full max-w-[420px] space-y-8">
+
+          <!-- Kopf -->
+          <div class="space-y-2">
+            <h2 class="font-headline text-3xl font-bold text-white tracking-tight">
+              @if (mode() === 'password') { Anmelden } @else { Link anfordern }
+            </h2>
+            <p class="text-[#8b9ab0] text-sm">
+              @if (mode() === 'password') {
+                Willkommen zurück. Geben Sie Ihre Zugangsdaten ein.
+              } @else {
+                Sie erhalten einen Einmal-Link per E-Mail — kein Passwort nötig.
+              }
+            </p>
+          </div>
+
+          <!-- Modus-Tabs -->
+          <div class="flex gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/[0.06]">
+            <button type="button" (click)="mode.set('password')"
+              class="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-200"
+              [class]="mode() === 'password'
+                ? 'bg-white/10 text-white shadow-sm'
+                : 'text-[#8b9ab0] hover:text-white'">
+              Passwort
+            </button>
+            <button type="button" (click)="mode.set('magic-link')"
+              class="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-200"
+              [class]="mode() === 'magic-link'
+                ? 'bg-white/10 text-white shadow-sm'
+                : 'text-[#8b9ab0] hover:text-white'">
+              Magic Link
+            </button>
+          </div>
+
+          <!-- Formular -->
+          <form (ngSubmit)="submit()" class="space-y-4">
+
+            <!-- E-Mail -->
+            <div class="space-y-2">
+              <label class="block text-xs font-semibold text-[#8b9ab0] uppercase tracking-widest">E-Mail</label>
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#4a5568] text-[18px] pointer-events-none">
+                  mail
+                </span>
+                <input
+                  type="email"
+                  [(ngModel)]="email"
+                  name="email"
+                  required
+                  placeholder="ihre@email.de"
+                  class="w-full pl-11 pr-4 py-3.5 rounded-xl text-sm text-white placeholder:text-[#4a5568]
+                         bg-white/[0.04] border border-white/[0.08]
+                         focus:outline-none focus:border-primary/50 focus:bg-white/[0.06] focus:ring-0
+                         transition-all duration-200"
+                />
               </div>
             </div>
-            <span class="text-xs font-label text-outline uppercase tracking-widest">+2.4k Active Agents</span>
-          </div>
 
-          <!-- Step Indicators -->
-          <div class="space-y-4 pt-4">
-            @for (step of steps; track step.title; let i = $index) {
-              <div class="flex items-start gap-4 opacity-{{ i === 0 ? '100' : '40' }}">
-                <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center mt-0.5"
-                     [class]="i === 0 ? 'bg-[#0070FF]/20' : 'bg-surface-container-highest'">
-                  <span class="material-symbols-outlined text-sm" [class]="i === 0 ? 'text-[#0070FF]' : 'text-on-surface-variant'">{{ step.icon }}</span>
-                </div>
-                <div>
-                  <p class="font-bold text-sm text-on-surface">{{ step.title }}</p>
-                  <p class="text-xs text-on-surface-variant mt-0.5">{{ step.description }}</p>
+            <!-- Passwort -->
+            @if (mode() === 'password') {
+              <div class="space-y-2">
+                <label class="block text-xs font-semibold text-[#8b9ab0] uppercase tracking-widest">Passwort</label>
+                <div class="relative">
+                  <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#4a5568] text-[18px] pointer-events-none">
+                    lock
+                  </span>
+                  <input
+                    type="password"
+                    [(ngModel)]="password"
+                    name="password"
+                    required
+                    placeholder="••••••••"
+                    class="w-full pl-11 pr-4 py-3.5 rounded-xl text-sm text-white placeholder:text-[#4a5568]
+                           bg-white/[0.04] border border-white/[0.08]
+                           focus:outline-none focus:border-primary/50 focus:bg-white/[0.06]
+                           transition-all duration-200"
+                  />
                 </div>
               </div>
             }
-          </div>
-        </div>
 
-        <!-- Right: Glass Login Modal -->
-        <div class="lg:col-span-7 flex justify-center lg:justify-end">
-          <div class="w-full max-w-[480px] rounded-xl shadow-2xl overflow-hidden p-8 md:p-12 space-y-10
-                      border border-white/5 glow-border"
-               style="background: rgba(26, 28, 32, 0.6); backdrop-filter: blur(40px);">
-
-            <!-- Step Progress -->
-            <div class="space-y-6">
-              <div class="flex gap-2">
-                <div class="h-1 w-8 bg-[#0070FF] rounded-full"></div>
-                <div class="h-1 w-8 bg-surface-container-highest rounded-full"></div>
-                <div class="h-1 w-8 bg-surface-container-highest rounded-full"></div>
-              </div>
-              <div class="space-y-3">
-                <h2 class="font-headline text-3xl font-bold text-white tracking-tight leading-tight">
-                  Wählen Sie Ihren Agenten.
-                </h2>
-                <p class="text-on-surface-variant/80 font-body text-base">
-                  Starten Sie mit einem spezialisierten Kernmodul für Sales, SEO oder Datenanalyse.
+            <!-- Hinweis nach Zugang-Anfrage -->
+            @if (requestSent()) {
+              <div class="flex items-start gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3">
+                <span class="material-symbols-outlined text-emerald-400 text-base mt-0.5 flex-shrink-0">check_circle</span>
+                <p class="text-sm text-emerald-300 leading-relaxed">
+                  Ihre Zugangsanfrage ist bei uns angekommen. Wir melden uns am gleichen Werktag mit Ihren Anmeldedaten.
                 </p>
               </div>
-              <div class="grid grid-cols-2 gap-3 pt-2">
-                <div class="bg-surface-container-high/50 p-4 rounded-lg border border-white/5 flex items-center gap-3">
-                  <span class="material-symbols-outlined text-[#0070FF]">trending_up</span>
-                  <span class="text-xs font-label uppercase tracking-wider">Sales</span>
-                </div>
-                <div class="bg-surface-container-high/50 p-4 rounded-lg border border-white/5 flex items-center gap-3">
-                  <span class="material-symbols-outlined text-secondary">database</span>
-                  <span class="text-xs font-label uppercase tracking-wider">Data</span>
-                </div>
+            }
+
+            <!-- Fehlermeldung -->
+            @if (errorMessage()) {
+              <div class="flex items-start gap-3 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+                <span class="material-symbols-outlined text-red-400 text-base mt-0.5 flex-shrink-0">error</span>
+                <p class="text-sm text-red-400">{{ errorMessage() }}</p>
               </div>
-            </div>
+            }
 
-            <!-- Login Options -->
-            <div class="space-y-6 pt-6 border-t border-white/5">
-              <div class="space-y-4">
-                <!-- Google Login -->
-                <a routerLink="/dashboard"
-                   class="w-full flex items-center justify-center gap-4 bg-white text-surface py-4 px-6
-                          rounded-lg font-bold hover:bg-slate-200 transition-all active:scale-95 duration-200">
-                  <svg class="w-5 h-5" viewBox="0 0 24 24">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                  </svg>
-                  <span>Google Workspace</span>
-                </a>
-
-                <!-- LinkedIn Login -->
-                <a routerLink="/dashboard"
-                   class="w-full flex items-center justify-center gap-4 bg-[#0077b5] text-white py-4 px-6
-                          rounded-lg font-bold hover:opacity-90 transition-all active:scale-95 duration-200">
-                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                  </svg>
-                  <span>LinkedIn Identity</span>
-                </a>
+            <!-- Erfolg Magic Link -->
+            @if (magicLinkSent()) {
+              <div class="flex items-start gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3">
+                <span class="material-symbols-outlined text-emerald-400 text-base mt-0.5 flex-shrink-0">check_circle</span>
+                <p class="text-sm text-emerald-400">Link gesendet. Bitte prüfen Sie Ihr Postfach.</p>
               </div>
+            }
 
-              <div class="relative flex items-center py-2">
-                <div class="flex-grow border-t border-white/5"></div>
-                <span class="flex-shrink mx-4 text-outline text-[10px] font-label uppercase tracking-widest">Enterprise Access</span>
-                <div class="flex-grow border-t border-white/5"></div>
-              </div>
+            <!-- Absenden -->
+            <button
+              type="submit"
+              [disabled]="loading()"
+              class="w-full relative flex items-center justify-center gap-2.5 py-3.5 rounded-xl
+                     text-sm font-bold text-white transition-all duration-200
+                     disabled:opacity-50 disabled:cursor-not-allowed
+                     active:scale-[0.99]"
+              style="background: linear-gradient(135deg, #0070FF 0%, #0050CC 100%);
+                     box-shadow: 0 4px 24px rgba(0,112,255,0.25);"
+              [style.box-shadow]="loading() ? 'none' : '0 4px 24px rgba(0,112,255,0.25)'"
+            >
+              @if (loading()) {
+                <span class="material-symbols-outlined text-base animate-spin">progress_activity</span>
+              }
+              @if (mode() === 'password') { Anmelden } @else { Link anfordern }
+            </button>
+          </form>
 
-              <p class="text-center text-on-surface-variant/40 text-[11px] leading-snug">
-                By continuing, you agree to AgentHub's
-                <a href="#" class="underline hover:text-primary transition-colors">Terms of Service</a>
-                and
-                <a href="#" class="underline hover:text-primary transition-colors">Privacy Policy</a>.
-              </p>
-            </div>
+          <!-- Divider -->
+          <div class="flex items-center gap-4">
+            <div class="flex-1 h-px bg-white/[0.06]"></div>
+            <span class="text-[11px] text-[#4a5568] uppercase tracking-widest font-label">oder</span>
+            <div class="flex-1 h-px bg-white/[0.06]"></div>
           </div>
-        </div>
 
-      </main>
+          <!-- Registrierung -->
+          <p class="text-center text-sm text-[#8b9ab0]">
+            Noch kein Konto?
+            <a routerLink="/registrieren"
+               class="font-semibold text-white hover:text-primary transition-colors duration-150 ml-1">
+              Jetzt registrieren →
+            </a>
+          </p>
 
-      <!-- Live status badge -->
-      <div class="fixed bottom-10 right-10 flex items-center gap-3 py-2 px-4 rounded-full border border-white/5"
-           style="background: rgba(26, 28, 32, 0.6); backdrop-filter: blur(40px);">
-        <div class="relative flex h-2 w-2">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
         </div>
-        <span class="text-[10px] font-label text-on-surface-variant uppercase tracking-widest">Nodes Operational</span>
       </div>
-
     </div>
   `,
 })
 export class Login {
-  steps = [
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+
+  mode = signal<LoginMode>('password');
+  email = '';
+  password = '';
+  loading = signal(false);
+  errorMessage = signal('');
+  magicLinkSent = signal(false);
+  requestSent = signal(this.route.snapshot.queryParamMap.get('msg') === 'request-sent');
+
+  features = [
     {
-      icon: 'smart_toy',
-      title: 'Agenten auswählen',
-      description: 'Wählen Sie aus Sales, Content, SEO oder Data Agents.',
+      icon: 'campaign',
+      label: 'Marketing & SEO',
+      desc: 'Texte, Strategien und Analysen automatisiert erstellen.',
+      color: '#0070FF',
+      bg: 'rgba(0,112,255,0.12)',
     },
     {
-      icon: 'tune',
-      title: 'Workflow konfigurieren',
-      description: 'Parameter, Zielgruppe und Tonalität einstellen.',
+      icon: 'trending_up',
+      label: 'Sales & Leadgenerierung',
+      desc: 'Qualifizierte Kontakte recherchieren und ansprechen.',
+      color: '#10b981',
+      bg: 'rgba(16,185,129,0.12)',
     },
     {
-      icon: 'rocket_launch',
-      title: 'Automatisierung starten',
-      description: 'Output direkt in HubSpot, Notion oder Slack pushen.',
+      icon: 'analytics',
+      label: 'Daten & Reporting',
+      desc: 'Kennzahlen auswerten und Berichte automatisch erstellen.',
+      color: '#8b5cf6',
+      bg: 'rgba(139,92,246,0.12)',
     },
   ];
+
+  async submit(): Promise<void> {
+    this.errorMessage.set('');
+    this.magicLinkSent.set(false);
+    this.loading.set(true);
+
+    try {
+      if (this.mode() === 'password') {
+        const { error } = await this.auth.signInWithPassword(this.email, this.password);
+        if (error) {
+          this.errorMessage.set('E-Mail oder Passwort nicht korrekt.');
+        } else {
+          await this.router.navigate(['/dashboard']);
+        }
+      } else {
+        const { error } = await this.auth.signInWithMagicLink(this.email);
+        if (error) {
+          this.errorMessage.set('Der Link konnte nicht gesendet werden. Bitte prüfen Sie die E-Mail-Adresse.');
+        } else {
+          this.magicLinkSent.set(true);
+        }
+      }
+    } finally {
+      this.loading.set(false);
+    }
+  }
 }

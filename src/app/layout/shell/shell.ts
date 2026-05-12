@@ -5,6 +5,7 @@ import { filter } from 'rxjs/operators';
 import { NotificationService } from '../../services/notification.service';
 import { NotificationDropdown } from '../../components/notification-dropdown/notification-dropdown';
 import { AGENTS, AgentMeta } from '../../data/agents.data';
+import { AuthService } from '../../services/auth.service';
 
 const TOP_LEVEL_PATHS = new Set([
   '/dashboard',
@@ -29,6 +30,7 @@ interface NavItem {
   icon: string;
   route: string;
   queryParams?: Record<string, string>;
+  comingSoon?: boolean;
 }
 
 interface NavSection {
@@ -47,8 +49,10 @@ export class Shell {
   readonly notifService = inject(NotificationService);
   readonly router = inject(Router);
   private readonly location = inject(Location);
+  readonly auth = inject(AuthService);
 
   showNotifications = signal(false);
+  showUserMenu = signal(false);
   sidebarCollapsed = signal(localStorage.getItem('sidebarCollapsed') === 'true');
   collapsedSections = signal<Set<string>>(new Set());
   private readonly currentPath = signal(this.extractPath(this.router.url));
@@ -111,6 +115,16 @@ export class Shell {
     this.showNotifications.update(v => !v);
   }
 
+  toggleUserMenu(): void {
+    this.showUserMenu.update(v => !v);
+  }
+
+  async signOut(): Promise<void> {
+    this.showUserMenu.set(false);
+    await this.auth.signOut();
+    await this.router.navigate(['/login']);
+  }
+
   toggleSection(label: string): void {
     this.collapsedSections.update(s => {
       const next = new Set(s);
@@ -132,26 +146,34 @@ export class Shell {
     return this.router.url.includes(`category=${category}`);
   }
 
-  navSections: NavSection[] = [
-    {
-      label: '',
-      items: [
-        { label: 'Live KPIs', icon: 'query_stats', route: '/kpi-dashboard' },
-        { label: 'Reporting', icon: 'summarize', route: '/reporting-bot' },
-        { label: 'Verlauf', icon: 'history', route: '/history' },
-        { label: 'Verwaltung', icon: 'tune', route: '/management' },
-      ],
-    },
-    {
-      label: 'KI-Systeme',
-      items: [
-        { label: 'Marketing', icon: 'campaign', route: '/agents', queryParams: { category: 'Marketing' } },
-        { label: 'Sales', icon: 'trending_up', route: '/agents', queryParams: { category: 'Sales' } },
-        { label: 'HR', icon: 'groups', route: '/agents', queryParams: { category: 'HR' } },
-        { label: 'Data', icon: 'analytics', route: '/agents', queryParams: { category: 'Data' } },
-      ],
-    },
-  ];
+  readonly navSections = computed<NavSection[]>(() => {
+    const isAdmin = this.auth.isAdmin();
+    const overviewItems: NavItem[] = isAdmin
+      ? [
+          { label: 'Live KPIs', icon: 'query_stats', route: '/kpi-dashboard' },
+          { label: 'Reporting', icon: 'summarize', route: '/reporting-bot' },
+          { label: 'Verlauf', icon: 'history', route: '/history' },
+          { label: 'Verwaltung', icon: 'tune', route: '/management' },
+        ]
+      : [
+          { label: 'Live KPIs', icon: 'query_stats', route: '/kpi-dashboard' },
+          { label: 'Verlauf', icon: 'history', route: '/history' },
+          { label: 'Verwaltung', icon: 'tune', route: '/management' },
+          { label: 'Reporting', icon: 'summarize', route: '/reporting-bot', comingSoon: true },
+        ];
+    return [
+      { label: '', items: overviewItems },
+      {
+        label: 'KI-Systeme',
+        items: [
+          { label: 'Marketing', icon: 'campaign', route: '/agents', queryParams: { category: 'Marketing' } },
+          { label: 'Sales', icon: 'trending_up', route: '/agents', queryParams: { category: 'Sales' } },
+          { label: 'HR', icon: 'groups', route: '/agents', queryParams: { category: 'HR' } },
+          { label: 'Data', icon: 'analytics', route: '/agents', queryParams: { category: 'Data' } },
+        ],
+      },
+    ];
+  });
 
   mobileNavItems: NavItem[] = [
     { label: 'Marketing', icon: 'campaign', route: '/agents', queryParams: { category: 'Marketing' } },

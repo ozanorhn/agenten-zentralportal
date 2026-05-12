@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-const WEBHOOK_CONTACT = 'https://n8n.eom.de/webhook/kontakt';
+const WEBHOOK_CONTACT = 'https://n8n.eom.de/webhook/Kontaktformular';
 
 @Component({
   selector: 'app-contact',

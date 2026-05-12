@@ -1,5 +1,9 @@
 export const environment = {
   production: false,
+  supabase: {
+    url: 'http://72.62.49.215:8000',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE',
+  },
   n8nBase: '/api/n8n',
   geoAnalysisWebhookUrl: '/api/n8n/webhook/geo-analyse',
   geoAnalysisStartWebhookUrl: '/api/n8n/webhook/geo-analyse-start',

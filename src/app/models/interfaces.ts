@@ -630,6 +630,20 @@ export interface AppNotification {
   time: string;
   read: boolean;
   link: string;
+  createdAt?: string;
+  targetUserId?: string | null;
+}
+
+// ─── User Settings ────────────────────────────────────────────────────────────
+
+export type ThemePreference = 'light' | 'dark' | 'system';
+
+export interface UserSettings {
+  user_id: string;
+  theme: ThemePreference;
+  notify_in_app: boolean;
+  notify_email: boolean;
+  updated_at: string;
 }
 
 // ─── Toast ────────────────────────────────────────────────────────────────────

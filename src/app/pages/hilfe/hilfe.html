@@ -1,0 +1,146 @@
+<section class="px-6 md:px-10 py-8 max-w-4xl mx-auto">
+
+  <!-- Hero -->
+  <div class="mb-8">
+    <span class="text-[11px] uppercase tracking-[0.2em] text-on-surface-variant font-semibold">
+      Hilfecenter
+    </span>
+    <h1 class="font-headline text-3xl md:text-4xl font-bold text-on-surface mt-1">
+      Häufige Fragen
+    </h1>
+    <p class="text-sm text-on-surface-variant mt-2">
+      Antworten zu Einstieg, KI-Systemen, Konto und Datenschutz. Falls Ihre Frage offen bleibt, schreiben Sie uns direkt.
+    </p>
+  </div>
+
+  <!-- Suche -->
+  <div class="relative mb-6">
+    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/60 text-base pointer-events-none">
+      search
+    </span>
+    <input
+      type="text"
+      [ngModel]="search()"
+      (ngModelChange)="search.set($event)"
+      placeholder="Suchen Sie nach einem Stichwort…"
+      class="w-full pl-11 pr-11 py-3 bg-surface-container border border-outline-variant/20 rounded-xl
+             text-on-surface placeholder:text-on-surface-variant/40 text-sm
+             focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10
+             transition-all"
+    />
+    @if (search()) {
+      <button
+        type="button"
+        (click)="clearSearch()"
+        class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/60 hover:text-on-surface transition-colors"
+        aria-label="Suche zurücksetzen"
+      >
+        <span class="material-symbols-outlined text-base">close</span>
+      </button>
+    }
+  </div>
+
+  <!-- Kategorien -->
+  <div class="flex flex-wrap gap-2 mb-8">
+    @for (cat of categories; track cat.id) {
+      <button
+        type="button"
+        (click)="setCategory(cat.id)"
+        class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-medium border transition-all"
+        [class.bg-primary]="activeCategory() === cat.id"
+        [class.text-on-primary]="activeCategory() === cat.id"
+        [class.border-primary]="activeCategory() === cat.id"
+        [class.bg-surface-container]="activeCategory() !== cat.id"
+        [class.text-on-surface-variant]="activeCategory() !== cat.id"
+        [class.border-outline-variant]="activeCategory() !== cat.id"
+        [class.hover:text-on-surface]="activeCategory() !== cat.id"
+      >
+        <span class="material-symbols-outlined text-sm">{{ cat.icon }}</span>
+        {{ cat.label }}
+      </button>
+    }
+  </div>
+
+  <!-- FAQ-Liste -->
+  @if (filteredFaqs().length === 0) {
+    <div class="bg-surface-container-low/60 border border-outline-variant/20 rounded-2xl p-10 text-center">
+      <span class="material-symbols-outlined text-3xl text-on-surface-variant/50">search_off</span>
+      <p class="text-sm text-on-surface mt-3 font-medium">Keine passenden Fragen gefunden.</p>
+      <p class="text-xs text-on-surface-variant mt-1">
+        Versuchen Sie ein anderes Stichwort oder schreiben Sie uns direkt.
+      </p>
+      <a
+        routerLink="/kontakt"
+        class="inline-flex items-center gap-2 mt-5 px-4 py-2 rounded-xl bg-primary text-on-primary text-sm font-medium hover:opacity-90 transition-opacity"
+      >
+        <span class="material-symbols-outlined text-base">mail</span>
+        Frage stellen
+      </a>
+    </div>
+  } @else {
+    <div class="space-y-2.5">
+      @for (item of filteredFaqs(); track item.q; let i = $index) {
+        <div class="bg-surface-container-low/60 border border-outline-variant/20 rounded-2xl overflow-hidden transition-all"
+             [class.border-primary]="openIndex() === i">
+          <button
+            type="button"
+            (click)="toggle(i)"
+            class="w-full flex items-center justify-between gap-4 px-5 py-4 text-left hover:bg-surface-container/40 transition-colors"
+            [attr.aria-expanded]="openIndex() === i"
+          >
+            <span class="text-sm font-semibold text-on-surface">{{ item.q }}</span>
+            <span
+              class="material-symbols-outlined text-on-surface-variant flex-shrink-0 transition-transform"
+              [class.rotate-180]="openIndex() === i"
+            >
+              expand_more
+            </span>
+          </button>
+          @if (openIndex() === i) {
+            <div class="px-5 pb-5 -mt-1">
+              <p class="text-sm text-on-surface-variant leading-relaxed">{{ item.a }}</p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Kontakt-Karte -->
+  <div class="mt-10 bg-surface-container border border-outline-variant/20 rounded-2xl p-6 md:p-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+      <div>
+        <h2 class="font-headline text-lg font-bold text-on-surface">
+          Frage nicht dabei?
+        </h2>
+        <p class="text-sm text-on-surface-variant mt-1.5 max-w-md">
+          Schreiben Sie uns kurz, was Sie wissen möchten – wir antworten in der Regel innerhalb eines Werktages.
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <a
+          routerLink="/kontakt"
+          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-on-primary text-sm font-medium hover:opacity-90 transition-opacity"
+        >
+          <span class="material-symbols-outlined text-base">mail</span>
+          Kontakt aufnehmen
+        </a>
+        <a
+          routerLink="/fehler-melden"
+          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container-high text-on-surface text-sm font-medium border border-outline-variant/30 hover:bg-surface-container-highest transition-colors"
+        >
+          <span class="material-symbols-outlined text-base">warning</span>
+          Fehler melden
+        </a>
+        <a
+          routerLink="/idee-einreichen"
+          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container-high text-on-surface text-sm font-medium border border-outline-variant/30 hover:bg-surface-container-highest transition-colors"
+        >
+          <span class="material-symbols-outlined text-base">lightbulb</span>
+          Idee einreichen
+        </a>
+      </div>
+    </div>
+  </div>
+
+</section>
